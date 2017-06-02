@@ -52,5 +52,18 @@ ul.sections li a {
 
 .main {
     margin: auto;
-    width: 650px;
+    width: 40%;
+}
+
+.hoogleBar {
+  padding: 10px;
+  border: solid 1px #fff;
+  border-radius: 5px;
+  box-shadow: inset 1px 1px 2px 0 #717171;
+  transition: box-shadow 0.4s;
+}
+
+.hoogleBar:focus {
+  box-shadow: inset 1px 1px 2px 0 #c8c8c8;
+  border-radius: 5px;
 }

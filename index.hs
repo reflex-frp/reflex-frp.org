@@ -12,6 +12,8 @@ import Data.Monoid
 import Control.Monad
 import Data.Map (Map)
 import Debug.Trace
+import Data.Text (Text)
+import qualified Data.Text as T
 
 main = mainWidgetWithCss $(embedFile "style.css") $ do
 
@@ -23,7 +25,7 @@ main = mainWidgetWithCss $(embedFile "style.css") $ do
               ]
 
   elClass "div" "header" $ do
-    elClass "h1" "logo" $ text "Reflex-FRP"
+    elAttr "img" logo blank
     elClass "ul" "sections" $ navMenu
 
   elClass "div" "main" $ do
@@ -35,8 +37,17 @@ main = mainWidgetWithCss $(embedFile "style.css") $ do
     forM_ links $ \pair -> do
       elAttr "a" ("href" =: (snd pair)) $ text (fst pair)
       el "br" $ return ()
+  el "br" blank
+  elAttr "div" hoogle $ do 
+    el "label" $ text "Hoogle: "
+    elAttr "input" hoogleBar blank
 
   return ()
+
+logo :: Map Text Text
+logo = "class" =: "logo" 
+        <> "src" =: "../img/REFLEX.png" 
+        <> "style" =: "height: 20%;width: 30%;margin: auto;display: block;padding: 0;"
 
 navMenu :: (MonadWidget t m) => m ()
 navMenu = do
@@ -49,3 +60,12 @@ navMenu = do
                  , ("Documentation", "http://reflex-frp.readthedocs.io")
                  , ("FAQ", "/")]
 
+hoogle :: Map Text Text
+hoogle = "style" =: "margin: 0 auto;text-align: center;"
+
+hoogleBar :: Map Text Text
+hoogleBar = "class" =: "hoogleBar" 
+          <> "name" =: "hoogleBar"
+          <> "placeholder" =: "Search Hoogle Here..."
+          <> "type" =: "text"
+          <> "style" =: "width: 30%;"
