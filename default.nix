@@ -13,6 +13,7 @@
     ghcjs-dom
     reflex
     reflex-dom
+    safe
     these
   ];
   backendDepends = p: with p; [
