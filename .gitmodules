@@ -1,0 +1,4 @@
+[submodule "focus"]
+	path = focus
+	url = git@gitlab.com:obsidian.systems/focus
+	branch = develop

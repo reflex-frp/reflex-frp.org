@@ -15,7 +15,7 @@ import Debug.Trace
 import Data.Text (Text)
 import qualified Data.Text as T
 
-main = mainWidgetWithCss $(embedFile "style.css") $ do
+main = mainWidgetWithCss $(embedFile "static/style.css") $ do
 
   let links = [ ("hackage", "https://hackage.haskell.org/package/reflex")
               , ("twitter", "http://twitter.com")
@@ -46,7 +46,7 @@ main = mainWidgetWithCss $(embedFile "style.css") $ do
 
 logo :: Map Text Text
 logo = "class" =: "logo" 
-        <> "src" =: "../img/REFLEX.png" 
+        <> "src" =: "img/REFLEX.png" 
         <> "style" =: "height: 20%;width: 30%;margin: auto;display: block;padding: 0;"
 
 navMenu :: (MonadWidget t m) => m ()
