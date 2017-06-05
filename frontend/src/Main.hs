@@ -1,5 +1,6 @@
 {-# LANGUAGE RecursiveDo, TemplateHaskell #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE FlexibleContexts #-}
 
 import Reflex
 import Reflex.Dom
@@ -15,8 +16,19 @@ import Debug.Trace
 import Data.Text (Text)
 import qualified Data.Text as T
 
-main = mainWidgetWithCss $(embedFile "static/style.css") $ do
+main :: IO ()
+main = mainWidgetWithHead siteHead siteBody
 
+siteHead :: MonadWidget t m => m ()
+siteHead = do
+  el "title" $ text "Reflex FRP"
+  let fa = "font-awesome-4.7.0/css/font-awesome.min.css"
+  headLink fa
+  styleSheet "style.css"
+  return ()
+
+siteBody :: MonadWidget t m => m ()
+siteBody = do 
   let links = [ ("hackage", "https://hackage.haskell.org/package/reflex")
               , ("twitter", "http://twitter.com")
               , ("github", "http://github.com/reflex-frp")
@@ -38,12 +50,9 @@ main = mainWidgetWithCss $(embedFile "static/style.css") $ do
       elAttr "a" ("href" =: (snd pair)) $ text (fst pair)
       el "br" $ return ()
   el "br" blank
-  elAttr "div" hoogle $ do 
-    el "label" $ text "Hoogle: "
-    elAttr "input" hoogleBar blank
-
   return ()
 
+--Element Attributes
 logo :: Map Text Text
 logo = "class" =: "logo" 
         <> "src" =: "img/REFLEX.png" 
@@ -55,17 +64,19 @@ navMenu = do
     el "li" $
       elAttr "a" ("href" =: (snd pair)) $ text (fst pair)
   where sections = [ ("Home", "/")
-                 , ("Tutorial", "/")
+                 , ("Tutorial", "https://github.com/hansroland/reflex-dom-inbits/blob/master/tutorial.md")
                  , ("Examples", "/")
                  , ("Documentation", "http://reflex-frp.readthedocs.io")
                  , ("FAQ", "/")]
 
-hoogle :: Map Text Text
-hoogle = "style" =: "margin: 0 auto;text-align: center;"
+--Helper Functions
+styleSheet myLink = elAttr "link" (Map.fromList [
+    ("rel", "stylesheet"),
+    ("type", "text/css"),
+    ("href", myLink)
+  ]) $ return ()
 
-hoogleBar :: Map Text Text
-hoogleBar = "class" =: "hoogleBar" 
-          <> "name" =: "hoogleBar"
-          <> "placeholder" =: "Search Hoogle Here..."
-          <> "type" =: "text"
-          <> "style" =: "width: 30%;"
+headLink url = elAttr "link" (Map.fromList [
+    ("rel", "stylesheet"),
+    ("href", url)
+  ]) $ return ()
