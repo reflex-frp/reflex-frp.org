@@ -22,6 +22,8 @@ main = mainWidgetWithHead siteHead siteBody
 siteHead :: MonadWidget t m => m ()
 siteHead = do
   el "title" $ text "Reflex FRP"
+  elAttr "meta" metaDesc blank
+  elAttr "meta" metaKeywords blank
   let fa = "font-awesome-4.7.0/css/font-awesome.min.css"
   headLink fa
   styleSheet "style.css"
@@ -30,7 +32,7 @@ siteHead = do
 siteBody :: MonadWidget t m => m ()
 siteBody = do 
   let links = [ ("hackage", "https://hackage.haskell.org/package/reflex")
-              , ("twitter", "http://twitter.com")
+              , ("twitter", "https://twitter.com/search?q=%23reflexfrp")
               , ("github", "http://github.com/reflex-frp")
               , ("reddit", "http://reddit.com/r/reflexfrp")
               , ("irc.freenode.net #reflex-frp", "http://webchat.freenode.net/?channels=%23reflex-frp&uio=d4")
@@ -53,6 +55,14 @@ siteBody = do
   return ()
 
 --Element Attributes
+metaDesc :: Map Text Text
+metaDesc = "name" =: "description" 
+        <> "content" =: "Reflex Functional Reactive Programming"
+
+metaKeywords :: Map Text Text
+metaKeywords = "name" =: "keywords"
+            <> "content" =: "reflex, reflex frp, functional reactive programming, haskell, framework, reflex dom" 
+
 logo :: Map Text Text
 logo = "class" =: "logo" 
         <> "src" =: "img/REFLEX.png" 
