@@ -47,7 +47,7 @@ ul.sections li a {
 }
 
     ul.sections li a:hover, ul.sections li a:focus {
-        color: blue;
+        color: #E6182E;
     }
 
 .main {
@@ -66,4 +66,19 @@ ul.sections li a {
 .hoogleBar:focus {
   box-shadow: inset 1px 1px 2px 0 #c8c8c8;
   border-radius: 5px;
+}
+
+.footer {
+  text-align: center;
+  margin: 0 auto;
+}
+
+.footer i {
+  color: #453B3B;
+  padding-left: .5%;
+  font-size: 1.2em;
+}
+
+.footer i:hover {
+  color: #E6182E;
 }
