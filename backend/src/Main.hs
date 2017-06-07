@@ -10,11 +10,11 @@ import Focus.HTTP.Serve
 import Data.ByteString (ByteString)
 import qualified Data.ByteString as BS
 import qualified Data.ByteString.Char8 as BSC
-import Data.Default
+--import Data.Default
 
 import Control.Lens
-import qualified Data.Text.Lazy as TL
-import Lucid
+--import qualified Data.Text.Lazy as TL
+--import Lucid
 import Frontend.App
 import Reflex.Dom.Builder.Static
 
@@ -39,7 +39,7 @@ assetHandler = do
     else serveAssets "assets" "static"
 
 -- TODO! Add missing components to app handler, 
--- You should consider re-doing the CSS for the site. 
+-- You should consider re-doing the CSS for the site in Haskell.
 appHandler :: ByteString -> ByteString -> Snap ()
 appHandler theHead theBody = serveApp "" $ def
   & appConfig_initialHead .~ Just theHead

@@ -165,12 +165,14 @@ faq = elClass "div" "main" $ do
             el "p" $ text "FAQ questions coming soon! For now, feel free to ask questions within the Reflex-FRP IRC chat provided below. Thank you!"
 
 --Helper Functions
+styleSheet :: DomBuilder t m => Text -> m ()
 styleSheet myLink = elAttr "link" (Map.fromList [
     ("rel", "stylesheet"),
     ("type", "text/css"),
     ("href", myLink)
   ]) $ return ()
 
+headLink :: DomBuilder t m => Text -> m ()
 headLink url = elAttr "link" (Map.fromList [
     ("rel", "stylesheet"),
     ("href", url)
