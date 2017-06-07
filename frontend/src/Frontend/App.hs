@@ -23,6 +23,7 @@ import Common.Route
 import Frontend.Router
 import GHCJS.DOM.Types (MonadJSM)
 import Focus.JS.Prerender
+import Control.Monad.Fix
 
 siteHead :: DomBuilder t m => m ()
 siteHead = do
@@ -34,14 +35,14 @@ siteHead = do
   styleSheet "style.css"
   return ()
 
-siteBody :: (DomBuilder t m, MonadHold t m, TriggerEvent t m, PostBuild t m, PerformEvent t m, Prerender x m) => Route -> m ()
+siteBody :: (DomBuilder t m, MonadHold t m, MonadFix m, TriggerEvent t m, PostBuild t m, PerformEvent t m, Prerender x m) => Route -> m ()
 siteBody initRoute = do 
   let links = [ ("Hackage", "https://hackage.haskell.org/package/reflex")
               , ("irc.freenode.net #reflex-frp", "http://webchat.freenode.net/?channels=%23reflex-frp&uio=d4")
               ]
 
  
-  (initialRoute, changes) <- prerender (return (routeToUrl initRoute, never)) browserHistory 
+ -- (initialRoute, changes) <- prerender (return (routeToUrl initRoute, never)) browserHistory 
 
   pageSwitch <- elClass "div" "header" $ do
     elAttr "img" logo blank
@@ -55,11 +56,17 @@ siteBody initRoute = do
             Route_Documentation -> documentation
             Route_FAQ -> faq
 
-  _ <- widgetHold (routeToWidget $ fromMaybe Route_Home $ urlToRoute initialRoute) $ 
+  routeSwitch (initRoute) $ \r -> do  
+        routeToWidget r
+        return (pageSwitch, ())
+ 
+ -- Workflow handled widgetholds job this time around: TODO Research. 
+ 
+ {- _ <- widgetHold (routeToWidget $ fromMaybe Route_Home $ urlToRoute initialRoute) $ 
           ffor (leftmost [pageSwitch, fmap (fromMaybe Route_Home . urlToRoute) changes]) routeToWidget 
 
   prerender (return ()) $ performEvent_ $ ffor pageSwitch $ \r -> pushState' $ routeToUrl r
-
+-}
     -- Create a list of links from a list of tuples
   elClass "div" "main" $ do 
     el "p" $ text "Check us out on Hackage or join the community IRC chat!"
