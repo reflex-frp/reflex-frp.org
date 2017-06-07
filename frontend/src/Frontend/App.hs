@@ -1,9 +1,11 @@
 {-# LANGUAGE RecursiveDo, TemplateHaskell #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE ScopedTypeVariables #-}
 
 module Frontend.App where
 
+import Data.Maybe
 import Reflex
 import Reflex.Dom
 import qualified Data.Map as Map
@@ -17,6 +19,10 @@ import Data.Map (Map)
 --import Debug.Trace
 import Data.Text (Text)
 --import qualified Data.Text as T
+import Common.Route
+import Frontend.Router
+import GHCJS.DOM.Types (MonadJSM)
+import Focus.JS.Prerender
 
 siteHead :: DomBuilder t m => m ()
 siteHead = do
@@ -28,23 +34,31 @@ siteHead = do
   styleSheet "style.css"
   return ()
 
-siteBody :: (DomBuilder t m, MonadHold t m) => m ()
-siteBody = do 
+siteBody :: (DomBuilder t m, MonadHold t m, TriggerEvent t m, PostBuild t m, PerformEvent t m, Prerender x m) => Route -> m ()
+siteBody initRoute = do 
   let links = [ ("Hackage", "https://hackage.haskell.org/package/reflex")
               , ("irc.freenode.net #reflex-frp", "http://webchat.freenode.net/?channels=%23reflex-frp&uio=d4")
               ]
 
-  let x = do elClass "div" "main" $ do
-              elClass "h3" "title" $ text "Practical Functional Reactive Programming"
-              elClass "p" "class" $ text "Reflex is an fully-deterministic, higher-order Functional Reactive Programming (FRP) interface and an engine that efficiently implements that interface."
+ 
+  (initialRoute, changes) <- prerender (return (routeToUrl initRoute, never)) browserHistory 
 
-  
   pageSwitch <- elClass "div" "header" $ do
     elAttr "img" logo blank
-    elClass "ul" "sections" $ navMenu
+    elClass "ul" "sections" navMenu
     --try to change some of the nav li elements into events
 
-  _ <- ($) widgetHold x $ pageSwitch
+  let routeToWidget r = case r of
+            Route_Home -> home
+            Route_Tutorials -> tutorials
+            Route_Examples -> examples
+            Route_Documentation -> documentation
+            Route_FAQ -> faq
+
+  _ <- widgetHold (routeToWidget $ fromMaybe Route_Home $ urlToRoute initialRoute) $ 
+          ffor (leftmost [pageSwitch, fmap (fromMaybe Route_Home . urlToRoute) changes]) routeToWidget 
+
+  prerender (return ()) $ performEvent_ $ ffor pageSwitch $ \r -> pushState' $ routeToUrl r
 
     -- Create a list of links from a list of tuples
   elClass "div" "main" $ do 
@@ -102,18 +116,27 @@ navMenu = do
 -}
 
 --Nav Bar generator with click-able Events
-navMenu :: (DomBuilder t m) => m (Event t (m ()))
+navMenu :: (DomBuilder t m) => m (Event t Route)
 navMenu = do 
-  events <- forM sections $ \(sectionName, section) -> do
+  events <- forM sections $ \route -> do
     el "li" $ do
-      (linkEl, _) <- elAttr' "a" ("id" =: (sectionName)) $ text (sectionName)
-      return (section <$ domEvent Click linkEl) 
+      (linkEl, _) <- elAttr' "a" ("id" =: (routeToTitle route)) $ text (routeToTitle route)
+      return (route <$ domEvent Click linkEl) 
   return $ leftmost events
-  where sections = [ ("Home", home)
-                 , ("Tutorials", tutorials)
-                 , ("Examples", examples)
-                 , ("Documentation", documentation)
-                 , ("FAQ", faq)]
+  where sections = [ Route_Home
+                   , Route_Tutorials
+                   , Route_Examples
+                   , Route_Documentation
+                   , Route_FAQ
+                   ]
+
+routeToTitle :: Route -> Text
+routeToTitle r = case r of  
+ Route_Home -> "Home"
+ Route_Tutorials -> "Tutorials"
+ Route_Examples -> "Examples"
+ Route_Documentation -> "Documentation" 
+ Route_FAQ -> "FAQ"
 
 --nav bar body components
 home :: (DomBuilder t m) => m ()

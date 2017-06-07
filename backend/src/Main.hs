@@ -10,24 +10,34 @@ import Focus.HTTP.Serve
 import Data.ByteString (ByteString)
 import qualified Data.ByteString as BS
 import qualified Data.ByteString.Char8 as BSC
---import Data.Default
+import Data.Text.Encoding
 
 import Control.Lens
---import qualified Data.Text.Lazy as TL
---import Lucid
 import Frontend.App
 import Reflex.Dom.Builder.Static
+import Common.Route
+import Control.Monad.IO.Class
+import qualified Data.Text as T
+import Data.Maybe
 
 main :: IO ()
 main = do 
   theHead <- fmap snd $ renderStatic siteHead
-  theBody <- fmap snd $ renderStatic siteBody
-  withFocus . quickHttpServe $ rootHandler theHead theBody
+  withFocus . quickHttpServe $ rootHandler theHead 
 
-rootHandler :: ByteString -> ByteString -> Snap ()
-rootHandler theHead theBody = route 
+rootHandler :: ByteString -> Snap ()
+rootHandler theHead = route 
   [ ("", assetHandler)
-  , ("", appHandler theHead theBody)
+  , ("", do 
+            r <- getRequest
+            let mRoute = urlToRoute $ decodeUtf8 $ rqURI r 
+            case mRoute of 
+              Nothing -> pass
+              Just r -> serveStaticIndex $ def 
+                & appConfig_initialHead .~ Just theHead
+                & appConfig_initialBody .~ Just (liftIO $ fmap snd $ renderStatic $ siteBody $ r) 
+            )
+  , ("", appHandler theHead $ fmap snd $ renderStatic $ siteBody $ Route_Home)
   ]
 
 assetHandler :: Snap ()
@@ -38,9 +48,7 @@ assetHandler = do
     --Serve static HTML files without redirecting
     else serveAssets "assets" "static"
 
--- TODO! Add missing components to app handler, 
--- You should consider re-doing the CSS for the site in Haskell.
-appHandler :: ByteString -> ByteString -> Snap ()
+appHandler :: ByteString -> IO ByteString -> Snap ()
 appHandler theHead theBody = serveApp "" $ def
   & appConfig_initialHead .~ Just theHead
-  & appConfig_initialBody .~ Just (return theBody)
+  & appConfig_initialBody .~ Just (liftIO theBody)
