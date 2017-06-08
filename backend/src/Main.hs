@@ -2,23 +2,24 @@
 {-# LANGUAGE GADTs, ScopedTypeVariables, QuasiQuotes, LambdaCase #-}
 {-# LANGUAGE MultiWayIf, KindSignatures, ViewPatterns #-}
 
-import Data.Default
 import Focus.Backend
 import Focus.Backend.Snap
 import Snap
 import Focus.HTTP.Serve
+import Reflex.Dom.Builder.Static
+
+import Data.Default
 import Data.ByteString (ByteString)
 import qualified Data.ByteString as BS
 import qualified Data.ByteString.Char8 as BSC
 import Data.Text.Encoding
-
 import Control.Lens
-import Frontend.App
-import Reflex.Dom.Builder.Static
-import Common.Route
 import Control.Monad.IO.Class
-import qualified Data.Text as T
-import Data.Maybe
+--import qualified Data.Text as T
+--import Data.Maybe
+
+import Frontend.App --used for siteHead & siteBody
+import Common.Route --used for urlToRoute function & Route data types
 
 main :: IO ()
 main = do 
@@ -35,7 +36,7 @@ rootHandler theHead = route
               Nothing -> pass
               Just r -> serveStaticIndex $ def 
                 & appConfig_initialHead .~ Just theHead
-                & appConfig_initialBody .~ Just (liftIO $ fmap snd $ renderStatic $ siteBody $ r) 
+                & appConfig_initialBody .~ Just (liftIO $ fmap snd $ renderStatic $ siteBody r) 
             )
   , ("", appHandler theHead $ fmap snd $ renderStatic $ siteBody $ Route_Home)
   ]

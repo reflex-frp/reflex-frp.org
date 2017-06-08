@@ -5,7 +5,7 @@
 
 module Frontend.App where
 
-import Data.Maybe
+--import Data.Maybe
 import Reflex
 import Reflex.Dom
 import qualified Data.Map as Map
@@ -19,12 +19,14 @@ import Data.Map (Map)
 --import Debug.Trace
 import Data.Text (Text)
 --import qualified Data.Text as T
-import Common.Route
+import Common.Route --used for navBar's Route data types 
 import Frontend.Router
-import GHCJS.DOM.Types (MonadJSM)
+--import GHCJS.DOM.Types (MonadJSM)
 import Focus.JS.Prerender
 import Control.Monad.Fix
 
+
+------------------- <head></head> ----------------------------------------
 siteHead :: DomBuilder t m => m ()
 siteHead = do
   el "title" $ text "Reflex FRP"
@@ -35,39 +37,22 @@ siteHead = do
   styleSheet "style.css"
   return ()
 
+------------------- <body></body> ----------------------------------------
 siteBody :: (DomBuilder t m, MonadHold t m, MonadFix m, TriggerEvent t m, PostBuild t m, PerformEvent t m, Prerender x m) => Route -> m ()
 siteBody initRoute = do 
   let links = [ ("Hackage", "https://hackage.haskell.org/package/reflex")
               , ("irc.freenode.net #reflex-frp", "http://webchat.freenode.net/?channels=%23reflex-frp&uio=d4")
               ]
 
- 
- -- (initialRoute, changes) <- prerender (return (routeToUrl initRoute, never)) browserHistory 
-
   pageSwitch <- elClass "div" "header" $ do
     elAttr "img" logo blank
     elClass "ul" "sections" navMenu
-    --try to change some of the nav li elements into events
 
-  let routeToWidget r = case r of
-            Route_Home -> home
-            Route_Tutorials -> tutorials
-            Route_Examples -> examples
-            Route_Documentation -> documentation
-            Route_FAQ -> faq
-
-  routeSwitch (initRoute) $ \r -> do  
-        routeToWidget r
-        return (pageSwitch, ())
+  _ <- ($) routeSwitch initRoute $ \r -> do  
+           routeToWidget r
+           return (pageSwitch, ())
  
- -- Workflow handled widgetholds job this time around: TODO Research. 
- 
- {- _ <- widgetHold (routeToWidget $ fromMaybe Route_Home $ urlToRoute initialRoute) $ 
-          ffor (leftmost [pageSwitch, fmap (fromMaybe Route_Home . urlToRoute) changes]) routeToWidget 
-
-  prerender (return ()) $ performEvent_ $ ffor pageSwitch $ \r -> pushState' $ routeToUrl r
--}
-    -- Create a list of links from a list of tuples
+  -- Create a list of links from a list of tuples
   elClass "div" "main" $ do 
     el "p" $ text "Check us out on Hackage or join the community IRC chat!"
     forM_ links $ \pair -> do
@@ -75,16 +60,66 @@ siteBody initRoute = do
       el "br" $ return ()
   el "br" blank
 
+  -- Place Font Awesome Icons in Footer
   elClass "div" "footer" $ do
-   elAttr "a" rdirTwitter $ do
-    elAttr "i" (("class" =: "fa fa-twitter") <> ("aria-hidden" =: "true")) blank 
-   elAttr "a" rdirGithub $ do
-    elAttr "i" (("class" =: "fa fa-github") <> ("aria-hidden" =: "true")) blank 
-   elAttr "a" rdirReddit $ do
-    elAttr "i" (("class" =: "fa fa-reddit") <> ("aria-hidden" =: "true")) blank 
+    elAttr "a" rdirTwitter $ do
+      elAttr "i" (("class" =: "fa fa-twitter") <> ("aria-hidden" =: "true")) blank 
+    elAttr "a" rdirGithub $ do
+      elAttr "i" (("class" =: "fa fa-github") <> ("aria-hidden" =: "true")) blank 
+    elAttr "a" rdirReddit $ do
+      elAttr "i" (("class" =: "fa fa-reddit") <> ("aria-hidden" =: "true")) blank 
   return ()
+  
+----------------------Helper Functions-------------------------------
 
---Element Attributes
+--styleSheet & headLink are functions to add links to html <head>
+styleSheet :: DomBuilder t m => Text -> m ()
+styleSheet myLink = elAttr "link" (Map.fromList [
+    ("rel", "stylesheet"),
+    ("type", "text/css"),
+    ("href", myLink)
+  ]) $ return ()
+
+headLink :: DomBuilder t m => Text -> m ()
+headLink url = elAttr "link" (Map.fromList [
+    ("rel", "stylesheet"),
+    ("href", url)
+  ]) $ return ()
+  
+--Nav Bar generator produces click-able Widget Events
+navMenu :: (DomBuilder t m) => m (Event t Route)
+navMenu = do 
+  events <- forM sections $ \route -> do
+    el "li" $ do
+      (linkEl, _) <- elAttr' "a" ("id" =: (routeToTitle route)) $ text (routeToTitle route)
+      return (route <$ domEvent Click linkEl) 
+  return $ leftmost events
+  where sections = [ Route_Home
+                   , Route_Tutorials
+                   , Route_Examples
+                   , Route_Documentation
+                   , Route_FAQ
+                   ]
+
+--Produces Text for navMenu, takes a route as an arguement
+routeToTitle :: Route -> Text
+routeToTitle r = case r of  
+     Route_Home -> "Home"
+     Route_Tutorials -> "Tutorials"
+     Route_Examples -> "Examples"
+     Route_Documentation -> "Documentation" 
+     Route_FAQ -> "FAQ"
+
+--Receives a route and returns it's corresponding widget
+routeToWidget :: DomBuilder t m => Route -> m ()  
+routeToWidget r = case r of
+     Route_Home -> home
+     Route_Tutorials -> tutorials
+     Route_Examples -> examples
+     Route_Documentation -> documentation
+     Route_FAQ -> faq
+
+----------------------Element Attributes------------------------------
 metaDesc :: Map Text Text
 metaDesc = "name" =: "description" 
         <> "content" =: "Reflex Functional Reactive Programming"
@@ -108,48 +143,12 @@ rdirReddit :: Map Text Text
 rdirReddit = "href" =: "http://reddit.com/r/reflexfrp"
            <> "title" =: "reddit"
 
-{-
---Nav Bar generator with Anchor tags 
-navMenu :: (MonadWidget t m) => m ()
-navMenu = do
-  forM_ sections $ \pair -> do
-    el "li" $
-      elAttr "a" ("href" =: (snd pair) <> "id" =: (fst pair)) $ text (fst pair)
-  where sections = [ ("Home", "/")
-                 , ("Tutorials", "https://github.com/hansroland/reflex-dom-inbits/blob/master/tutorial.md")
-                 , ("Examples", "/")
-                 , ("Documentation", "http://reflex-frp.readthedocs.io")
-                 , ("FAQ", "/")]
--}
 
---Nav Bar generator with click-able Events
-navMenu :: (DomBuilder t m) => m (Event t Route)
-navMenu = do 
-  events <- forM sections $ \route -> do
-    el "li" $ do
-      (linkEl, _) <- elAttr' "a" ("id" =: (routeToTitle route)) $ text (routeToTitle route)
-      return (route <$ domEvent Click linkEl) 
-  return $ leftmost events
-  where sections = [ Route_Home
-                   , Route_Tutorials
-                   , Route_Examples
-                   , Route_Documentation
-                   , Route_FAQ
-                   ]
-
-routeToTitle :: Route -> Text
-routeToTitle r = case r of  
- Route_Home -> "Home"
- Route_Tutorials -> "Tutorials"
- Route_Examples -> "Examples"
- Route_Documentation -> "Documentation" 
- Route_FAQ -> "FAQ"
-
---nav bar body components
+---------------------Widgets to switch to/from-----------------------
 home :: (DomBuilder t m) => m ()
 home = elClass "div" "main" $ do
-              elClass "h3" "title" $ text "Practical Functional Reactive Programming"
-              elClass "p" "class" $ text "Reflex is an fully-deterministic, higher-order Functional Reactive Programming (FRP) interface and an engine that efficiently implements that interface."
+         elClass "h3" "title" $ text "Practical Functional Reactive Programming"
+         elClass "p" "class" $ text "Reflex is an fully-deterministic, higher-order Functional Reactive Programming (FRP) interface and an engine that efficiently implements that interface."
 
 
 tutorials :: (DomBuilder t m) => m ()
@@ -193,17 +192,3 @@ faq :: (DomBuilder t m) => m ()
 faq = elClass "div" "main" $ do
             elClass "h3" "title" $ text "FAQ:"
             el "p" $ text "FAQ questions coming soon! For now, feel free to ask questions within the Reflex-FRP IRC chat provided below. Thank you!"
-
---Helper Functions
-styleSheet :: DomBuilder t m => Text -> m ()
-styleSheet myLink = elAttr "link" (Map.fromList [
-    ("rel", "stylesheet"),
-    ("type", "text/css"),
-    ("href", myLink)
-  ]) $ return ()
-
-headLink :: DomBuilder t m => Text -> m ()
-headLink url = elAttr "link" (Map.fromList [
-    ("rel", "stylesheet"),
-    ("href", url)
-  ]) $ return ()
