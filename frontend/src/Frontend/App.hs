@@ -34,6 +34,7 @@ siteHead = do
   elAttr "meta" metaKeywords blank
   let fa = "font-awesome-4.7.0/css/font-awesome.min.css"
   headLink fa
+  elAttr "link" icon blank
   styleSheet "style.css"
   return ()
 
@@ -132,6 +133,10 @@ logo :: Map Text Text
 logo = "class" =: "logo" 
         <> "src" =: "img/REFLEX.png" 
         <> "style" =: "height: 20%;width: 30%;margin: auto;display: block;padding: 0;"
+
+icon :: Map Text Text
+icon = "rel" =: "shortcut icon"
+        <> "href" =: "img/favicon.ico"
 
 rdirTwitter :: Map Text Text
 rdirTwitter = "href" =: "https://twitter.com/search?q=%23reflexfrp"
