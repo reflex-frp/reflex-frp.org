@@ -15,6 +15,7 @@
     reflex-dom
     safe
     these
+    jsaddle
   ];
   backendDepends = p: with p; [
     data-default
