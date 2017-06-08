@@ -8,7 +8,7 @@ import Data.Maybe
 
 import Frontend.Router 
 
---Custom data types that correspond to a site's navBar
+--Custom data type that corresponds to a site's navBar
 data Route = Route_Home | Route_Tutorials | Route_Examples | Route_Documentation | Route_FAQ
   deriving (Show)
 
@@ -30,4 +30,3 @@ urlToRoute path = Map.lookup path routes
 instance IsPath Route where 
   pathToText = routeToUrl 
   textToPath = fromMaybe Route_Home . urlToRoute
-

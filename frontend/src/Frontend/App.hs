@@ -19,7 +19,7 @@ import Data.Map (Map)
 --import Debug.Trace
 import Data.Text (Text)
 --import qualified Data.Text as T
-import Common.Route --used for navBar's Route data types 
+import Common.Route --used for navBar's Route data type 
 import Frontend.Router
 --import GHCJS.DOM.Types (MonadJSM)
 import Focus.JS.Prerender
@@ -48,9 +48,9 @@ siteBody initRoute = do
     elAttr "img" logo blank
     elClass "ul" "sections" navMenu
 
-  _ <- ($) routeSwitch initRoute $ \r -> do  
-           routeToWidget r
-           return (pageSwitch, ())
+  _ <- routeSwitch initRoute $ \r -> do  
+       routeToWidget r
+       return (pageSwitch, ())
  
   -- Create a list of links from a list of tuples
   elClass "div" "main" $ do 

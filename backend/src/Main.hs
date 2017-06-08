@@ -19,7 +19,7 @@ import Control.Monad.IO.Class
 --import Data.Maybe
 
 import Frontend.App --used for siteHead & siteBody
-import Common.Route --used for urlToRoute function & Route data types
+import Common.Route --used for urlToRoute function & Route data type
 
 main :: IO ()
 main = do 
