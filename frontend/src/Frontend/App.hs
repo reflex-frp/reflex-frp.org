@@ -5,23 +5,17 @@
 
 module Frontend.App where
 
---import Data.Maybe
 import Reflex
 import Reflex.Dom
-import qualified Data.Map as Map
---import Safe (readMay)
---import Control.Applicative ((<*>), (<$>))
+import Reflex.Dom.Path
 
---import Data.FileEmbed
+import qualified Data.Map as Map
 import Data.Monoid
 import Control.Monad
 import Data.Map (Map)
---import Debug.Trace
 import Data.Text (Text)
 --import qualified Data.Text as T
 import Common.Route --used for navBar's Route data type 
-import Frontend.Router
---import GHCJS.DOM.Types (MonadJSM)
 import Focus.JS.Prerender
 import Control.Monad.Fix
 
@@ -39,7 +33,9 @@ siteHead = do
   return ()
 
 ------------------- <body></body> ----------------------------------------
-siteBody :: (DomBuilder t m, MonadHold t m, MonadFix m, TriggerEvent t m, PostBuild t m, PerformEvent t m, Prerender x m) => Route -> m ()
+siteBody :: ( DomBuilder t m, MonadHold t m, MonadFix m, TriggerEvent t m, PostBuild t m
+            , PerformEvent t m, Prerender x m)
+         => Route -> m ()
 siteBody initRoute = do 
   let links = [ ("Hackage", "https://hackage.haskell.org/package/reflex")
               , ("irc.freenode.net #reflex-frp", "http://webchat.freenode.net/?channels=%23reflex-frp&uio=d4")
@@ -49,9 +45,10 @@ siteBody initRoute = do
     elAttr "img" logo blank
     elClass "ul" "sections" navMenu
 
-  _ <- routeSwitch initRoute $ \r -> do  
-       routeToWidget r
-       return (pageSwitch, ())
+  _ <- prerender (routeToWidget initRoute)
+                 (void . pathWidget $ \r -> do  
+                    routeToWidget r
+                    return (pageSwitch, ()))
  
   -- Create a list of links from a list of tuples
   elClass "div" "main" $ do 

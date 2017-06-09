@@ -29,14 +29,13 @@ main = do
 rootHandler :: ByteString -> Snap ()
 rootHandler theHead = route 
   [ ("", assetHandler)
-  , ("", do 
-            r <- getRequest
-            let mRoute = urlToRoute $ decodeUtf8 $ rqURI r 
-            case mRoute of 
+  , ("", do r <- getRequest
+            let mRoute = urlToRoute $ decodeUtf8 $ rqURI r
+            case mRoute of
               Nothing -> pass
-              Just r -> serveStaticIndex $ def 
+              Just rt -> serveStaticIndex $ def
                 & appConfig_initialHead .~ Just theHead
-                & appConfig_initialBody .~ Just (liftIO $ fmap snd $ renderStatic $ siteBody r) 
+                & appConfig_initialBody .~ Just (liftIO $ fmap snd $ renderStatic $ siteBody rt)
             )
   , ("", appHandler theHead $ fmap snd $ renderStatic $ siteBody $ Route_Home)
   ]
