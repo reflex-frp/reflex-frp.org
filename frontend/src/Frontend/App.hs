@@ -16,7 +16,7 @@ import Data.Map (Map)
 import Data.Text (Text)
 --import qualified Data.Text as T
 import Common.Route --used for navBar's Route data type 
-import Focus.JS.Prerender
+import Focus.JS.Prerender (Prerender, prerender)
 import Control.Monad.Fix
 
 
