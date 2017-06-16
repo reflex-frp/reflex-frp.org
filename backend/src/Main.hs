@@ -5,7 +5,7 @@
 import Focus.Backend (withFocus)
 import Focus.Backend.Snap (serveStaticIndex, appConfig_initialHead, appConfig_initialBody, serveApp)
 import Snap
-import Focus.HTTP.Serve (serveAssets)
+import Obelisk.HTTP.Serve (serveAssets)
 import Reflex.Dom.Builder.Static
 
 import Data.Default
