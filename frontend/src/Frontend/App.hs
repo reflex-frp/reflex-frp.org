@@ -2,6 +2,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE LambdaCase #-}
 
 module Frontend.App where
 
@@ -41,15 +42,17 @@ siteBody initRoute = do
               , ("irc.freenode.net #reflex-frp", "http://webchat.freenode.net/?channels=%23reflex-frp&uio=d4")
               ]
 
-  pageSwitch <- elClass "div" "header" $ do
-    elAttr "img" logo blank
-    elClass "ul" "sections" navMenu
+  rec
+    pageSwitch <- elClass "div" "header" $ do
+      elAttr "img" logo blank
+      elClass "ul" "sections" $ navMenu active
+                                      -- ^ you need to change this...
 
-  _ <- prerender (routeToWidget initRoute)
-                 (void . pathWidget $ \r -> do  
+    active <- prerender (routeToWidget initRoute >> return (constDyn initRoute))
+                 (pathWidget $ \r -> do  
                     routeToWidget r
-                    return (pageSwitch, ()))
- 
+                    return (pageSwitch, r))
+
   -- Create a list of links from a list of tuples
   elClass "div" "main" $ do 
     el "p" $ text "Check us out on Hackage or join the community IRC chat!"
@@ -85,12 +88,15 @@ headLink url = elAttr "link" (Map.fromList [
   ]) $ return ()
   
 --Nav Bar generator produces click-able Widget Events
-navMenu :: (DomBuilder t m) => m (Event t Route)
-navMenu = do 
-  events <- forM sections $ \route -> do
-    el "li" $ do
-      (linkEl, _) <- elAttr' "a" ("id" =: (routeToTitle route)) $ text (routeToTitle route)
-      return (route <$ domEvent Click linkEl) 
+navMenu :: (DomBuilder t m, MonadHold t m, MonadFix m, PostBuild t m) => Dynamic t Route -> m (Event t Route)
+navMenu currentTab = do
+  rec events <- forM sections $ \route -> do
+        --activeBool <- toggle False $ leftmost events
+        let isActiveRoute r = (routeToTitle r) == (routeToTitle route)
+        let highlight = ffor currentTab $ \tab -> isActive tab $ isActiveRoute tab
+        el "li" $ do
+          (linkEl, _) <- elDynAttr' "a" (highlight) $ text (routeToTitle route)
+          return (route <$ domEvent Click linkEl) 
   return $ leftmost events
   where sections = [ Route_Home
                    , Route_Tutorials
@@ -98,6 +104,14 @@ navMenu = do
                    , Route_Documentation
                    , Route_FAQ
                    ]
+
+isActive :: Route -> Bool -> Map Text Text
+isActive ia isit = "id" =: (routeToTitle ia) 
+           <> "style" =: ("border-bottom: " <> active isit)
+  where 
+    active True = "4px solid #d4272a;"
+    active False = "none;"
+    
 
 --Produces Text for navMenu, takes a route as an arguement
 routeToTitle :: Route -> Text
@@ -155,7 +169,7 @@ home = elClass "div" "main" $ do
 
 tutorials :: (DomBuilder t m) => m ()
 tutorials = elClass "div" "main" $ do
-    elClass "h3" "title" $ text "Tutorials:"
+    elClass "h3" "title" $ text "Tutorials"
     el "ol" $ do
       el "li" $ do 
         el "label" $ text "Installation: "
@@ -168,7 +182,7 @@ tutorials = elClass "div" "main" $ do
 
 examples :: (DomBuilder t m) => m ()
 examples = elClass "div" "main" $ do
-     elClass "h3" "title" $ text "Check Out Some Example Code:"
+     elClass "h3" "title" $ text "Check Out Some Example Code"
      el "ul" $ do
       el "li" $ do 
         el "label" $ text "Basic ToDo List: "
@@ -192,5 +206,5 @@ documentation = elClass "div" "main" $ do
 
 faq :: (DomBuilder t m) => m ()
 faq = elClass "div" "main" $ do
-            elClass "h3" "title" $ text "FAQ:"
+            elClass "h3" "title" $ text "FAQ"
             el "p" $ text "FAQ questions coming soon! For now, feel free to ask questions within the Reflex-FRP IRC chat provided below. Thank you!"

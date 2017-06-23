@@ -50,15 +50,16 @@ ul.sections li a {
     color: #333;
     text-transform: uppercase;
     border-bottom: 4px solid transparent;
+    cursor: pointer;
 }
 
     ul.sections li a:hover, ul.sections li a:focus {
         color: #E6182E;
     }
     
-    ul.sections li a.active {
+    /*ul.sections li a:active {
         border-bottom: 4px solid  #d4272a;
-    }
+    }*/
 
 .main {
     margin: auto;
