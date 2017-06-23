@@ -10,7 +10,7 @@ import Reflex.Dom.Path
 
 --Custom data type that corresponds to a site's navBar
 data Route = Route_Home | Route_Tutorials | Route_Examples | Route_Documentation | Route_FAQ
-  deriving (Show, Eq)
+  deriving (Show, Eq, Ord)
 
 --Outputs text to be appended to url
 routeToUrl :: Route -> Text

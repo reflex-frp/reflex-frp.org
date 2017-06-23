@@ -15,8 +15,7 @@ import Data.Monoid
 import Control.Monad
 import Data.Map (Map)
 import Data.Text (Text)
---import qualified Data.Text as T
-import Common.Route --used for navBar's Route data type 
+import Common.Route -- ^ used for navBar's Route data type 
 import Focus.JS.Prerender (Prerender, prerender)
 import Control.Monad.Fix
 
@@ -46,7 +45,6 @@ siteBody initRoute = do
     pageSwitch <- elClass "div" "header" $ do
       elAttr "img" logo blank
       elClass "ul" "sections" $ navMenu active
-                                      -- ^ you need to change this...
 
     active <- prerender (routeToWidget initRoute >> return (constDyn initRoute))
                  (pathWidget $ \r -> do  
@@ -90,10 +88,10 @@ headLink url = elAttr "link" (Map.fromList [
 --Nav Bar generator produces click-able Widget Events
 navMenu :: (DomBuilder t m, MonadHold t m, MonadFix m, PostBuild t m) => Dynamic t Route -> m (Event t Route)
 navMenu currentTab = do
+  let currentTabDemux = demux currentTab
   rec events <- forM sections $ \route -> do
-        --activeBool <- toggle False $ leftmost events
-        let isActiveRoute r = (routeToTitle r) == (routeToTitle route)
-        let highlight = ffor currentTab $ \tab -> isActive tab $ isActiveRoute tab
+        let selected = demuxed currentTabDemux route
+        let highlight = zipDynWith isActive currentTab selected
         el "li" $ do
           (linkEl, _) <- elDynAttr' "a" (highlight) $ text (routeToTitle route)
           return (route <$ domEvent Click linkEl) 
