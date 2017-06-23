@@ -1,5 +1,27 @@
 @import url('https://fonts.googleapis.com/css?family=Asap:400,400i,500,500i,700,700i|PT+Sans:400,400i,700,700i');
 
+/*---------Responsive Design--------------*/ 
+
+@media screen and (max-width: 600px) {
+  .logo {
+      height: 40%;
+      width: 50%;
+      margin: auto;
+      display: block;
+      padding: 0;
+    }
+
+  ul .sections {
+      margin: auto;
+      display: flex;
+      list-style:none;
+      border-top: 1px solid #d1dadc;
+      border-bottom: 1px solid #d1dadc;
+    }
+}
+
+/*------Responsive End--------*/ 
+
 * {
     box-sizing: border-box;
 }
@@ -80,3 +102,4 @@ ul.sections li a {
 .footer i:hover {
   color: #E6182E;
 }
+

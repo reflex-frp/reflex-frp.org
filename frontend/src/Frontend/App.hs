@@ -26,6 +26,7 @@ siteHead = do
   el "title" $ text "Reflex FRP"
   elAttr "meta" metaDesc blank
   elAttr "meta" metaKeywords blank
+  elAttr "meta" viewport blank
   let fa = "font-awesome-4.7.0/css/font-awesome.min.css"
   headLink fa
   elAttr "link" icon blank
@@ -137,6 +138,10 @@ metaDesc = "name" =: "description"
 metaKeywords :: Map Text Text
 metaKeywords = "name" =: "keywords"
             <> "content" =: "reflex, reflex frp, functional reactive programming, haskell, framework, reflex dom" 
+
+viewport :: Map Text Text
+viewport = "name" =: "viewport"
+        <> "content" =: "width=device-width, initial-scale=1"
 
 logo :: Map Text Text
 logo = "class" =: "logo" 
