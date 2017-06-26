@@ -146,7 +146,7 @@ viewport = "name" =: "viewport"
 logo :: Map Text Text
 logo = "class" =: "logo" 
         <> "src" =: "img/REFLEX.png" 
-        <> "style" =: "height: 20%;width: 30%;margin: auto;display: block;padding: 0;"
+       -- <> "style" =: "height: 20%;width: 30%;margin: auto;display: block;padding: 0;"
 
 icon :: Map Text Text
 icon = "rel" =: "shortcut icon"
