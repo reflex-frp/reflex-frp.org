@@ -41,6 +41,7 @@ siteHead = do
   iconLinker "apple-touch-icon" "/" "152x152" "img/apple-touch-icon-152x152.png"
   iconLinker "icon" "image/png" "img/favicon-196x196.png" "196x196"
   styleSheet "style.css"
+  styleSheet "font.css"
   return ()
 
 ------------------- <body></body> ----------------------------------------
