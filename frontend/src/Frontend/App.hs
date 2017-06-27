@@ -29,7 +29,17 @@ siteHead = do
   elAttr "meta" viewport blank
   let fa = "font-awesome-4.7.0/css/font-awesome.min.css"
   headLink fa
-  elAttr "link" icon blank
+  iconLinker "icon" "image/png" "16x16" "img/favicon-16x16.png"
+  iconLinker "icon" "image/png" "32x32" "img/favicon-32x32.png" 
+  iconLinker "apple-touch-icon" "/" "57x57" "img/apple-touch-icon-57x57.png"
+  iconLinker "apple-touch-icon" "/" "60x60" "img/apple-touch-icon-60x60.png"
+  iconLinker "apple-touch-icon" "/" "72x72" "img/apple-touch-icon-72x72.png"
+  iconLinker "apple-touch-icon" "/" "76x76" "img/apple-touch-icon-76x76.png"
+  iconLinker "apple-touch-icon" "/" "114x114" "img/apple-touch-icon-114x114.png"
+  iconLinker "apple-touch-icon" "/" "120x120" "img/apple-touch-icon-120x120.png"
+  iconLinker "apple-touch-icon" "/" "144x144" "img/apple-touch-icon-144x144.png"
+  iconLinker "apple-touch-icon" "/" "152x152" "img/apple-touch-icon-152x152.png"
+  iconLinker "icon" "image/png" "img/favicon-196x196.png" "196x196"
   styleSheet "style.css"
   return ()
 
@@ -85,6 +95,18 @@ headLink url = elAttr "link" (Map.fromList [
     ("rel", "stylesheet"),
     ("href", url)
   ]) $ return ()
+
+-- TODO: make this function more type safe.
+-- The 4 arguments are as follows: rel type size href
+-- turn the second argument into a Maybe Text
+iconLinker :: DomBuilder t m => Text -> Text -> Text -> Text -> m ()
+iconLinker r t s h = elAttr "link" attribs blank 
+    where 
+      attribs = "rel" =: r
+             <> "type" =: t
+             <> "size" =: s
+             <> "href" =: h
+
   
 --Nav Bar generator produces click-able Widget Events
 navMenu :: (DomBuilder t m, MonadHold t m, MonadFix m, PostBuild t m) => Dynamic t Route -> m (Event t Route)
@@ -150,7 +172,7 @@ logo = "class" =: "logo"
 
 icon :: Map Text Text
 icon = "rel" =: "shortcut icon"
-        <> "href" =: "img/favicon.ico"
+        <> "href" =: "img/apple-touch-icon-57x57.png"
 
 rdirTwitter :: Map Text Text
 rdirTwitter = "href" =: "https://twitter.com/search?q=%23reflexfrp"
