@@ -16,6 +16,7 @@
     safe
     these
     jsaddle
+    font-awesome-type
   ];
   backendDepends = p: with p; [
     data-default
