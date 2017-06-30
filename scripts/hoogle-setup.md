@@ -23,10 +23,10 @@ cd static
    hoogle generate --local=./static  --database=hoogledb.hoo
 ```
 
-   This will take a while and create a file local.hoo
+   This will take a while and create a file `hoogledb.hoo`
 
 Copy the `static` directory and `hoogledb.hoo` on the server
-Start the server...
+and start the server...
 
    `hoogle server -p 8080 --database=hoogledb.hoo`
 
