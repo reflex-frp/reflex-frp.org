@@ -40,8 +40,8 @@ frontend = (head', body Route_Home)
       faviconLinker "apple-touch-icon" "/" "144x144" "img/apple-touch-icon-144x144.png"
       faviconLinker "apple-touch-icon" "/" "152x152" "img/apple-touch-icon-152x152.png"
       faviconLinker "icon" "image/png" "img/favicon-196x196.png" "196x196"
-      styleSheet "style.css"              -- ^ link css stylesheet
-      styleSheet "font.css"               -- ^ link css fonts
+      styleSheet "style.css"              --  link css stylesheet
+      styleSheet "font.css"               --  link css fonts
       return ()
 
 body :: (DomBuilder t m
@@ -61,7 +61,7 @@ body initRoute = do
       el "br" $ return ()
   el "br" blank
 
-  -- | Place Font Awesome Icons in footer <div>
+  --  Place Font Awesome Icons in footer <div>
   elClass "div" "footer" $ do
     elAttr "a" rdirTwitter $ do
       FA.faIcon FA.FaTwitter def
@@ -122,7 +122,7 @@ faviconLinker r t s h = elAttr "link" attribs blank
              <> "size" =: s
              <> "href" =: h
 
--- | styleSheet are functions to add links to html <head>
+--  styleSheet are functions to add links to html <head>
 styleSheet :: DomBuilder t m => Text -> m ()
 styleSheet myLink = elAttr "link" (Map.fromList [
     ("rel", "stylesheet"),

@@ -27,7 +27,7 @@ module Frontend.FontAwesome
   , dynIcon2xAttr
   , dynIcon
   , dynIcon2x
-  -- * Deprecated functions
+  -- Deprecated functions
   , icon
   , iconlg
   , icon2x
@@ -53,7 +53,7 @@ import qualified Data.Text as T
 import Data.Default
 import Data.Maybe
 
-import Web.FontAwesomeType -- ^ FontAwesome Enumerations
+import Web.FontAwesomeType --  FontAwesome Enumerations
 
 #ifdef USE_TEMPLATE_HASKELL
 import Control.Lens (makeLenses)
@@ -61,35 +61,35 @@ import Control.Lens (makeLenses)
 import Control.Lens (Lens')
 #endif
 
--- | Control the size of the icon.  See http://fontawesome.io/examples/#larger
+--  Control the size of the icon.  See http://fontawesome.io/examples/#larger
 data Size
   = Size_Default
-  | Size_Large -- ^ Make icon 33% bigger
-  | Size_2x    -- ^ Double icon size
-  | Size_3x    -- ^ Triple icon size
-  | Size_4x    -- ^ Cuadruple icon size
-  | Size_5x    -- ^ Quintuple icon size
+  | Size_Large --  Make icon 33% bigger
+  | Size_2x    --  Double icon size
+  | Size_3x    --  Triple icon size
+  | Size_4x    --  Cuadruple icon size
+  | Size_5x    --  Quintuple icon size
 
--- | Pull the icon left or right.  See http://fontawesome.io/examples/#bordered-pulled
+--  Pull the icon left or right.  See http://fontawesome.io/examples/#bordered-pulled
 data Pull
-  = Pull_Left  -- ^ Float left
-  | Pull_Right -- ^ Float right
+  = Pull_Left  --  Float left
+  | Pull_Right --  Float right
 
--- | Animate the icon.  See http://fontawesome.io/examples/#animated
+--  Animate the icon.  See http://fontawesome.io/examples/#animated
 data Animation
   = Animation_Spin
   | Animation_Pulse
 
--- | Rotate the icon.  See http://fontawesome.io/examples/#rotated-flipped
+--  Rotate the icon.  See http://fontawesome.io/examples/#rotated-flipped
 data Rotation = Rotate_90
               | Rotate_180
               | Rotate_270
 
--- | Flip the icon. See http://fontawesome.io/examples/#rotated-flipped
+--  Flip the icon. See http://fontawesome.io/examples/#rotated-flipped
 data Flip = Flip_Horizontal
           | Flip_Vertical
 
--- | Optional attributes for FontAwesome icons.  For the default set of options, use 'def'
+--  Optional attributes for FontAwesome icons.  For the default set of options, use 'def'
 data FontAwesomeConfig = FontAwesomeConfig
   { _fontAwesomeConfig_size :: Size
   , _fontAwesomeConfig_fixedWidth :: Bool
@@ -113,7 +113,7 @@ instance Default FontAwesomeConfig where
     , _fontAwesomeConfig_listIcon = False
     }
 
--- | This function takes an FontAwesomeConfig type and generates the necessary
+--  This function takes an FontAwesomeConfig type and generates the necessary
 -- "fa" class names for desired icon behavior
 fontAwesomeConfigClass :: FontAwesomeConfig -> Text
 fontAwesomeConfigClass c = T.intercalate " " . catMaybes $
@@ -154,7 +154,7 @@ fontAwesomeConfigClass c = T.intercalate " " . catMaybes $
   ]
 --TODO: Parts of this should go upstream
 
--- | Generates a <link> tag that references the MaxCDN bootstrap content
+--  Generates a <link> tag that references the MaxCDN bootstrap content
 fontAwesomeCDN :: DomBuilder t m => m ()
 fontAwesomeCDN = elAttr "link" ("rel" =: "stylesheet" <> "href" =: "https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css") $ return ()
 
@@ -175,12 +175,12 @@ dynIcon = dynIconAttr mempty
 dynIcon2x :: (DomBuilder t m, PostBuild t m) => Dynamic t Text -> m ()
 dynIcon2x = dynIcon2xAttr mempty
 
--- | Type checked faIcon functions
+--  Type checked faIcon functions
 faIcon :: DomBuilder t m => FontAwesome -> FontAwesomeConfig -> m ()
 faIcon i conf = elClass "i" ((fontAwesomeClass i) <> " " <> (fontAwesomeConfigClass conf)) $ return ()
 --TODO: This needs a clear fallback mechanism for when something isn't present in the FontAwesome type
 
--- | faIcon prime functions
+--  faIcon prime functions
 faIcon' :: DomBuilder t m => FontAwesome -> FontAwesomeConfig -> m (Element EventResult (DomBuilderSpace m) t, ())
 faIcon' i conf = elClass' "i" ((fontAwesomeClass i) <> " " <> (fontAwesomeConfigClass conf)) $ return ()
 
