@@ -1,3 +1,4 @@
+{-# LANGUAGE InstanceSigs #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecursiveDo #-}
 {-# LANGUAGE FlexibleContexts #-}
@@ -10,12 +11,16 @@ import Reflex.Dom.Core
 import Control.Monad.Fix
 import Control.Monad
 
+import qualified Data.Map as Map
 import Data.Text (Text)
 import qualified Data.Text as Text
 import Data.Map (Map)
+import Data.Maybe (fromMaybe)
 import Data.Monoid
 
 import Frontend.FontAwesome as FA
+
+import Common.Route
 
 --IsPath Modules---
 import Language.Javascript.JSaddle
@@ -30,8 +35,43 @@ import qualified GHCJS.DOM.Types as DOM
 import Control.Lens
 --------------------------------
 
+--  | instance of class from Frontend.Route
+instance IsPath Route where
+  pathToText = routeToUrl
+  textToPath = fromMaybe Route_Home . urlToRoute
+
+instance WebRoute Route where
+  --  Outputs text to be appended to url
+  routeToUrl :: Route -> Text
+  routeToUrl r = case r of
+   Route_Home -> "/home"
+   Route_Tutorials -> "/tutorials"
+   Route_Examples -> "/examples"
+   Route_Documentation -> "/documentation"
+   Route_FAQ -> "/faq"
+   --  Look up if a given url extension exists within a list of routes
+  urlToRoute :: Text -> Maybe Route
+  urlToRoute path = Map.lookup path routes
+    where routes = Map.fromList $ fmap (\r ->(routeToUrl r, r)) [Route_Home , Route_Tutorials , Route_Examples , Route_Documentation , Route_FAQ]
+
+  routeToTitle :: Route -> Text
+  routeToTitle r = case r of
+   Route_Home -> "Home"
+   Route_Tutorials -> "Tutorials"
+   Route_Examples -> "Examples"
+   Route_Documentation -> "Documentation"
+   Route_FAQ -> "Faq"
+
+  routeToWidget :: DomBuilder t m => Route -> m ()
+  routeToWidget r = case r of
+   Route_Home -> home
+   Route_Tutorials -> tutorials
+   Route_Examples -> examples
+   Route_Documentation -> documentation
+   Route_FAQ -> faq
+
 -- Set of functions to handle website directories/routes
-class WebRoute a where 
+class WebRoute a where
   routeToTitle :: a -> Text -- returns text to be printed on a Nav Bar's Dom
   routeToUrl :: a -> Text -- returns text to be appended to the URI
   routeToWidget :: (DomBuilder t m, MonadFix m, MonadHold t m) => a -> m () -- returns the corresponding widget
@@ -39,11 +79,11 @@ class WebRoute a where
 
 -- Body generating function, adds navbar and corresponding widgets
 bodyGen :: (DomBuilder t m, PostBuild t m, Prerender js m, MonadHold t m
-          , MonadFix m, PerformEvent t m, TriggerEvent t m, WebRoute a, IsPath a, Ord a) 
+          , MonadFix m, PerformEvent t m, TriggerEvent t m, WebRoute a, IsPath a, Ord a)
               => Text  -- path to image in project directory
               -> [a]   -- list of directories/routes of website
               -> a     -- directory/route website starts on initially
-              ->  m () 
+              ->  m ()
 bodyGen theLogo pageTabs ir = do
   rec
     pageSwitch <- elClass "div" "header" $ do
@@ -114,7 +154,7 @@ section False = "class" =: "noshow"
 -- This class provides a mapping between the path portion of a URL encoded as Text, and an arbitrary data type.
 -- the expectation being that you'll define an algebraic data type for the possible paths, and map invalid paths to
 -- some particular value of that (perhaps representing "home" or a "404").
-class IsPath path where 
+class IsPath path where
   pathToText :: path -> Text
   textToPath :: Text -> path
 
@@ -147,9 +187,9 @@ browserHistoryText = do
   location <- Window.getLocation window
   loc0 <- getPathDecoded location
   loc <- wrapDomEvent window (`DOM.on` DOM.popState) $ getPathDecoded location
-  return (loc0, loc) 
+  return (loc0, loc)
 
-browserHistory :: (IsPath p, MonadJSM m, TriggerEvent t m, Reflex t) => m (p, Event t p) 
+browserHistory :: (IsPath p, MonadJSM m, TriggerEvent t m, Reflex t) => m (p, Event t p)
 browserHistory = do
   (location, locationEvent) <- browserHistoryText
   return (textToPath location, fmap textToPath locationEvent)

@@ -13,47 +13,9 @@ import Data.Text (Text)
 import qualified Data.Map as Map
 import Data.Maybe
 
-import Frontend.Kiss
-
 -- | Custom data type that corresponds to a site's navBar
 data Route = Route_Home | Route_Tutorials | Route_Examples | Route_Documentation | Route_FAQ
   deriving (Show, Eq, Ord)
-
---  | instance of class from Frontend.Route
-instance IsPath Route where
-  pathToText = routeToUrl
-  textToPath = fromMaybe Route_Home . urlToRoute
-
-instance WebRoute Route where
-  -- | Outputs text to be appended to url
-  routeToUrl :: Route -> Text
-  routeToUrl r = case r of
-   Route_Home -> "/home"
-   Route_Tutorials -> "/tutorials"
-   Route_Examples -> "/examples"
-   Route_Documentation -> "/documentation"
-   Route_FAQ -> "/faq"
-
-  -- | Look up if a given url extension exists within a list of routes
-  urlToRoute :: Text -> Maybe Route
-  urlToRoute path = Map.lookup path routes
-    where routes = Map.fromList $ fmap (\r ->(routeToUrl r, r)) [Route_Home , Route_Tutorials , Route_Examples , Route_Documentation , Route_FAQ]
-
-  routeToTitle :: Route -> Text
-  routeToTitle r = case r of
-   Route_Home -> "Home"
-   Route_Tutorials -> "Tutorials"
-   Route_Examples -> "Examples"
-   Route_Documentation -> "Documentation"
-   Route_FAQ -> "Faq"
-
-  routeToWidget :: DomBuilder t m => Route -> m ()
-  routeToWidget r = case r of
-   Route_Home -> home
-   Route_Tutorials -> tutorials
-   Route_Examples -> examples
-   Route_Documentation -> documentation
-   Route_FAQ -> faq
 
 -----------------------------------------WIDGET BODIES------------------------------------
 home :: (DomBuilder t m) => m ()
