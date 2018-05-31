@@ -23,6 +23,7 @@ executable frontend
                , static
                , text
                , frontend
+               , font-awesome-type
   --TODO: Make these ghc-options optional
   ghc-options: -threaded
   if os(darwin)
