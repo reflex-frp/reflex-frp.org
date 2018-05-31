@@ -30,7 +30,7 @@ main = mainWidgetWithCss $(embedFile "style.css") $ do
 
   elClass "div" "main" $ do
     elClass "h3" "title" $ text "Practical Functional Reactive Programming"
-    elClass "p" "class" $ text "Reflex is an fully-deterministic, higher-order Functional Reactive Programming (FRP) interface and an engine that efficiently implements that interface."
+    elClass "p" "class" $ text "Reflex is a fully-deterministic, higher-order Functional Reactive Programming (FRP) interface and an engine that efficiently implements that interface."
 
 
     -- Create a list of links from a list of tuples
