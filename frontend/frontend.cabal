@@ -7,22 +7,39 @@ library
   hs-source-dirs: src
   build-depends: base
                , common
+               , containers
+               , data-default
+               , font-awesome-type
                , reflex-dom
                , static
                , text
+               , lens
+               , ghcjs-dom
+               , reflex
+               , jsaddle
+               , static
   exposed-modules:
     Frontend
+    Frontend.FontAwesome
+    Frontend.Kiss
   ghc-options: -Wall
 
 executable frontend
   main-is: main.hs
   hs-source-dirs: src
   build-depends: base
-               , common
+               , reflex
                , reflex-dom
-               , static
-               , text
+               , common
+               , containers
+               , data-default
+               , font-awesome-type
                , frontend
+               , ghcjs-dom
+               , jsaddle
+               , text
+               , lens
+               , static
   --TODO: Make these ghc-options optional
   ghc-options: -threaded
   if os(darwin)
