@@ -89,6 +89,8 @@ This will give you the exact environment needed to work with the given package a
 
 You can replace ghcjs with ghc to hack on the native GHC version of the package (including with GHCi if you want). You can also use a package name instead of a path, which will drop you into the standard build environment of that package; this works even if you don't yet have the source for that package.
 
+.. note:: The ``cabal update`` and ``cabal install`` commands should not be used as the task of fetching and installing dependecies is done by ``nix``.
+
 Add reflex-platform to project
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
