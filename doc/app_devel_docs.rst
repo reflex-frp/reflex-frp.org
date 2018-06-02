@@ -92,7 +92,7 @@ For more details checkout the articles on :ref:`monad_fix`
 Compilation Errors
 ~~~~~~~~~~~~~~~~~~
 
-These are a few common compile time errors which can occue while using the
+These are a few common compile time errors which can occur while using the
 widgets
 
 * If you define a widget but don't use it any where ::
