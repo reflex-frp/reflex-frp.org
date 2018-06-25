@@ -1,7 +1,7 @@
 {
   "owner": "obsidiansystems",
   "repo": "obelisk",
-  "branch": "srid-https-deploy--upstream-acme",
-  "rev": "2f41d037ddfbf948c4c71863e5c6664f2bf1dd80",
-  "sha256": "09wjl5nz5da95p3vps7va4q28gqf83bhx3gi8sljn4g2fbv9kp9y"
+  "branch": "master",
+  "rev": "495f20ccf033a7700fb8afaca40229dedd9d161b",
+  "sha256": "0z7w8byfcznq6z0rmf5siqp2clxmyian3sb3mpx5cvyia9fnmfgh"
 }
