@@ -9,6 +9,11 @@ library
                , reflex-dom
                , text
                , containers
+               , lens
+               , categories
+               , universe
+               , either
+               , obelisk-route
   exposed-modules:
     Common.Api
     Common.Route

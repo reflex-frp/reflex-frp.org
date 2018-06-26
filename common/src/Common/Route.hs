@@ -1,67 +1,97 @@
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE StandaloneDeriving #-}
 {-# LANGUAGE InstanceSigs #-}
-{-# LANGUAGE RecursiveDo, TemplateHaskell #-}
+{-# LANGUAGE RecursiveDo #-}
+{-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE KindSignatures #-}
+{-# LANGUAGE GADTs #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
 
 module Common.Route where
 
 import Reflex.Dom
 
+import Control.Monad.Except
 import Data.Text (Text)
 import qualified Data.Map as Map
 import Data.Maybe
 
--- | Custom data type that corresponds to a site's navBar
-data Route = Route_Home | Route_Tutorials | Route_Examples | Route_Documentation | Route_FAQ
-  deriving (Show, Eq, Ord)
+import Obelisk.Route
+import Data.Universe
+import Data.Some (Some)
+import qualified Data.Some as Some
+import Data.Dependent.Sum
+import Data.GADT.Compare.TH
+import Data.GADT.Show
+import Data.GADT.Show.TH
+import Data.Functor.Identity
 
------------------------------------------WIDGET BODIES------------------------------------
-home :: (DomBuilder t m) => m ()
-home = elClass "div" "main" $ do
-         elClass "h3" "title" $ text "Practical Functional Reactive Programming"
-         elClass "p" "class" $ text "Reflex is an fully-deterministic, higher-order Functional Reactive Programming (FRP) interface and an engine that efficiently implements that interface."
+--------------------------------------------------------------------------------
+-- Useful
+--------------------------------------------------------------------------------
 
+data Route :: * -> * where
+  Route_Home :: Route ()
+  Route_Tutorials :: Route ()
+  Route_Examples :: Route ()
+  Route_Documentation :: Route ()
+  Route_FAQ :: Route ()
 
-tutorials :: (DomBuilder t m) => m ()
-tutorials = elClass "div" "main" $ do
-    elClass "h3" "title" $ text "Tutorials"
-    el "ol" $ do
-      el "li" $ do
-        el "label" $ text "Installation: "
-        elAttr "a" ("href" =: "https://github.com/reflex-frp/reflex-platform/blob/develop/README.md") $ text "setup-instructions"
-      el "li" $ do
-        el "label" $ text "Beginner Friendly Tutorial: "
-        elAttr "a" ("href" =: "https://github.com/hansroland/reflex-dom-inbits/blob/master/tutorial.md") $ text "reflex-dom-inbits"
+--TODO: This naming convention should be changed
+--TODO: showRoute and routeEncoder should be separate
+showRoute :: Some Route -> Maybe Text
+showRoute = \case
+  Some.This Route_Home -> Nothing
+  Some.This Route_Tutorials -> Just "tutorials"
+  Some.This Route_Examples -> Just "examples"
+  Some.This Route_Documentation -> Just "documentation"
+  Some.This Route_FAQ -> Just "faq"
 
+--------------------------------------------------------------------------------
+-- Annoying
+--------------------------------------------------------------------------------
 
+--TODO: Don't use the term "rest" - it's loaded in web apps
+--TODO: We really shouldn't have to write this
+routeRestEncoder :: (MonadError Text check, MonadError Text parse) => Route a -> Encoder check parse a PageName
+routeRestEncoder = Encoder . pure . \case --TODO: Shouldn't have to say `Encoder . pure` here
+  Route_Home -> endValidEncoder mempty
+  Route_Tutorials -> endValidEncoder mempty
+  Route_Examples -> endValidEncoder mempty
+  Route_Documentation -> endValidEncoder mempty
+  Route_FAQ -> endValidEncoder mempty
 
-examples :: (DomBuilder t m) => m ()
-examples = elClass "div" "main" $ do
-     elClass "h3" "title" $ text "Check Out Some Example Code"
-     el "ul" $ do
-      el "li" $ do
-        el "label" $ text "Basic ToDo List: "
-        elAttr "a" ("href" =: "https://github.com/reflex-frp/reflex-examples/blob/master/BasicTodo/BasicTodo.hs") $ text "See Code Here"
-      el "li" $ do
-        el "label" $ text "JSON API - NASA Pic of the Day: "
-        elAttr "a" ("href" =: "https://github.com/reflex-frp/reflex-examples/blob/master/nasa-pod/workshop.hs") $ text "See Code Here"
+deriving instance Show (Route a)
 
+instance Universe (Some Route) where
+  universe =
+    [ Some.This Route_Home
+    , Some.This Route_Tutorials
+    , Some.This Route_Examples
+    , Some.This Route_Documentation
+    , Some.This Route_FAQ
+    ]
 
-documentation :: (DomBuilder t m) => m ()
-documentation = elClass "div" "main" $ do
-    elClass "h3" "title" $ text "Refreshing Reflex Documentation"
-    el "ul" $ do
-      el "li" $ do
-        el "label" $ text "Reflex Basic Documentation: "
-        elAttr "a" ("href" =: "http://reflex-frp.readthedocs.io/en/latest/architecture.html#overview-of-reflex-basics") $ text "View Here"
-      el "li" $ do
-        el "label" $ text "Quick Reference: "
-        elAttr "a" ("href" =: "https://github.com/reflex-frp/reflex-dom/blob/develop/Quickref.md") $ text "View Here"
+deriveGCompare ''Route
+deriveGEq ''Route
+deriveGShow ''Route
 
+instance EqTag Route Identity where
+  eqTagged r _ a b = case r of
+    Route_Home -> a == b
+    Route_Tutorials -> a == b
+    Route_Examples -> a == b
+    Route_Documentation -> a == b
+    Route_FAQ -> a == b
 
-faq :: (DomBuilder t m) => m ()
-faq = elClass "div" "main" $ do
-            elClass "h3" "title" $ text "FAQ"
-            el "p" $ text "FAQ questions coming soon! For now, feel free to ask questions within the Reflex-FRP IRC chat provided below. Thank you!"
+instance OrdTag Route Identity where
+  compareTagged r _ a b = case r of
+    Route_Home -> a `compare` b
+    Route_Tutorials -> a `compare` b
+    Route_Examples -> a `compare` b
+    Route_Documentation -> a `compare` b
+    Route_FAQ -> a `compare` b
