@@ -55,19 +55,19 @@ frontend = (head', body)
       elAttr "meta" viewport blank        -- add meta-data viewport
       FA.fontAwesomeCDN
       -- add various favIcon links
-      faviconLinker "icon" "image/png" "16x16" "img/favicon-16x16.png"
-      faviconLinker "icon" "image/png" "32x32" "img/favicon-32x32.png"
-      faviconLinker "apple-touch-icon" "/" "57x57" "img/apple-touch-icon-57x57.png"
-      faviconLinker "apple-touch-icon" "/" "60x60" "img/apple-touch-icon-60x60.png"
-      faviconLinker "apple-touch-icon" "/" "72x72" "img/apple-touch-icon-72x72.png"
-      faviconLinker "apple-touch-icon" "/" "76x76" "img/apple-touch-icon-76x76.png"
-      faviconLinker "apple-touch-icon" "/" "114x114" "img/apple-touch-icon-114x114.png"
-      faviconLinker "apple-touch-icon" "/" "120x120" "img/apple-touch-icon-120x120.png"
-      faviconLinker "apple-touch-icon" "/" "144x144" "img/apple-touch-icon-144x144.png"
-      faviconLinker "apple-touch-icon" "/" "152x152" "img/apple-touch-icon-152x152.png"
-      faviconLinker "icon" "image/png" "img/favicon-196x196.png" "196x196"
-      styleSheet "style.css"              --  link css stylesheet
-      styleSheet "font.css"               --  link css fonts
+      faviconLinker "icon" "image/png" "16x16" (static @"img/favicon-16x16.png")
+      faviconLinker "icon" "image/png" "32x32" (static @"img/favicon-32x32.png")
+      faviconLinker "apple-touch-icon" "/" "57x57" (static @"img/apple-touch-icon-57x57.png")
+      faviconLinker "apple-touch-icon" "/" "60x60" (static @"img/apple-touch-icon-60x60.png")
+      faviconLinker "apple-touch-icon" "/" "72x72" (static @"img/apple-touch-icon-72x72.png")
+      faviconLinker "apple-touch-icon" "/" "76x76" (static @"img/apple-touch-icon-76x76.png")
+      faviconLinker "apple-touch-icon" "/" "114x114" (static @"img/apple-touch-icon-114x114.png")
+      faviconLinker "apple-touch-icon" "/" "120x120" (static @"img/apple-touch-icon-120x120.png")
+      faviconLinker "apple-touch-icon" "/" "144x144" (static @"img/apple-touch-icon-144x144.png")
+      faviconLinker "apple-touch-icon" "/" "152x152" (static @"img/apple-touch-icon-152x152.png")
+      faviconLinker "icon" "image/png" "196x196" (static @"img/favicon-196x196.png")
+      styleSheet $ static @"style.css"              --  link css stylesheet
+      styleSheet $ static @"font.css"               --  link css fonts
       return ()
 
 body :: (DomBuilder t m
@@ -321,18 +321,13 @@ navMenu tabList = do
   let currentTabDemux = demux currentTab      -- change type (Dynamic t a) to (Demux t a)
   forM_ tabList $ \route -> do
         let selected = demuxed currentTabDemux route -- compare currentTab and section
-        let highlight = zipDynWith isActive currentTab selected -- if selected is True, highlight currentTab
+        let highlight = ffor selected $ \case
+              True -> "class" =: "chosenOne"
+              False -> mempty
         el "li" $ do
           -- Get anchor tag element with Route name and corresponding "active:" styling
           (linkEl, _) <- elDynAttr' "a" (highlight) $ text (routeToTitle route)
           tellEvent $ Endo (const route) <$ domEvent Click linkEl
-
-isActive :: R Route -> Bool -> Map Text Text
-isActive ia isit = "id" =: (routeToTitle ia)
-           <> "class" =: (active isit)
-  where
-    active True = "chosenOne"
-    active False = ""
 
 
 -------------MOBILE NAV MENU BUILDER ----------------------------------
