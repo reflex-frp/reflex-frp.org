@@ -13,12 +13,8 @@
 
 module Common.Route where
 
-import Reflex.Dom
-
 import Control.Monad.Except
 import Data.Text (Text)
-import qualified Data.Map as Map
-import Data.Maybe
 
 import Obelisk.Route
 import Data.Universe
@@ -26,7 +22,6 @@ import Data.Some (Some)
 import qualified Data.Some as Some
 import Data.Dependent.Sum
 import Data.GADT.Compare.TH
-import Data.GADT.Show
 import Data.GADT.Show.TH
 import Data.Functor.Identity
 
@@ -77,10 +72,6 @@ instance Universe (Some Route) where
     , Some.This Route_FAQ
     ]
 
-deriveGCompare ''Route
-deriveGEq ''Route
-deriveGShow ''Route
-
 --TODO: Eliminate the need to write these instances by hand
 instance EqTag Route Identity where
   eqTagged r _ a b = case r of
@@ -98,3 +89,7 @@ instance OrdTag Route Identity where
     Route_Examples -> a `compare` b
     Route_Documentation -> a `compare` b
     Route_FAQ -> a `compare` b
+
+deriveGCompare ''Route
+deriveGEq ''Route
+deriveGShow ''Route

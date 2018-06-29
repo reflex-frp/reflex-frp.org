@@ -10,12 +10,9 @@
 {-# LANGUAGE Rank2Types #-}
 module Frontend where
 
-import Prelude hiding ((.), id, fst, snd)
-
 import Data.Map (Map)
 import qualified Data.Map as Map
 import Data.Text (Text)
-import qualified Data.Text as T
 import Reflex.Dom.Core
 import Data.Monoid
 import Control.Monad
@@ -23,28 +20,14 @@ import Control.Monad.Fix
 import Obelisk.Route
 import Obelisk.Route.Frontend
 import Data.Universe
+import Data.Dependent.Sum (DSum (..))
+import Control.Monad.Identity
 
-import Common.Api
 import Common.Route
-import Frontend.Kiss
 import qualified Frontend.FontAwesome as FA
 import Static
 
-import Reflex.View.Base
-import Network.URI
-import Control.Monad.Except
-import Control.Category
-import qualified Control.Categorical.Functor as Cat
-import Control.Categorical.Bifunctor
-import Control.Category.Cartesian
 import Language.Javascript.JSaddle
-import Control.Monad.Reader
-import Data.Dependent.Sum (DSum (..))
-import Data.GADT.Show
-import Data.Functor.Compose
-import Data.GADT.Compare
-import Data.Functor.Identity
-import qualified GHCJS.DOM.Types as DOM
 import Data.Some (Some)
 import qualified Data.Some as Some
 
@@ -199,12 +182,11 @@ faq = elClass "div" "main" $ do
 
 routeToTitle :: R Route -> Text
 routeToTitle r = case r of
-  Route_Home :/ () -> "Home"
-  Route_Tutorials :/ () -> "Tutorials"
-  Route_Examples :/ () -> "Examples"
-  Route_Documentation :/ () -> "Documentation"
-  Route_FAQ :/ () -> "FAQ"
-
+  Route_Home :=> Identity () -> "Home"
+  Route_Tutorials :=> Identity () -> "Tutorials"
+  Route_Examples :=> Identity () -> "Examples"
+  Route_Documentation :=> Identity () -> "Documentation"
+  Route_FAQ :=> Identity () -> "FAQ"
 
 -- Body generating function, adds navbar and corresponding widgets
 bodyGen
@@ -217,9 +199,9 @@ bodyGen
      , TriggerEvent t m
      )
   => Text  -- path to image in project directory
-  -> ViewT t (R Route) (Endo (R Route)) m ()
+  -> RoutedT t (R Route) (EventWriterT t (Endo (R Route)) m) ()
 bodyGen theLogo = elClass "div" "header" $ do
-  (homeEvent,_) <- elAttr' "img" ("class" =: "logo" <> "src" =: theLogo) blank
+  (homeEvent, _) <- elAttr' "img" ("class" =: "logo" <> "src" =: theLogo) blank
   tellEvent $ Endo (const $ Route_Home :/ ()) <$ domEvent Click homeEvent -- go Home if site logo is clicked
   mobileNavMenu navMenu
   subRoute_ $ \case
@@ -244,8 +226,8 @@ navMenu
 navMenu = do
   currentTab <- askRoute
   let currentTabDemux = demux currentTab      -- change type (Dynamic t a) to (Demux t a)
-  forM_ universe $ \(Some.This section) -> do
-        let route = section :/ case section of
+  forM_ universe $ \(Some.This sec) -> do
+        let route = sec :/ case sec of
               Route_Home -> ()
               Route_Tutorials -> ()
               Route_Examples -> ()
@@ -283,8 +265,8 @@ mobileNavMenu items = do
     isOpen <- toggle False onClick                      -- add toggle-able Boolean Event when clicked
     let toggleOpen = section <$> isOpen                 -- fmap Boolean to 'section'
     let onClick = domEvent Click modalDiv                -- add Event target
-    (modalDiv,mWidg) <- elDynAttr' "div" toggleOpen $ do -- Bootleg modal div (used to close dropdown if user clicks elsewhere)
-      (_,widg) <- elDynAttr' "ul" toggleOpen $ do        -- get a tuple with (EventResult, m())
+    (modalDiv, _) <- elDynAttr' "div" toggleOpen $ do -- Bootleg modal div (used to close dropdown if user clicks elsewhere)
+      (_, widg) <- elDynAttr' "ul" toggleOpen $ do        -- get a tuple with (EventResult, m())
         let selectedTitle = routeToTitle <$> activeTab    -- set Title for Responsive Menu
         el "div" $ text " "                              -- added this div for flexbox fix (temp fix)
         el "p" $ dynText selectedTitle                   -- add h3 with Dynmically changing title
