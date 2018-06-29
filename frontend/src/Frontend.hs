@@ -208,7 +208,7 @@ routeToTitle r = case r of
   Route_Tutorials :/ () -> "Tutorials"
   Route_Examples :/ () -> "Examples"
   Route_Documentation :/ () -> "Documentation"
-  Route_FAQ :/ () -> "Faq"
+  Route_FAQ :/ () -> "FAQ"
 
 
 -- Body generating function, adds navbar and corresponding widgets
@@ -278,7 +278,7 @@ mobileNavMenu items = do
     let onClick = domEvent Click modalDiv                -- add Event target
     (modalDiv,mWidg) <- elDynAttr' "div" toggleOpen $ do -- Bootleg modal div (used to close dropdown if user clicks elsewhere)
       (_,widg) <- elDynAttr' "ul" toggleOpen $ do        -- get a tuple with (EventResult, m())
-        let selectedTitle = T.toUpper . routeToTitle <$> activeTab    -- set Title for Responsive Menu
+        let selectedTitle = routeToTitle <$> activeTab    -- set Title for Responsive Menu
         el "div" $ text " "                              -- added this div for flexbox fix (temp fix)
         el "p" $ dynText selectedTitle                   -- add h3 with Dynmically changing title
         _ <- FA.faIcon' FA.FaBars $ def -- add FontAwsome Menu Icon with Large size configs added
