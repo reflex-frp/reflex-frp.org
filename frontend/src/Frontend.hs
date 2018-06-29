@@ -30,6 +30,7 @@ import Static
 
 import Reflex.View.Base
 import Network.URI
+import Control.Monad.Except
 import Control.Category
 import qualified Control.Categorical.Functor as Cat
 import Control.Categorical.Bifunctor
@@ -40,6 +41,8 @@ import Data.Dependent.Sum (DSum (..))
 import Data.Functor.Compose
 import Data.GADT.Compare
 import Data.Functor.Identity
+import qualified GHCJS.DOM.Types as DOM
+import Data.Some (Some)
 
 frontend :: (StaticWidget x (), Widget x ())
 frontend = (head', body)
@@ -79,7 +82,7 @@ body :: (DomBuilder t m
         )
         => m ()
 body = do
-  runRouteViewT $ bodyGen siteLogo siteRoutes
+  runRouteViewT routeComponentEncoder routeRestEncoder $ bodyGen siteLogo siteRoutes
   elClass "div" "main" $ do
     el "p" $ text "Check us out on Hackage or join the community IRC chat!"
     forM_ links $ \pair -> do
@@ -214,44 +217,67 @@ historyItemToUrlPathCommand
 historyItemToUrlPathCommand encoder = ViewMorphism
   { _viewMorphism_mapCommand = \(Endo update) -> Endo $ \oldVal -> case update $ eitherToDSum $ _validEncoder_decode fullEncoder $ (uriPath &&& uriQuery) $ _historyItem_uri oldVal of
       LeftTag :/ _ -> oldVal --TODO: Do something with errors?
-      RightTag :/ newRoute -> case _validEncoder_encode encoder newRoute of
+      RightTag :/ newRoute -> case _validEncoder_encode fullEncoder newRoute of
         (newPathSegments, newQueryItems) -> oldVal
           { _historyItem_uri = (_historyItem_uri oldVal)
-            { uriPath = _validEncoder_encode pathEncoder newPathSegments
-            , uriQuery = _validEncoder_encode queryEncoder newQueryItems
+            { uriPath = newPathSegments
+            , uriQuery = newQueryItems
             }
           }
   , _viewMorphism_mapState = eitherToDSum . _validEncoder_decode fullEncoder . (uriPath &&& uriQuery) . _historyItem_uri
   }
   where --TODO: URL component encoding/decoding
-    Right pathEncoder = checkEncoder $ unpackTextEncoder . prefixTextEncoder "/" . intercalateTextEncoder "/" . listToNonEmptyEncoder :: Either Text (ValidEncoder (Either Text) [Text] String)
-    Right queryEncoder = checkEncoder $ unpackTextEncoder . prefixNonemptyTextEncoder "?" . intercalateTextEncoder "&" . listToNonEmptyEncoder . Cat.fmap (joinPairTextEncoder "=") . toListMapEncoder :: Either Text (ValidEncoder (Either Text) (Map Text Text) String)
-    fullEncoder = bimap pathEncoder queryEncoder . encoder
+    fullEncoder = pageNameEncoder . encoder
+
+-- | Encode a PageName into a path and query string, suitable for use in the
+-- 'URI' type
+pageNameEncoder :: MonadError Text parse => ValidEncoder parse PageName (String, String)
+pageNameEncoder = ve
+  where Right ve = checkEncoder $ bimap
+          (unpackTextEncoder . prefixTextEncoder "/" . intercalateTextEncoder "/" . listToNonEmptyEncoder)
+          (unpackTextEncoder . prefixNonemptyTextEncoder "?" . intercalateTextEncoder "&" . listToNonEmptyEncoder . Cat.fmap (joinPairTextEncoder "=") . toListMapEncoder)
 
 --TODO: Factor this out into Obelisk
 runRouteViewT
-  :: ( Monad m
+  :: forall t m.
+     ( Monad m
      , TriggerEvent t m
      , PerformEvent t m
      , MonadHold t m
      , MonadJSM m
      , MonadJSM (Performable m)
      , MonadFix m
+     , Adjustable t m
+     , DomBuilder t m
      )
-  => ViewT t (R (EitherTag Text (R Route))) (Endo (R (EitherTag Text (R Route)))) m a
+  => (Encoder (Either Text) (Either Text) (Some Route) (Maybe Text))
+  -> (forall a. Route a -> Encoder (Either Text) (Either Text) a PageName)
+  -> ViewT t (R Route) (Endo (R Route)) m ()
   -> m ()
-runRouteViewT b = do
+runRouteViewT routeEncoder routeRestEncoder b = do
   rec historyState <- manageHistory $ HistoryCommand_PushState <$> setState
-      let Right encoder = checkEncoder $ obeliskRouteEncoder showRoute routeRestEncoder . Encoder (pure $ prismValidEncoder $ rPrism _ObeliskRoute_App)
-      changeState <- execViewT (mapViewT (historyItemToUrlPathCommand encoder) b) historyState
-      let f oldItem change =
-            let newItem = appEndo change oldItem
-            in HistoryStateUpdate
-               { _historyStateUpdate_state = _historyItem_state newItem
-               , _historyStateUpdate_title = "Reflex FRP" --TODO
-               , _historyStateUpdate_uri = Just $ _historyItem_uri newItem
-               }
-          setState = attachWith f (current historyState) changeState
+      let Right myEncoder = checkEncoder $ obeliskRouteEncoder routeEncoder routeRestEncoder . Encoder (pure $ prismValidEncoder $ rPrism _ObeliskRoute_App)
+          route :: Dynamic t (R (EitherTag Text (R Route)))
+          route = fmap (eitherToDSum . _validEncoder_decode (pageNameEncoder . myEncoder) . (uriPath &&& uriQuery) . _historyItem_uri) historyState
+      let app :: ReaderT (Dynamic t (R (EitherTag Text (R Route)))) (EventWriterT t (Endo (R Route)) m) () --TODO: should probably be flipped monoid compared with `Endo`
+          app = factorRoute_ $ \case
+            LeftTag -> text "404"
+            RightTag -> b
+      ((), changeState) <- runEventWriterT $ runReaderT app route
+      let f oldRoute change = case oldRoute of
+            LeftTag :/ _ -> Nothing
+            RightTag :/ r -> Just $
+              let newRoute = appEndo change r
+                  (newPath, newQuery) = _validEncoder_encode (pageNameEncoder . myEncoder) newRoute
+              in HistoryStateUpdate
+                 { _historyStateUpdate_state = DOM.SerializedScriptValue jsNull
+                 , _historyStateUpdate_title = "Reflex FRP" --TODO
+                 , _historyStateUpdate_uri = Just $ nullURI
+                   { uriPath = newPath
+                   , uriQuery = newQuery
+                   }
+                 }
+          setState = attachWithMaybe f (current route) changeState
   return ()
 
 --TODO: This needs to use a monad other than ReaderT - something that guarantees that the value is actually available.  Perhaps a "strict ReaderT"? Otherwise factorDyn will fail
@@ -266,19 +292,17 @@ bodyGen :: (DomBuilder t m, PostBuild t m, Prerender js m, MonadHold t m
           , MonadFix m, PerformEvent t m, TriggerEvent t m)
               => Text  -- path to image in project directory
               -> [R Route]   -- list of directories/routes of website
-              -> ViewT t (R (EitherTag Text (R Route))) (Endo (R (EitherTag Text (R Route)))) m ()
-bodyGen theLogo pageTabs = factorRoute_ $ \case
-  LeftTag -> text "404" --TODO: Do we actually want a 404 page?
-  RightTag -> elClass "div" "header" $ do
-    (homeEvent,_) <- elAttr' "img" ("class" =: "logo" <> "src" =: theLogo) blank
-    tellEvent $ Endo (const (RightTag :/ head pageTabs)) <$ domEvent Click homeEvent -- go Home if site logo is clicked
-    mobileNavMenu $ navMenu pageTabs
-    factorRoute_ $ \case
-      Route_Home -> home
-      Route_Tutorials -> tutorials
-      Route_Examples -> examples
-      Route_Documentation -> documentation
-      Route_FAQ -> faq
+              -> ViewT t (R Route) (Endo (R Route)) m ()
+bodyGen theLogo pageTabs = elClass "div" "header" $ do
+  (homeEvent,_) <- elAttr' "img" ("class" =: "logo" <> "src" =: theLogo) blank
+  tellEvent $ Endo (const (head pageTabs)) <$ domEvent Click homeEvent -- go Home if site logo is clicked
+  mobileNavMenu $ navMenu pageTabs
+  factorRoute_ $ \case
+    Route_Home -> home
+    Route_Tutorials -> tutorials
+    Route_Examples -> examples
+    Route_Documentation -> documentation
+    Route_FAQ -> faq
 
 ----------------------------------------------------NAV MENU BUILDER ---------------------------------------------------
 -- Nav Bar generator produces click-able Widget Events
@@ -287,7 +311,7 @@ navMenu
      , MonadHold t m
      , MonadFix m
      , PostBuild t m
-     , EventWriter t (Endo (R (EitherTag Text (R Route)))) m
+     , EventWriter t (Endo (R Route)) m
      , MonadReader (Dynamic t (R Route)) m
      )
   => [R Route]
@@ -301,7 +325,7 @@ navMenu tabList = do
         el "li" $ do
           -- Get anchor tag element with Route name and corresponding "active:" styling
           (linkEl, _) <- elDynAttr' "a" (highlight) $ text (routeToTitle route)
-          tellEvent $ Endo (const $ RightTag :/ route) <$ domEvent Click linkEl
+          tellEvent $ Endo (const route) <$ domEvent Click linkEl
 
 isActive :: R Route -> Bool -> Map Text Text
 isActive ia isit = "id" =: (routeToTitle ia)

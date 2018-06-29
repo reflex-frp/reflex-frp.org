@@ -43,20 +43,20 @@ data Route :: * -> * where
 
 --TODO: This naming convention should be changed
 --TODO: showRoute and routeEncoder should be separate
-showRoute :: Some Route -> Maybe Text
-showRoute = \case
-  Some.This Route_Home -> Nothing
-  Some.This Route_Tutorials -> Just "tutorials"
-  Some.This Route_Examples -> Just "examples"
-  Some.This Route_Documentation -> Just "documentation"
-  Some.This Route_FAQ -> Just "faq"
+routeComponentEncoder :: (MonadError Text check, MonadError Text parse) => Encoder check parse (Some Route) (Maybe Text)
+routeComponentEncoder = enum1Encoder $ \case
+  Route_Home -> Nothing
+  Route_Tutorials -> Just "tutorials"
+  Route_Examples -> Just "examples"
+  Route_Documentation -> Just "documentation"
+  Route_FAQ -> Just "faq"
 
 --------------------------------------------------------------------------------
 -- Annoying
 --------------------------------------------------------------------------------
 
 --TODO: Don't use the term "rest" - it's loaded in web apps
---TODO: We really shouldn't have to write this
+--TODO: We should consider using a typeclass to infer the continuations for each thing
 routeRestEncoder :: (MonadError Text check, MonadError Text parse) => Route a -> Encoder check parse a PageName
 routeRestEncoder = Encoder . pure . \case --TODO: Shouldn't have to say `Encoder . pure` here
   Route_Home -> endValidEncoder mempty
@@ -67,6 +67,7 @@ routeRestEncoder = Encoder . pure . \case --TODO: Shouldn't have to say `Encoder
 
 deriving instance Show (Route a)
 
+--TODO: Eliminate the need to write these instances by hand
 instance Universe (Some Route) where
   universe =
     [ Some.This Route_Home
@@ -80,6 +81,7 @@ deriveGCompare ''Route
 deriveGEq ''Route
 deriveGShow ''Route
 
+--TODO: Eliminate the need to write these instances by hand
 instance EqTag Route Identity where
   eqTagged r _ a b = case r of
     Route_Home -> a == b
@@ -88,6 +90,7 @@ instance EqTag Route Identity where
     Route_Documentation -> a == b
     Route_FAQ -> a == b
 
+--TODO: Eliminate the need to write these instances by hand
 instance OrdTag Route Identity where
   compareTagged r _ a b = case r of
     Route_Home -> a `compare` b
