@@ -14,6 +14,8 @@
 {-# LANGUAGE PolyKinds #-}
 module Reflex.View.Base where
 
+import Obelisk.Route.Frontend
+
 import Control.Lens
 import Control.Monad.Reader
 import Data.Coerce
@@ -69,22 +71,11 @@ myWidget v = factorView v $ \case
 -- | IMPORTANT: The state 'Dynamic' must always be sampleable
 --TODO: Split the ReaderT part of this into a "strict dynamic" monad
 --TODO: newtype this
-type ViewT t s c m a = ReaderT (Dynamic t s) (EventWriterT t c m) a
+type ViewT t s c m a = RoutedT t s (EventWriterT t c m) a
 
-
---TODO: Probably shouldn't return Event
-factorWidget :: (MonadWidget t m, GEq k) => Dynamic t (DSum k v) -> (DSum k (Compose (Dynamic t) v) -> m a) -> m (Event t a)
-factorWidget d w = do
-  d' <- factorDyn d
-  dyn $ fmap w d'
 
 askModel :: Monad m => ViewT t s c m (Dynamic t s)
-askModel = ask
-
-modelDyn :: (Reflex t, MonadSample t m, MonadHold t m, Adjustable t m, Semigroup c) => (s -> ViewT t s c m a) -> ViewT t s c m (Dynamic t a)
-modelDyn f = do
-  m <- askModel
-  strictDynWidget m f
+askModel = askRoute
 
 --TODO: Should these be patches?
 data ViewMorphism s s' c c' = ViewMorphism
@@ -114,13 +105,13 @@ dmapToEndo (AppendDMap m) = Endo $ \kv@(k :=> Identity v) -> case DMap.lookup k 
 
 -- | IMPORTANT: The state 'Dynamic' must always be sampleable
 runViewT :: (Reflex t, Monad m, Semigroup c) => ViewT t s c m a -> Dynamic t s -> m (a, Event t c)
-runViewT v s = runEventWriterT $ runReaderT v s
+runViewT v s = runEventWriterT $ runRoutedT v s
 
 execViewT :: (Reflex t, Monad m, Semigroup c) => ViewT t s c m a -> Dynamic t s -> m (Event t c)
 execViewT v s = snd <$> runViewT v s
 
 mapViewT :: (Reflex t, Semigroup c, Semigroup c', MonadHold t m, MonadFix m) => ViewMorphism s' s c' c -> ViewT t s' c' m a -> ViewT t s c m a
-mapViewT (ViewMorphism g f) = withReaderT (fmap f) . mapReaderT (withEventWriterT g)
+mapViewT (ViewMorphism g f) = withRoutedT (fmap f) . mapRoutedT (withEventWriterT g)
 
 newtype AppendDMap k v = AppendDMap { unAppendDMap :: DMap k v }
 
@@ -138,41 +129,6 @@ instance (GCompare k, ForallF Semigroup v) => Monoid (AppendDMap k v) where
           f (_ :: k a) = case instF @Semigroup @v @a of
             Sub Dict -> (<>)
 
--- | WARNING: The input 'Dynamic' must be fully constructed when this is run
-strictDynWidget :: (Reflex t, MonadSample t m, MonadHold t m, Adjustable t m) => Dynamic t a -> (a -> m b) -> m (Dynamic t b)
-strictDynWidget a f = do
-  a0 <- sample $ current a
-  (result0, result') <- runWithReplace (f a0) $ f <$> updated a
-  holdDyn result0 result'
-
-strictDynWidget_ :: (Reflex t, MonadSample t m, MonadHold t m, Adjustable t m) => Dynamic t a -> (a -> m ()) -> m ()
-strictDynWidget_ a f = do
-  a0 <- sample $ current a
-  (result0, result') <- runWithReplace (f a0) $ f <$> updated a
-  pure ()
-
---TODO: How do we capture that the command being sent back will always match the current state?
-factorViewT
-  :: forall t m k s c v.
-     ( Reflex t
-     , Monad m
-     , MonadFix m
-     , MonadHold t m
-     , ForallF Semigroup c
-     , Adjustable t m
-     , GCompare k
-     )
-  => (forall a. k a -> ViewT t (s a) (c a) m (v a))
-  -> ViewT t (DSum k s) (AppendDMap k c) m (Dynamic t (DSum k v))
-factorViewT v = do
-  s <- factorDyn =<< ask
-  strictDynWidget s $ \((k :: k a) :=> Compose s) ->
-    case instF @Semigroup @c @a of
-      Sub Dict -> do
-        (v, c) <- lift $ lift $ runViewT (v k) s
-        tellEvent $ fmapCheap (AppendDMap . DMap.singleton k) c
-        return $ k :=> v
-
 -- Separate routing concerns:
 --   Parsing/unparsing
 --   StrictDynamic (being able to write Dynamic t (m a) -> m (Dynamic t a))
@@ -183,6 +139,7 @@ factorViewT v = do
 --     factorDynPure
 --       unsafeLiftPushM :: PushM t a -> PullM t a
 
+{-
 unsafeLiftPushM :: Reflex t => PushM t a -> PullM t a
 unsafeLiftPushM = undefined
 
@@ -212,3 +169,4 @@ f d =
       out :: Dynamic t (n (Compose (Dynamic t) v))
       out = unsafeBuildDynamic getInitial update
   in out
+-}

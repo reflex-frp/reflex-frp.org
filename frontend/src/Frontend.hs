@@ -21,6 +21,8 @@ import Data.Monoid
 import Control.Monad
 import Control.Monad.Fix
 import Obelisk.Route
+import Obelisk.Route.Frontend
+import Data.Universe
 
 import Common.Api
 import Common.Route
@@ -38,6 +40,7 @@ import Control.Category.Cartesian
 import Language.Javascript.JSaddle
 import Control.Monad.Reader
 import Data.Dependent.Sum (DSum (..))
+import Data.GADT.Show
 import Data.Functor.Compose
 import Data.GADT.Compare
 import Data.Functor.Identity
@@ -82,7 +85,7 @@ body :: (DomBuilder t m
         )
         => m ()
 body = do
-  runRouteViewT routeComponentEncoder routeRestEncoder $ bodyGen siteLogo siteRoutes
+  runRouteViewT routeComponentEncoder routeRestEncoder routeToTitle (\_ -> Route_Home :/ ()) $ bodyGen siteLogo siteRoutes
   elClass "div" "main" $ do
     el "p" $ text "Check us out on Hackage or join the community IRC chat!"
     forM_ links $ \pair -> do
@@ -207,85 +210,6 @@ routeToTitle r = case r of
   Route_Documentation :/ () -> "Documentation"
   Route_FAQ :/ () -> "Faq"
 
---TODO: Factor out into Obelisk
---TODO: When the user manually goes to a URL, see if we can parse it as an AppRoute; if we can, jump straight to it without leaving the app; otherwise let the browser go to it separately.  This should also apply to all links
---TODO: Avoid parsing repeatedly
-historyItemToUrlPathCommand
-  :: forall a.
-     ValidEncoder (Either Text) a PageName
-  -> ViewMorphism (R (EitherTag Text a)) HistoryItem (Endo (R (EitherTag Text a))) (Endo HistoryItem)
-historyItemToUrlPathCommand encoder = ViewMorphism
-  { _viewMorphism_mapCommand = \(Endo update) -> Endo $ \oldVal -> case update $ eitherToDSum $ _validEncoder_decode fullEncoder $ (uriPath &&& uriQuery) $ _historyItem_uri oldVal of
-      LeftTag :/ _ -> oldVal --TODO: Do something with errors?
-      RightTag :/ newRoute -> case _validEncoder_encode fullEncoder newRoute of
-        (newPathSegments, newQueryItems) -> oldVal
-          { _historyItem_uri = (_historyItem_uri oldVal)
-            { uriPath = newPathSegments
-            , uriQuery = newQueryItems
-            }
-          }
-  , _viewMorphism_mapState = eitherToDSum . _validEncoder_decode fullEncoder . (uriPath &&& uriQuery) . _historyItem_uri
-  }
-  where --TODO: URL component encoding/decoding
-    fullEncoder = pageNameEncoder . encoder
-
--- | Encode a PageName into a path and query string, suitable for use in the
--- 'URI' type
-pageNameEncoder :: MonadError Text parse => ValidEncoder parse PageName (String, String)
-pageNameEncoder = ve
-  where Right ve = checkEncoder $ bimap
-          (unpackTextEncoder . prefixTextEncoder "/" . intercalateTextEncoder "/" . listToNonEmptyEncoder)
-          (unpackTextEncoder . prefixNonemptyTextEncoder "?" . intercalateTextEncoder "&" . listToNonEmptyEncoder . Cat.fmap (joinPairTextEncoder "=") . toListMapEncoder)
-
---TODO: Factor this out into Obelisk
-runRouteViewT
-  :: forall t m.
-     ( Monad m
-     , TriggerEvent t m
-     , PerformEvent t m
-     , MonadHold t m
-     , MonadJSM m
-     , MonadJSM (Performable m)
-     , MonadFix m
-     , Adjustable t m
-     , DomBuilder t m
-     )
-  => (Encoder (Either Text) (Either Text) (Some Route) (Maybe Text))
-  -> (forall a. Route a -> Encoder (Either Text) (Either Text) a PageName)
-  -> ViewT t (R Route) (Endo (R Route)) m ()
-  -> m ()
-runRouteViewT routeEncoder routeRestEncoder b = do
-  rec historyState <- manageHistory $ HistoryCommand_PushState <$> setState
-      let Right myEncoder = checkEncoder $ obeliskRouteEncoder routeEncoder routeRestEncoder . Encoder (pure $ prismValidEncoder $ rPrism _ObeliskRoute_App)
-          route :: Dynamic t (R (EitherTag Text (R Route)))
-          route = fmap (eitherToDSum . _validEncoder_decode (pageNameEncoder . myEncoder) . (uriPath &&& uriQuery) . _historyItem_uri) historyState
-      let app :: ReaderT (Dynamic t (R (EitherTag Text (R Route)))) (EventWriterT t (Endo (R Route)) m) () --TODO: should probably be flipped monoid compared with `Endo`
-          app = factorRoute_ $ \case
-            LeftTag -> text "404"
-            RightTag -> b
-      ((), changeState) <- runEventWriterT $ runReaderT app route
-      let f oldRoute change = case oldRoute of
-            LeftTag :/ _ -> Nothing
-            RightTag :/ r -> Just $
-              let newRoute = appEndo change r
-                  (newPath, newQuery) = _validEncoder_encode (pageNameEncoder . myEncoder) newRoute
-              in HistoryStateUpdate
-                 { _historyStateUpdate_state = DOM.SerializedScriptValue jsNull
-                 , _historyStateUpdate_title = "Reflex FRP" --TODO
-                 , _historyStateUpdate_uri = Just $ nullURI
-                   { uriPath = newPath
-                   , uriQuery = newQuery
-                   }
-                 }
-          setState = attachWithMaybe f (current route) changeState
-  return ()
-
---TODO: This needs to use a monad other than ReaderT - something that guarantees that the value is actually available.  Perhaps a "strict ReaderT"? Otherwise factorDyn will fail
-factorRoute_ :: (Reflex t, MonadFix m, MonadHold t m, GEq r, Adjustable t m) => (forall a. r a -> ReaderT (Dynamic t a) m ()) -> ReaderT (Dynamic t (R r)) m ()
-factorRoute_ f = ReaderT $ \d -> do
-  d' <- factorDyn d
-  strictDynWidget_ d' $ \(r :=> Compose d'') -> do
-    runReaderT (f r) $ coerceDynamic d''
 
 -- Body generating function, adds navbar and corresponding widgets
 bodyGen :: (DomBuilder t m, PostBuild t m, Prerender js m, MonadHold t m
@@ -297,7 +221,7 @@ bodyGen theLogo pageTabs = elClass "div" "header" $ do
   (homeEvent,_) <- elAttr' "img" ("class" =: "logo" <> "src" =: theLogo) blank
   tellEvent $ Endo (const (head pageTabs)) <$ domEvent Click homeEvent -- go Home if site logo is clicked
   mobileNavMenu $ navMenu pageTabs
-  factorRoute_ $ \case
+  subRoute_ $ \case
     Route_Home -> home
     Route_Tutorials -> tutorials
     Route_Examples -> examples
@@ -312,12 +236,12 @@ navMenu
      , MonadFix m
      , PostBuild t m
      , EventWriter t (Endo (R Route)) m
-     , MonadReader (Dynamic t (R Route)) m
+     , Routed t (R Route) m
      )
   => [R Route]
   -> m ()
 navMenu tabList = do
-  currentTab <- ask
+  currentTab <- askRoute
   let currentTabDemux = demux currentTab      -- change type (Dynamic t a) to (Demux t a)
   forM_ tabList $ \route -> do
         let selected = demuxed currentTabDemux route -- compare currentTab and section
@@ -342,12 +266,12 @@ mobileNavMenu
      , MonadHold t m
      , MonadFix m
      , PostBuild t m
-     , MonadReader (Dynamic t (R Route)) m
+     , Routed t (R Route) m
      )
   => m ()
   -> m ()
 mobileNavMenu items = do
-  activeTab <- ask
+  activeTab <- askRoute
   rec
     isOpen <- toggle False onClick                      -- add toggle-able Boolean Event when clicked
     let toggleOpen = section <$> isOpen                 -- fmap Boolean to 'section'
