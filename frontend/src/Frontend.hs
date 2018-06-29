@@ -46,6 +46,7 @@ import Data.GADT.Compare
 import Data.Functor.Identity
 import qualified GHCJS.DOM.Types as DOM
 import Data.Some (Some)
+import qualified Data.Some as Some
 
 frontend :: (StaticWidget x (), Widget x ())
 frontend = (head', body)
@@ -85,9 +86,13 @@ body :: (DomBuilder t m
         )
         => m ()
 body = do
-  runRouteViewT routeComponentEncoder routeRestEncoder routeToTitle (\_ -> Route_Home :/ ()) $ bodyGen siteLogo siteRoutes
+  runRouteViewT routeComponentEncoder routeRestEncoder routeToTitle (\_ -> Route_Home :/ ()) $ bodyGen siteLogo
   elClass "div" "main" $ do
     el "p" $ text "Check us out on Hackage or join the community IRC chat!"
+    let links =
+          [ ("Hackage", "https://hackage.haskell.org/package/reflex")
+          , ("irc.freenode.net #reflex-frp", "http://webchat.freenode.net/?channels=%23reflex-frp&uio=d4")
+          ]
     forM_ links $ \pair -> do
       elAttr "a" ("href" =: (snd pair)) $ text (fst pair)
       el "br" $ return ()
@@ -102,17 +107,7 @@ body = do
     elAttr "a" rdirReddit $ do
       FA.faIcon FA.FaReddit def
   where
-    siteLogo = "img/REFLEX.png"
-    siteRoutes = (:/ ()) <$>
-      [ Route_Home
-      , Route_Tutorials
-      , Route_Examples
-      , Route_Documentation
-      , Route_FAQ
-      ]
-    links = [ ("Hackage", "https://hackage.haskell.org/package/reflex")
-              , ("irc.freenode.net #reflex-frp", "http://webchat.freenode.net/?channels=%23reflex-frp&uio=d4")
-              ]
+    siteLogo = static @"img/REFLEX.png"
 
 metaDesc :: Map Text Text
 metaDesc = "name" =: "description"
@@ -212,15 +207,21 @@ routeToTitle r = case r of
 
 
 -- Body generating function, adds navbar and corresponding widgets
-bodyGen :: (DomBuilder t m, PostBuild t m, Prerender js m, MonadHold t m
-          , MonadFix m, PerformEvent t m, TriggerEvent t m)
-              => Text  -- path to image in project directory
-              -> [R Route]   -- list of directories/routes of website
-              -> ViewT t (R Route) (Endo (R Route)) m ()
-bodyGen theLogo pageTabs = elClass "div" "header" $ do
+bodyGen
+  :: ( DomBuilder t m
+     , PostBuild t m
+     , Prerender js m
+     , MonadHold t m
+     , MonadFix m
+     , PerformEvent t m
+     , TriggerEvent t m
+     )
+  => Text  -- path to image in project directory
+  -> ViewT t (R Route) (Endo (R Route)) m ()
+bodyGen theLogo = elClass "div" "header" $ do
   (homeEvent,_) <- elAttr' "img" ("class" =: "logo" <> "src" =: theLogo) blank
-  tellEvent $ Endo (const (head pageTabs)) <$ domEvent Click homeEvent -- go Home if site logo is clicked
-  mobileNavMenu $ navMenu pageTabs
+  tellEvent $ Endo (const $ Route_Home :/ ()) <$ domEvent Click homeEvent -- go Home if site logo is clicked
+  mobileNavMenu navMenu
   subRoute_ $ \case
     Route_Home -> home
     Route_Tutorials -> tutorials
@@ -237,20 +238,26 @@ navMenu
      , PostBuild t m
      , EventWriter t (Endo (R Route)) m
      , Routed t (R Route) m
+     , Universe (Some Route)
      )
-  => [R Route]
-  -> m ()
-navMenu tabList = do
+  => m ()
+navMenu = do
   currentTab <- askRoute
   let currentTabDemux = demux currentTab      -- change type (Dynamic t a) to (Demux t a)
-  forM_ tabList $ \route -> do
+  forM_ universe $ \(Some.This section) -> do
+        let route = section :/ case section of
+              Route_Home -> ()
+              Route_Tutorials -> ()
+              Route_Examples -> ()
+              Route_Documentation -> ()
+              Route_FAQ -> ()
         let selected = demuxed currentTabDemux route -- compare currentTab and section
         let highlight = ffor selected $ \case
               True -> "class" =: "chosenOne"
               False -> mempty
         el "li" $ do
           -- Get anchor tag element with Route name and corresponding "active:" styling
-          (linkEl, _) <- elDynAttr' "a" (highlight) $ text (routeToTitle route)
+          (linkEl, _) <- elDynAttr' "a" highlight $ text $ routeToTitle route
           tellEvent $ Endo (const route) <$ domEvent Click linkEl
 
 
