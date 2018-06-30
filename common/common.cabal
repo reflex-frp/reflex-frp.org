@@ -6,14 +6,17 @@ build-type: Simple
 library
   hs-source-dirs: src
   build-depends: base
+               , categories
+               , containers
+               , dependent-sum
+               , dependent-sum-template
+               , either
+               , lens
+               , mtl
+               , obelisk-route
                , reflex-dom
                , text
-               , containers
-               , lens
-               , categories
                , universe
-               , either
-               , obelisk-route
   exposed-modules:
     Common.Api
     Common.Route

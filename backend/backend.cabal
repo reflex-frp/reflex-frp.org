@@ -10,14 +10,20 @@ library
   build-depends: base
                , common
                , frontend
+               , lens
+               , modern-uri
                , obelisk-backend
+               , obelisk-backend
+               , obelisk-executable-config
+               , obelisk-executable-config-inject
+               , obelisk-route
+               , text
   exposed-modules:
     Backend
   ghc-options: -Wall
 
 executable backend
-  main-is: main.hs
-  hs-source-dirs: src
+  main-is: src/main.hs
   if impl(ghcjs)
     buildable: False
   build-depends: base
@@ -29,4 +35,5 @@ executable backend
                , obelisk-backend
                , obelisk-executable-config
                , obelisk-executable-config-inject
+               , obelisk-route
                , text

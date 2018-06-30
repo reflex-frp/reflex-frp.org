@@ -9,37 +9,29 @@ library
                , common
                , containers
                , data-default
+               , dependent-sum
                , font-awesome-type
+               , ghcjs-dom
+               , jsaddle
+               , lens
+               , mtl
+               , obelisk-route
+               , reflex
                , reflex-dom
                , static
-               , text
-               , lens
-               , ghcjs-dom
-               , reflex
-               , jsaddle
                , static
+               , text
+               , universe
   exposed-modules:
     Frontend
     Frontend.FontAwesome
-    Frontend.Kiss
   ghc-options: -Wall
 
 executable frontend
-  main-is: main.hs
-  hs-source-dirs: src
+  main-is: src/main.hs
   build-depends: base
-               , reflex
-               , reflex-dom
-               , common
-               , containers
-               , data-default
-               , font-awesome-type
                , frontend
-               , ghcjs-dom
-               , jsaddle
-               , text
-               , lens
-               , static
+               , reflex-dom
   --TODO: Make these ghc-options optional
   ghc-options: -threaded
   if os(darwin)
