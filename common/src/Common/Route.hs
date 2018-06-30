@@ -90,6 +90,15 @@ instance OrdTag Route Identity where
     Route_Documentation -> a `compare` b
     Route_FAQ -> a `compare` b
 
+--TODO: Eliminate the need to write these instances by hand
+instance ShowTag Route Identity where
+  showTaggedPrec = \case
+    Route_Home -> showsPrec
+    Route_Tutorials -> showsPrec
+    Route_Examples -> showsPrec
+    Route_Documentation -> showsPrec
+    Route_FAQ -> showsPrec
+
 deriveGCompare ''Route
 deriveGEq ''Route
 deriveGShow ''Route

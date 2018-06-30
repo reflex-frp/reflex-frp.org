@@ -181,7 +181,7 @@ faq = elClass "div" "main" $ do
             el "p" $ text "FAQ questions coming soon! For now, feel free to ask questions within the Reflex-FRP IRC chat provided below. Thank you!"
 
 routeToTitle :: R Route -> Text
-routeToTitle r = case r of
+routeToTitle = \case
   Route_Home :=> Identity () -> "Home"
   Route_Tutorials :=> Identity () -> "Tutorials"
   Route_Examples :=> Identity () -> "Examples"
