@@ -6,6 +6,7 @@ import Frontend
 import qualified Obelisk.Backend as Ob
 
 backend :: IO ()
-backend = Ob.backend (obeliskRouteEncoder routeComponentEncoder routeRestEncoder) Ob.def
+backend = Ob.backend $ Ob.def
   { Ob._backendConfig_head = fst frontend
+  , Ob._backendConfig_routeEncoder = obeliskRouteEncoder routeComponentEncoder routeRestEncoder
   }

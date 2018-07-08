@@ -34,5 +34,6 @@ executable frontend
                , reflex-dom
   --TODO: Make these ghc-options optional
   ghc-options: -threaded
+  ghcjs-options: -DGHCJS_BROWSER
   if os(darwin)
      ghc-options: -dynamic
