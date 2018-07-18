@@ -46,7 +46,6 @@ module Frontend.FontAwesome
 
 import Data.Map (Map)
 import Reflex.Dom.Core
-import Data.Monoid
 import Data.Text (Text)
 import qualified Data.Text as T
 

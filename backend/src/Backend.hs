@@ -1,12 +1,15 @@
+{-# LANGUAGE EmptyCase #-}
+{-# LANGUAGE LambdaCase #-}
 module Backend where
 
 import Common.Route
+import Data.Dependent.Sum (DSum (..))
+import Obelisk.Backend
 import Obelisk.Route
-import Frontend
-import qualified Obelisk.Backend as Ob
 
-backend :: IO ()
-backend = Ob.backend $ Ob.def
-  { Ob._backendConfig_head = fst frontend
-  , Ob._backendConfig_routeEncoder = obeliskRouteEncoder routeComponentEncoder routeRestEncoder
+backend :: Backend Void1 Route
+backend = Backend
+  { _backend_routeEncoder = backendRouteEncoder
+  , _backend_run = \serve -> serve $ \case
+      r :=> _ -> case r of {}
   }

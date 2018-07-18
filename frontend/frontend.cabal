@@ -15,6 +15,7 @@ library
                , jsaddle
                , lens
                , mtl
+               , obelisk-frontend
                , obelisk-route
                , reflex
                , reflex-dom
@@ -30,7 +31,10 @@ library
 executable frontend
   main-is: src/main.hs
   build-depends: base
+               , common
                , frontend
+               , obelisk-frontend
+               , obelisk-route
                , reflex-dom
   --TODO: Make these ghc-options optional
   ghc-options: -threaded

@@ -1,18 +1,21 @@
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE StandaloneDeriving #-}
-{-# LANGUAGE InstanceSigs #-}
-{-# LANGUAGE RecursiveDo #-}
-{-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE EmptyCase #-}
 {-# LANGUAGE FlexibleContexts #-}
-{-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE LambdaCase #-}
-{-# LANGUAGE KindSignatures #-}
-{-# LANGUAGE GADTs #-}
 {-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE GADTs #-}
+{-# LANGUAGE InstanceSigs #-}
+{-# LANGUAGE KindSignatures #-}
+{-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
-
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE RecursiveDo #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE StandaloneDeriving #-}
+{-# LANGUAGE TemplateHaskell #-}
 module Common.Route where
 
+import Prelude hiding ((.))
+
+import Control.Category
 import Control.Monad.Except
 import Data.Text (Text)
 
@@ -21,6 +24,7 @@ import Data.Universe
 import Data.Some (Some)
 import qualified Data.Some as Some
 import Data.Dependent.Sum
+import Data.Functor.Sum
 import Data.GADT.Compare.TH
 import Data.GADT.Show.TH
 import Data.Functor.Identity
@@ -49,6 +53,19 @@ routeComponentEncoder = enum1Encoder $ \case
 --------------------------------------------------------------------------------
 -- Annoying
 --------------------------------------------------------------------------------
+
+backendRouteEncoder
+  :: ( check ~ parse
+     , MonadError Text parse
+     )
+  => Encoder check parse (R (Sum Void1 (ObeliskRoute Route))) PageName
+backendRouteEncoder = Encoder $ do
+  let myComponentEncoder = (void1Encoder `shadowEncoder` obeliskRouteComponentEncoder routeComponentEncoder) . someSumEncoder
+  myObeliskRestValidEncoder <- checkObeliskRouteRestEncoder routeRestEncoder
+  checkEncoder $ pathComponentEncoder myComponentEncoder $ \case
+    InL backendRoute -> case backendRoute of {}
+    InR obeliskRoute -> runValidEncoderFunc myObeliskRestValidEncoder obeliskRoute
+
 
 --TODO: Don't use the term "rest" - it's loaded in web apps
 --TODO: We should consider using a typeclass to infer the continuations for each thing
