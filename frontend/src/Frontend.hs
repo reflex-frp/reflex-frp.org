@@ -54,7 +54,7 @@ frontend = Frontend
       styleSheet $ static @"style.css"              --  link css stylesheet
       styleSheet $ static @"font.css"               --  link css fonts
   , _frontend_body = do
-      let siteLogo = static @"img/REFLEX.png"
+      let siteLogo = static @"img/REFLEX.svg"
       bodyGen siteLogo
       elClass "div" "main" $ do
         el "p" $ text "Check us out on Hackage or join the community IRC chat!"
@@ -75,7 +75,7 @@ frontend = Frontend
           FA.faIcon FA.FaGithub def
         elAttr "a" rdirReddit $ do
           FA.faIcon FA.FaReddit def
-  , _frontend_title = routeToTitle
+  , _frontend_title = \_ -> ""
   , _frontend_notFoundRoute = \_ -> Route_Home :/ ()
   }
 
