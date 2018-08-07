@@ -1,3 +1,7 @@
+-- A slightly contrived example just to demonstrate use of nested dynamics
+-- This example also has a nested state machine,
+-- By using foldDynM, we could use foldDyn inside of it.
+--
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE LambdaCase #-}
 
@@ -5,10 +9,6 @@ import Reflex.Dom
 import Data.Text as T
 import Data.Monoid
 
--- A slightly contrived example just to demonstrate use of nested dynamics
--- This example also has a nested state machine,
--- By using foldDynM, we could use foldDyn inside of it.
---
 -- A ScoreCard can either display some info/updates or the current score
 data ScoreCard t =
     Info (Dynamic t Text)
@@ -33,11 +33,11 @@ main = mainWidget $ do
       -- gameEv :: (Reflex t) => Event t GameEvent
       gameEv = leftmost [newGame, move1, move2, move3, move4]
 
-      newGame = const NewGame <$> newGameEv
-      move1 = const (DoTurn "Move 1" 1) <$> m1
-      move2 = const (DoTurn "Move 2" 20) <$> m2
-      move3 = const (DoTurn "Move 3" 10) <$> m3
-      move4 = const (DoTurn "Move 4" 5) <$> m4
+      newGame = NewGame <$ newGameEv
+      move1 = (DoTurn "Move 1" 1) <$ m1
+      move2 = (DoTurn "Move 2" 20) <$ m2
+      move3 = (DoTurn "Move 3" 10) <$ m3
+      move4 = (DoTurn "Move 4" 5) <$ m4
 
   -- Capture the score, in a Dynamic independent of ScoreCard
   -- This will maintain its value irrespective of the state of ScoreCard
@@ -47,9 +47,9 @@ main = mainWidget $ do
 
     foldDyn handleGameEvent 0 gameEv
 
-  let 
+  let
       initCard = Score scoreDyn
-      
+
       eventHandler _ (Info _) = return (Score scoreDyn)
       eventHandler _ (Score _) = do
         let handleGameEvent (NewGame)    _  = "New Game!"
@@ -62,7 +62,7 @@ main = mainWidget $ do
         -- So this will be reset whenever you toggle the display of score card
         textDyn <- foldDyn handleGameEvent "" gameEv
         return (Info textDyn)
-            
+
   -- external state machine using foldDynM
   -- Here the (ScoreCard t) itself contains a Dynamic value
   -- scoreCardDyn :: Dynamic t (ScoreCard t)
