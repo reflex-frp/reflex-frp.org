@@ -23,7 +23,7 @@ library
   ghc-options: -Wall
 
 executable backend
-  main-is: src/main.hs
+  main-is: src-bin/main.hs
   if impl(ghcjs)
     buildable: False
   build-depends: base

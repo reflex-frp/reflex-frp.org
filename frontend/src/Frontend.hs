@@ -14,9 +14,9 @@ import Data.Map (Map)
 import qualified Data.Map as Map
 import Data.Text (Text)
 import Reflex.Dom.Core
-import Data.Monoid
 import Control.Monad
 import Control.Monad.Fix
+import Obelisk.Frontend
 import Obelisk.Route
 import Obelisk.Route.Frontend
 import Data.Universe
@@ -27,15 +27,12 @@ import Common.Route
 import qualified Frontend.FontAwesome as FA
 import Static
 
-import Language.Javascript.JSaddle
 import Data.Some (Some)
 import qualified Data.Some as Some
 
-frontend :: (StaticWidget x (), Widget x ())
-frontend = (head', body)
-  where
-    head' :: DomBuilder t m => m ()
-    head' = do
+frontend :: Frontend (R Route)
+frontend = Frontend
+  { _frontend_head = do
       el "title" $ text "Reflex FRP"      -- add Page title
       elAttr "meta" metaDesc blank        -- add meta-data description
       elAttr "meta" metaKeywords blank    -- add meta-data keywords
@@ -56,41 +53,29 @@ frontend = (head', body)
       styleSheet $ static @"style.css"              --  link css stylesheet
       styleSheet $ static @"font.css"               --  link css fonts
       return ()
+  , _frontend_body = do
+    let siteLogo = static @"img/REFLEX.png"
+    bodyGen siteLogo
+    elClass "div" "main" $ do
+      el "p" $ text "Check us out on Hackage or join the community IRC chat!"
+      let links =
+            [ ("Hackage", "https://hackage.haskell.org/package/reflex")
+            , ("irc.freenode.net #reflex-frp", "http://webchat.freenode.net/?channels=%23reflex-frp&uio=d4")
+            ]
+      forM_ links $ \pair -> do
+        elAttr "a" ("href" =: (snd pair)) $ text (fst pair)
+        el "br" $ return ()
+    el "br" blank
 
-body :: (DomBuilder t m
-        , MonadHold t m
-        , MonadFix m
-        , TriggerEvent t m
-        , PostBuild t m
-        , PerformEvent t m
-        , Prerender x m
-        , MonadJSM m
-        , MonadJSM (Performable m)
-        )
-        => m ()
-body = do
-  runRouteViewT routeComponentEncoder routeRestEncoder routeToTitle (\_ -> Route_Home :/ ()) $ bodyGen siteLogo
-  elClass "div" "main" $ do
-    el "p" $ text "Check us out on Hackage or join the community IRC chat!"
-    let links =
-          [ ("Hackage", "https://hackage.haskell.org/package/reflex")
-          , ("irc.freenode.net #reflex-frp", "http://webchat.freenode.net/?channels=%23reflex-frp&uio=d4")
-          ]
-    forM_ links $ \pair -> do
-      elAttr "a" ("href" =: (snd pair)) $ text (fst pair)
-      el "br" $ return ()
-  el "br" blank
-
-  --  Place Font Awesome Icons in footer <div>
-  elClass "div" "footer" $ do
-    elAttr "a" rdirTwitter $ do
-      FA.faIcon FA.FaTwitter def
-    elAttr "a" rdirGithub $ do
-      FA.faIcon FA.FaGithub def
-    elAttr "a" rdirReddit $ do
-      FA.faIcon FA.FaReddit def
-  where
-    siteLogo = static @"img/REFLEX.png"
+    --  Place Font Awesome Icons in footer <div>
+    elClass "div" "footer" $ do
+      elAttr "a" rdirTwitter $ do
+        FA.faIcon FA.FaTwitter def
+      elAttr "a" rdirGithub $ do
+        FA.faIcon FA.FaGithub def
+      elAttr "a" rdirReddit $ do
+        FA.faIcon FA.FaReddit def
+  }
 
 metaDesc :: Map Text Text
 metaDesc = "name" =: "description"
@@ -165,7 +150,7 @@ examples = elClass "div" "main" $ do
 
 documentation :: (DomBuilder t m) => m ()
 documentation = elClass "div" "main" $ do
-    elClass "h3" "title" $ text "Refreshing Reflex Documentation"
+    elClass "h3" "title" $ text "Documentation"
     el "ul" $ do
       el "li" $ do
         el "label" $ text "Reflex Basic Documentation: "
@@ -192,17 +177,15 @@ routeToTitle = \case
 bodyGen
   :: ( DomBuilder t m
      , PostBuild t m
-     , Prerender js m
      , MonadHold t m
      , MonadFix m
-     , PerformEvent t m
-     , TriggerEvent t m
+     , SetRoute t (R Route) m
      )
   => Text  -- path to image in project directory
-  -> RoutedT t (R Route) (EventWriterT t (Endo (R Route)) m) ()
+  -> RoutedT t (R Route) m ()
 bodyGen theLogo = elClass "div" "header" $ do
   (homeEvent, _) <- elAttr' "img" ("class" =: "logo" <> "src" =: theLogo) blank
-  tellEvent $ Endo (const $ Route_Home :/ ()) <$ domEvent Click homeEvent -- go Home if site logo is clicked
+  setRoute $ Route_Home :/ () <$ domEvent Click homeEvent -- go Home if site logo is clicked
   mobileNavMenu navMenu
   subRoute_ $ \case
     Route_Home -> home
@@ -215,10 +198,8 @@ bodyGen theLogo = elClass "div" "header" $ do
 -- Nav Bar generator produces click-able Widget Events
 navMenu
   :: ( DomBuilder t m
-     , MonadHold t m
-     , MonadFix m
      , PostBuild t m
-     , EventWriter t (Endo (R Route)) m
+     , SetRoute t (R Route) m
      , Routed t (R Route) m
      , Universe (Some Route)
      )
@@ -240,7 +221,7 @@ navMenu = do
         el "li" $ do
           -- Get anchor tag element with Route name and corresponding "active:" styling
           (linkEl, _) <- elDynAttr' "a" highlight $ text $ routeToTitle route
-          tellEvent $ Endo (const route) <$ domEvent Click linkEl
+          setRoute $ route <$ domEvent Click linkEl
 
 
 -------------MOBILE NAV MENU BUILDER ----------------------------------
