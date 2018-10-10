@@ -12,8 +12,9 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE StandaloneDeriving #-}
 {-# LANGUAGE TemplateHaskell #-}
+module Common.Route where
 
-module Common.Route (Route (..), backendRouteEncoder) where
+import Prelude hiding ((.))
 
 import Control.Monad.Except
 import Data.Text (Text)

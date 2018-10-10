@@ -9,6 +9,7 @@ library
     buildable: False
   build-depends: base
                , common
+               , dependent-sum
                , frontend
                , lens
                , modern-uri

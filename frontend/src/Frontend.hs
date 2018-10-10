@@ -16,7 +16,6 @@ import Data.Text (Text)
 import Reflex.Dom.Core
 import Control.Monad
 import Control.Monad.Fix
-import Obelisk.Frontend
 import Obelisk.Route
 import Obelisk.Route.Frontend
 import Data.Universe
@@ -29,6 +28,7 @@ import Static
 
 import Data.Some (Some)
 import qualified Data.Some as Some
+import Obelisk.Frontend
 
 frontend :: Frontend (R Route)
 frontend = Frontend
@@ -52,29 +52,28 @@ frontend = Frontend
       faviconLinker "icon" "image/png" "196x196" (static @"img/favicon-196x196.png")
       styleSheet $ static @"style.css"              --  link css stylesheet
       styleSheet $ static @"font.css"               --  link css fonts
-      return ()
   , _frontend_body = do
-    let siteLogo = static @"img/REFLEX.png"
-    bodyGen siteLogo
-    elClass "div" "main" $ do
-      el "p" $ text "Check us out on Hackage or join the community IRC chat!"
-      let links =
-            [ ("Hackage", "https://hackage.haskell.org/package/reflex")
-            , ("irc.freenode.net #reflex-frp", "http://webchat.freenode.net/?channels=%23reflex-frp&uio=d4")
-            ]
-      forM_ links $ \pair -> do
-        elAttr "a" ("href" =: (snd pair)) $ text (fst pair)
-        el "br" $ return ()
-    el "br" blank
+      let siteLogo = static @"img/REFLEX.svg"
+      bodyGen siteLogo
+      elClass "div" "main" $ do
+        el "p" $ text "Check us out on Hackage or join the community IRC chat!"
+        let links =
+              [ ("Hackage", "https://hackage.haskell.org/package/reflex")
+              , ("irc.freenode.net #reflex-frp", "http://webchat.freenode.net/?channels=%23reflex-frp&uio=d4")
+              ]
+        forM_ links $ \pair -> do
+          elAttr "a" ("href" =: (snd pair)) $ text (fst pair)
+          el "br" $ return ()
+      el "br" blank
 
-    --  Place Font Awesome Icons in footer <div>
-    elClass "div" "footer" $ do
-      elAttr "a" rdirTwitter $ do
-        FA.faIcon FA.FaTwitter def
-      elAttr "a" rdirGithub $ do
-        FA.faIcon FA.FaGithub def
-      elAttr "a" rdirReddit $ do
-        FA.faIcon FA.FaReddit def
+      --  Place Font Awesome Icons in footer <div>
+      elClass "div" "footer" $ do
+        elAttr "a" rdirTwitter $ do
+          FA.faIcon FA.FaTwitter def
+        elAttr "a" rdirGithub $ do
+          FA.faIcon FA.FaGithub def
+        elAttr "a" rdirReddit $ do
+          FA.faIcon FA.FaReddit def
   }
 
 metaDesc :: Map Text Text
@@ -154,7 +153,7 @@ documentation = elClass "div" "main" $ do
     el "ul" $ do
       el "li" $ do
         el "label" $ text "Reflex Basic Documentation: "
-        elAttr "a" ("href" =: "http://reflex-frp.readthedocs.io/en/latest/architecture.html#overview-of-reflex-basics") $ text "View Here"
+        elAttr "a" ("href" =: "https://reflex-frp.readthedocs.io/en/latest/overview.html#reflex-basics") $ text "View Here"
       el "li" $ do
         el "label" $ text "Quick Reference: "
         elAttr "a" ("href" =: "https://github.com/reflex-frp/reflex-dom/blob/develop/Quickref.md") $ text "View Here"

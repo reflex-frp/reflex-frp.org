@@ -1,15 +1,15 @@
 {-# LANGUAGE EmptyCase #-}
 {-# LANGUAGE LambdaCase #-}
-
 module Backend where
 
 import Common.Route
-import Obelisk.Route
+import Data.Dependent.Sum (DSum (..))
 import Obelisk.Backend
-import Data.Dependent.Sum
+import Obelisk.Route
 
 backend :: Backend Void1 Route
 backend = Backend
   { _backend_routeEncoder = backendRouteEncoder
-  , _backend_run = \serve -> serve $ \(k :=> _) -> case k of {}
+  , _backend_run = \serve -> serve $ \case
+      r :=> _ -> case r of {}
   }
