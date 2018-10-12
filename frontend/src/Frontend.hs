@@ -13,6 +13,7 @@ module Frontend where
 import Data.Map (Map)
 import qualified Data.Map as Map
 import Data.Text (Text)
+import qualified Data.Text as T
 import Reflex.Dom.Core
 import Control.Monad
 import Control.Monad.Fix
@@ -30,6 +31,9 @@ import Data.Some (Some)
 import qualified Data.Some as Some
 import Obelisk.Frontend
 
+tshow :: Show a => a -> Text
+tshow = T.pack . show
+
 frontend :: Frontend (R Route)
 frontend = Frontend
   { _frontend_head = do
@@ -38,22 +42,38 @@ frontend = Frontend
       elAttr "meta" metaKeywords blank    -- add meta-data keywords
       elAttr "meta" viewport blank        -- add meta-data viewport
       FA.fontAwesomeCDN
+      -- TODO: make this function more type safe.
+      -- The 4 arguments are as follows: rel type size href
+      -- turn the second argument into a Maybe Text
+      let faviconPngLink :: DomBuilder t m => Int -> Text -> m ()
+          faviconPngLink sz url = elAttr "link" attrs blank
+              where
+                attrs = "rel" =: "icon"
+                     <> "type" =: "image/png"
+                     <> "size" =: (tshow sz <> "x" <> tshow sz)
+                     <> "href" =: url
+          appleTouchIconPngLink :: DomBuilder t m => Int -> Text -> m ()
+          appleTouchIconPngLink sz url = elAttr "link" attrs blank
+              where
+                attrs = "rel" =: "apple-touch-icon"
+                     <> "sizes" =: (tshow sz <> "x" <> tshow sz)
+                     <> "href" =: url
       -- add various favIcon links
-      faviconLinker "icon" "image/png" "16x16" (static @"img/favicon-16x16.png")
-      faviconLinker "icon" "image/png" "32x32" (static @"img/favicon-32x32.png")
-      faviconLinker "apple-touch-icon" "/" "57x57" (static @"img/apple-touch-icon-57x57.png")
-      faviconLinker "apple-touch-icon" "/" "60x60" (static @"img/apple-touch-icon-60x60.png")
-      faviconLinker "apple-touch-icon" "/" "72x72" (static @"img/apple-touch-icon-72x72.png")
-      faviconLinker "apple-touch-icon" "/" "76x76" (static @"img/apple-touch-icon-76x76.png")
-      faviconLinker "apple-touch-icon" "/" "114x114" (static @"img/apple-touch-icon-114x114.png")
-      faviconLinker "apple-touch-icon" "/" "120x120" (static @"img/apple-touch-icon-120x120.png")
-      faviconLinker "apple-touch-icon" "/" "144x144" (static @"img/apple-touch-icon-144x144.png")
-      faviconLinker "apple-touch-icon" "/" "152x152" (static @"img/apple-touch-icon-152x152.png")
-      faviconLinker "icon" "image/png" "196x196" (static @"img/favicon-196x196.png")
+      faviconPngLink 16 $ static @"img/icon-16x16.png"
+      faviconPngLink 32 $ static @"img/icon-32x32.png"
+      faviconPngLink 196 $ static @"img/icon-196x196.png"
+      appleTouchIconPngLink 57 $ static @"img/icon-57x57.png"
+      appleTouchIconPngLink 60 $ static @"img/icon-60x60.png"
+      appleTouchIconPngLink 72 $ static @"img/icon-72x72.png"
+      appleTouchIconPngLink 76 $ static @"img/icon-76x76.png"
+      appleTouchIconPngLink 114 $ static @"img/icon-114x114.png"
+      appleTouchIconPngLink 120 $ static @"img/icon-120x120.png"
+      appleTouchIconPngLink 144 $ static @"img/icon-144x144.png"
+      appleTouchIconPngLink 152 $ static @"img/icon-152x152.png"
       styleSheet $ static @"style.css"              --  link css stylesheet
       styleSheet $ static @"font.css"               --  link css fonts
   , _frontend_body = do
-      let siteLogo = static @"img/REFLEX.svg"
+      let siteLogo = static @"img/logo.svg"
       bodyGen siteLogo
       elClass "div" "main" $ do
         el "p" $ text "Check us out on Hackage or join the community IRC chat!"
@@ -87,17 +107,6 @@ metaKeywords = "name" =: "keywords"
 viewport :: Map Text Text
 viewport = "name" =: "viewport"
         <> "content" =: "width=device-width, initial-scale=1"
-
--- TODO: make this function more type safe.
--- The 4 arguments are as follows: rel type size href
--- turn the second argument into a Maybe Text
-faviconLinker :: DomBuilder t m => Text -> Text -> Text -> Text -> m ()
-faviconLinker r t s h = elAttr "link" attribs blank
-    where
-      attribs = "rel" =: r
-             <> "type" =: t
-             <> "size" =: s
-             <> "href" =: h
 
 --  styleSheet are functions to add links to html <head>
 styleSheet :: DomBuilder t m => Text -> m ()
