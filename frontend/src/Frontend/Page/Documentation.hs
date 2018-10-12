@@ -13,8 +13,9 @@ module Frontend.Page.Documentation (documentation) where
 import Reflex.Dom
 
 documentation :: DomBuilder t m => m ()
-documentation = elClass "div" "main" $ do
-  elClass "h3" "title" $ text "Documentation"
+documentation = do
+  elClass "h3" "title" $ do
+    text "Documentation"
   el "ul" $ do
     el "li" $ do
       el "label" $ text "Reflex Basic Documentation: "

@@ -29,17 +29,17 @@ frontend :: Frontend (R Route)
 frontend = Frontend
   { _frontend_head = pageHead
   , _frontend_body = do
-      elClass "div" "header" $ do
+      divClass "header" $ do
         -- Draw the header logo
         (logo, _) <- elAttr' "img" ("class" =: "logo" <> "src" =: static @"img/logo.svg") blank
         -- When the logo is clicked, go to the homepage
         setRoute $ Route_Home :/ () <$ domEvent Click logo
         nav
-        subRoute_ $ \case
-          Route_Home -> home
-          Route_Tutorials -> tutorials
-          Route_Examples -> examples
-          Route_Documentation -> documentation
-          Route_FAQ -> faq
-      footer
+      divClass "main" $ subRoute_ $ \case
+        Route_Home -> home
+        Route_Tutorials -> tutorials
+        Route_Examples -> examples
+        Route_Documentation -> documentation
+        Route_FAQ -> faq
+      divClass "footer" footer
   }

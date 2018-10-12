@@ -13,7 +13,7 @@ module Frontend.Page.Examples (examples) where
 import Reflex.Dom
 
 examples :: DomBuilder t m => m ()
-examples = elClass "div" "main" $ do
+examples = do
   elClass "h3" "title" $ text "Check Out Some Example Code"
   el "ul" $ do
    el "li" $ do

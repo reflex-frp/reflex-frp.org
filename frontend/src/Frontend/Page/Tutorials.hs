@@ -13,8 +13,9 @@ module Frontend.Page.Tutorials (tutorials) where
 import Reflex.Dom
 
 tutorials :: DomBuilder t m => m ()
-tutorials = elClass "div" "main" $ do
-  elClass "h3" "title" $ text "Tutorials"
+tutorials = do
+  elClass "h3" "title" $ do
+    text "Tutorials"
   el "ol" $ do
     el "li" $ do
       el "label" $ text "Installation: "
