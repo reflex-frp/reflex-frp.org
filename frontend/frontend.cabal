@@ -19,8 +19,7 @@ library
                , obelisk-route
                , reflex
                , reflex-dom
-               , static
-               , static
+               , obelisk-generated-static
                , text
                , universe
   exposed-modules:

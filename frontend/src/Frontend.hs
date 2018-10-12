@@ -25,7 +25,7 @@ import Control.Monad.Identity
 
 import Common.Route
 import qualified Frontend.FontAwesome as FA
-import Static
+import Obelisk.Generated.Static
 
 import Data.Some (Some)
 import qualified Data.Some as Some
