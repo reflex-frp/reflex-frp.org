@@ -21,9 +21,11 @@ import Data.Text (Text)
 
 import Obelisk.Route
 import Obelisk.Route.TH
+import Data.Dependent.Sum (DSum (..))
 import Data.Functor.Sum
 import Data.Functor.Identity
-import Data.Dependent.Sum (DSum (..))
+import Data.Some (Some)
+import qualified Data.Some as Some
 
 data Route :: * -> * where
   Route_Home :: Route ()
@@ -44,11 +46,23 @@ backendRouteEncoder = handleEncoder (\_ -> InR (ObeliskRoute_App Route_Home) :/ 
     Route_Documentation -> PathSegment "documentation" $ unitEncoder mempty
     Route_FAQ -> PathSegment "faq" $ unitEncoder mempty
 
--- | Provide a human-readable name for a given route
-routeToTitle :: R Route -> Text
-routeToTitle = \case
-  Route_Home :=> Identity () -> "Home"
-  Route_Tutorials :=> Identity () -> "Tutorials"
-  Route_Examples :=> Identity () -> "Examples"
-  Route_Documentation :=> Identity () -> "Documentation"
-  Route_FAQ :=> Identity () -> "FAQ"
+-- | Provide a human-readable name for a given section
+sectionTitle :: Some Route -> Text
+sectionTitle (Some.This sec) = case sec of
+  Route_Home -> "Home"
+  Route_Tutorials -> "Tutorials"
+  Route_Examples -> "Examples"
+  Route_Documentation -> "Documentation"
+  Route_FAQ -> "FAQ"
+
+routeTitle :: R Route -> Text
+routeTitle (sec :=> _) = sectionTitle $ Some.This sec
+
+-- | Given a section, provide its default route
+sectionHomepage :: Some Route -> R Route
+sectionHomepage (Some.This sec) = sec :/ case sec of
+  Route_Home -> ()
+  Route_Tutorials -> ()
+  Route_Examples -> ()
+  Route_Documentation -> ()
+  Route_FAQ -> ()

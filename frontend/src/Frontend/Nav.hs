@@ -12,21 +12,16 @@ module Frontend.Nav (nav) where
 
 import Common.Route
 import Control.Monad (forM_)
-import Control.Monad.Fix
+import Control.Monad.Fix (MonadFix)
+import Data.Dependent.Sum (DSum ((:=>)))
 import Data.Some (Some)
 import qualified Data.Some as Some
-import Data.Universe
+import Data.Universe (Universe, universe)
 import qualified Frontend.FontAwesome as FA
-import Obelisk.Route.Frontend
+import Obelisk.Route.Frontend (Routed (askRoute), R, SetRoute (setRoute))
 import Reflex.Dom
 
--------------MOBILE NAV MENU BUILDER ----------------------------------
---TODO some of the style changes that are within the style.css file may want
---to be integrated into the function somehow in order to avoid fingering
---through css code to figure out how to get this function to be useful
---straight out of the box.
--- Make the mobile app Menu become the parent ul of the li generated from
--- 'navMenu'
+-- | Build the entire nav bar, with hamburger menu for expanding on mobile
 nav
   :: ( DomBuilder t m
      , MonadHold t m
@@ -37,22 +32,25 @@ nav
      )
   => m ()
 nav = do
-  activeTab <- askRoute
   rec isOpen <- toggle False $ domEvent Click modalButtonAndBackground
       let openAttrs = ffor isOpen $ \case
             True -> "class" =: "sections"
             False -> "class" =: "noshow"
       (modalButtonAndBackground, _) <- elDynAttr' "div" openAttrs $ do
         elDynAttr "ul" openAttrs $ do
-          let selectedTitle = routeToTitle <$> activeTab
+          -- Build the title items, which will only be displayed on small screens
+          --TODO: these elements really shouldn't be inside the `ul`
           el "div" $ text " "
-          el "p" $ dynText selectedTitle
+          activeTab <- askRoute
+          el "p" $ dynText $ routeTitle <$> activeTab
           _ <- FA.faIcon' FA.FaBars $ def
-          navMenu
+
+          -- Build the actual tabs
+          menu
   return ()
 
--- Nav Bar generator produces click-able Widget Events
-navMenu
+-- | Build the nav's tabs
+menu
   :: ( DomBuilder t m
      , PostBuild t m
      , SetRoute t (R Route) m
@@ -60,21 +58,18 @@ navMenu
      , Universe (Some Route)
      )
   => m ()
-navMenu = do
+menu = do
+  -- Get the current route, so that we can highlight the corresponding tab
   currentTab <- askRoute
-  let currentTabDemux = demux currentTab      -- change type (Dynamic t a) to (Demux t a)
-  forM_ universe $ \(Some.This sec) -> do
-    let route = sec :/ case sec of
-          Route_Home -> ()
-          Route_Tutorials -> ()
-          Route_Examples -> ()
-          Route_Documentation -> ()
-          Route_FAQ -> ()
-        selected = demuxed currentTabDemux route -- compare currentTab and section
-        highlight = ffor selected $ \case
+  let currentTabDemux = demux $ fmap (\(sec :=> _) -> Some.This sec) currentTab
+  -- Iterate over all the top-level routes
+  forM_ universe $ \section -> el "li" $ do
+    -- Create a link that is highlighted if it is the current section
+    let thisTabIsSelected = demuxed currentTabDemux section
+        highlight = ffor thisTabIsSelected $ \case
           True -> "class" =: "chosenOne"
           False -> mempty
-    el "li" $ do
-      -- Get anchor tag element with Route name and corresponding "active:" styling
-      (linkEl, _) <- elDynAttr' "a" highlight $ text $ routeToTitle route
-      setRoute $ route <$ domEvent Click linkEl
+    (linkEl, _) <- elDynAttr' "a" highlight $ do
+      text $ sectionTitle section
+    -- When clicked, go to that section's homepage
+    setRoute $ sectionHomepage section <$ domEvent Click linkEl
