@@ -25,6 +25,14 @@ library
   exposed-modules:
     Frontend
     Frontend.FontAwesome
+    Frontend.Footer
+    Frontend.Head
+    Frontend.Nav
+    Frontend.Page.Documentation
+    Frontend.Page.Examples
+    Frontend.Page.Faq
+    Frontend.Page.Home
+    Frontend.Page.Tutorials
   ghc-options: -Wall
 
 executable frontend
