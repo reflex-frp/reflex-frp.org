@@ -23,6 +23,7 @@ import Obelisk.Route
 import Obelisk.Route.TH
 import Data.Functor.Sum
 import Data.Functor.Identity
+import Data.Dependent.Sum (DSum (..))
 
 data Route :: * -> * where
   Route_Home :: Route ()
@@ -42,3 +43,12 @@ backendRouteEncoder = handleEncoder (\_ -> InR (ObeliskRoute_App Route_Home) :/ 
     Route_Examples -> PathSegment "examples" $ unitEncoder mempty
     Route_Documentation -> PathSegment "documentation" $ unitEncoder mempty
     Route_FAQ -> PathSegment "faq" $ unitEncoder mempty
+
+-- | Provide a human-readable name for a given route
+routeToTitle :: R Route -> Text
+routeToTitle = \case
+  Route_Home :=> Identity () -> "Home"
+  Route_Tutorials :=> Identity () -> "Tutorials"
+  Route_Examples :=> Identity () -> "Examples"
+  Route_Documentation :=> Identity () -> "Documentation"
+  Route_FAQ :=> Identity () -> "FAQ"
