@@ -32,6 +32,7 @@ data Route :: * -> * where
   Route_Tutorials :: Route ()
   Route_Examples :: Route ()
   Route_Documentation :: Route ()
+  Route_Talks :: Route ()
   Route_FAQ :: Route ()
 deriving instance Show (Route a)
 deriveRouteComponent ''Route
@@ -44,6 +45,7 @@ backendRouteEncoder = handleEncoder (\_ -> InR (ObeliskRoute_App Route_Home) :/ 
     Route_Tutorials -> PathSegment "tutorials" $ unitEncoder mempty
     Route_Examples -> PathSegment "examples" $ unitEncoder mempty
     Route_Documentation -> PathSegment "documentation" $ unitEncoder mempty
+    Route_Talks -> PathSegment "talks" $ unitEncoder mempty
     Route_FAQ -> PathSegment "faq" $ unitEncoder mempty
 
 -- | Provide a human-readable name for a given section
@@ -53,6 +55,7 @@ sectionTitle (Some.This sec) = case sec of
   Route_Tutorials -> "Tutorials"
   Route_Examples -> "Examples"
   Route_Documentation -> "Documentation"
+  Route_Talks -> "Talks"
   Route_FAQ -> "FAQ"
 
 routeTitle :: R Route -> Text
@@ -65,4 +68,5 @@ sectionHomepage (Some.This sec) = sec :/ case sec of
   Route_Tutorials -> ()
   Route_Examples -> ()
   Route_Documentation -> ()
+  Route_Talks -> ()
   Route_FAQ -> ()

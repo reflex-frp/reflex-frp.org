@@ -13,6 +13,7 @@ import Frontend.Page.Documentation
 import Frontend.Page.Examples
 import Frontend.Page.Faq
 import Frontend.Page.Home
+import Frontend.Page.Talks
 import Frontend.Page.Tutorials
 import Obelisk.Frontend
 import Obelisk.Generated.Static
@@ -32,6 +33,7 @@ frontend = Frontend
         nav
       divClass "main" $ subRoute_ $ \case
         Route_Home -> home
+        Route_Talks -> talks
         Route_Tutorials -> tutorials
         Route_Examples -> examples
         Route_Documentation -> documentation
