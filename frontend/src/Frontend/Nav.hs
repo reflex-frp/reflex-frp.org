@@ -1,22 +1,15 @@
-{-# LANGUAGE DataKinds #-}
 {-# LANGUAGE LambdaCase #-}
-{-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE RecursiveDo #-}
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE RecursiveDo #-}
-{-# LANGUAGE GADTs #-}
 {-# LANGUAGE FlexibleContexts #-}
-{-# LANGUAGE Rank2Types #-}
 module Frontend.Nav (nav) where
 
 import Common.Route
 import Control.Monad (forM_)
 import Control.Monad.Fix (MonadFix)
 import Data.Dependent.Sum (DSum ((:=>)))
-import Data.Some (Some)
 import qualified Data.Some as Some
-import Data.Universe (Universe, universe)
+import Data.Universe (universe)
 import qualified Frontend.FontAwesome as FA
 import Obelisk.Route.Frontend (Routed (askRoute), R, SetRoute (setRoute))
 import Reflex.Dom
@@ -43,7 +36,7 @@ nav = do
           el "div" $ text " "
           activeTab <- askRoute
           el "p" $ dynText $ routeTitle <$> activeTab
-          _ <- FA.faIcon' FA.FaBars $ def
+          _ <- FA.faIcon' FA.FaBars def
 
           -- Build the actual tabs
           menu
@@ -55,7 +48,6 @@ menu
      , PostBuild t m
      , SetRoute t (R Route) m
      , Routed t (R Route) m
-     , Universe (Some Route)
      )
   => m ()
 menu = do

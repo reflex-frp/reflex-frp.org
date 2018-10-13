@@ -1,13 +1,4 @@
-{-# LANGUAGE DataKinds #-}
-{-# LANGUAGE LambdaCase #-}
-{-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE RecursiveDo #-}
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE TypeApplications #-}
-{-# LANGUAGE RecursiveDo #-}
-{-# LANGUAGE GADTs #-}
-{-# LANGUAGE FlexibleContexts #-}
-{-# LANGUAGE Rank2Types #-}
 module Frontend.Footer (footer) where
 
 import Control.Monad (forM_)
@@ -21,8 +12,8 @@ footer = do
         [ ("Hackage", "https://hackage.haskell.org/package/reflex")
         , ("irc.freenode.net #reflex-frp", "http://webchat.freenode.net/?channels=%23reflex-frp&uio=d4")
         ]
-  forM_ links $ \pair -> do
-    elAttr "a" ("href" =: (snd pair)) $ text (fst pair)
+  forM_ links $ \(name, url) -> do
+    elAttr "a" ("href" =: url) $ text name
     el "br" blank
   el "br" blank
   let socialIcon icon title url = elAttr "a" ("href" =: url <> "title" =: title) $ do

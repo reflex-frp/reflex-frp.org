@@ -176,12 +176,12 @@ dynIcon2x = dynIcon2xAttr mempty
 
 --  Type checked faIcon functions
 faIcon :: DomBuilder t m => FontAwesome -> FontAwesomeConfig -> m ()
-faIcon i conf = elClass "i" ((fontAwesomeClass i) <> " " <> (fontAwesomeConfigClass conf)) $ return ()
+faIcon i conf = elClass "i" (fontAwesomeClass i <> " " <> fontAwesomeConfigClass conf) $ return ()
 --TODO: This needs a clear fallback mechanism for when something isn't present in the FontAwesome type
 
 --  faIcon prime functions
 faIcon' :: DomBuilder t m => FontAwesome -> FontAwesomeConfig -> m (Element EventResult (DomBuilderSpace m) t, ())
-faIcon' i conf = elClass' "i" ((fontAwesomeClass i) <> " " <> (fontAwesomeConfigClass conf)) $ return ()
+faIcon' i conf = elClass' "i" (fontAwesomeClass i <> " " <> fontAwesomeConfigClass conf) $ return ()
 
 faLg :: FontAwesomeConfig -> FontAwesomeConfig
 faLg cfg = cfg { _fontAwesomeConfig_size = Size_Large }
