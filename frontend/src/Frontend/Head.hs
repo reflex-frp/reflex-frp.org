@@ -12,6 +12,7 @@ import Reflex.Dom
 
 pageHead :: DomBuilder t m => m ()
 pageHead = do
+  elAttr "base" ("href" =: "/") blank --TODO: Update obelisk to automatically inject this
   el "title" $ text "Reflex FRP"
   elAttr "meta" metaDesc blank
   elAttr "meta" metaKeywords blank

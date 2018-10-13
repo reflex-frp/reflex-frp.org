@@ -16,7 +16,6 @@ module Common.Route where
 
 import Prelude hiding ((.))
 
-import Control.Monad.Except
 import Data.Text (Text)
 
 import Obelisk.Route
@@ -32,12 +31,27 @@ data Route :: * -> * where
   Route_Tutorials :: Route ()
   Route_Examples :: Route ()
   Route_Documentation :: Route ()
-  Route_Talks :: Route ()
+  Route_Talks :: Route (Maybe (R Talk))
   Route_FAQ :: Route ()
 deriving instance Show (Route a)
-deriveRouteComponent ''Route
 
-backendRouteEncoder :: MonadError Text check => Encoder check Identity (R (Sum Void1 (ObeliskRoute Route))) PageName
+data Talk :: * -> * where
+  Talk_PracticalFRP :: Talk (R PracticalFRP)
+  Talk_RealWorld :: Talk ()
+  Talk_BrowserProgramming :: Talk ()
+  Talk_Cochleagram :: Talk ()
+deriving instance Show (Talk a)
+
+data PracticalFRP :: * -> * where
+  PracticalFRP_Part1 :: PracticalFRP ()
+  PracticalFRP_Part2 :: PracticalFRP ()
+deriving instance Show (PracticalFRP a)
+
+deriveRouteComponent ''Route
+deriveRouteComponent ''Talk
+deriveRouteComponent ''PracticalFRP
+
+backendRouteEncoder :: (check ~ Either Text) => Encoder check Identity (R (Sum Void1 (ObeliskRoute Route))) PageName
 backendRouteEncoder = handleEncoder (\_ -> InR (ObeliskRoute_App Route_Home) :/ ()) $ pathComponentEncoder $ \case
   InL v -> case v of {}
   InR obeliskRoute -> obeliskRouteSegment obeliskRoute $ \case
@@ -45,7 +59,13 @@ backendRouteEncoder = handleEncoder (\_ -> InR (ObeliskRoute_App Route_Home) :/ 
     Route_Tutorials -> PathSegment "tutorials" $ unitEncoder mempty
     Route_Examples -> PathSegment "examples" $ unitEncoder mempty
     Route_Documentation -> PathSegment "documentation" $ unitEncoder mempty
-    Route_Talks -> PathSegment "talks" $ unitEncoder mempty
+    Route_Talks -> PathSegment "talks" $ maybeEncoder (unitEncoder mempty) $ pathComponentEncoder $ \case
+      Talk_PracticalFRP -> PathSegment "practical-frp" $ pathComponentEncoder $ \case
+        PracticalFRP_Part1 -> PathSegment "part-1" $ unitEncoder mempty
+        PracticalFRP_Part2 -> PathSegment "part-2" $ unitEncoder mempty
+      Talk_RealWorld -> PathSegment "real-world" $ unitEncoder mempty
+      Talk_BrowserProgramming -> PathSegment "browser-programming" $ unitEncoder mempty
+      Talk_Cochleagram -> PathSegment "cochleagram" $ unitEncoder mempty
     Route_FAQ -> PathSegment "faq" $ unitEncoder mempty
 
 -- | Provide a human-readable name for a given section
@@ -68,5 +88,21 @@ sectionHomepage (Some.This sec) = sec :/ case sec of
   Route_Tutorials -> ()
   Route_Examples -> ()
   Route_Documentation -> ()
-  Route_Talks -> ()
+  Route_Talks -> Nothing
   Route_FAQ -> ()
+
+-- | Provide a human-readable name for a given talk
+talkTitle :: Some Talk -> Text
+talkTitle (Some.This talk) = case talk of
+  Talk_PracticalFRP -> "Reflex: Practical Functional Reactive Programming (Ryan Trinkle)"
+  Talk_RealWorld -> "Real World Reflex (Doug Beardsley)"
+  Talk_BrowserProgramming -> "FRP Browser Programming (Niklas Hambüchen)"
+  Talk_Cochleagram -> "Reflex Cochleagram (Greg Hale)"
+
+-- | Given a section, provide its default route
+talkHomepage :: Some Talk -> R Talk
+talkHomepage (Some.This talk) = talk :/ case talk of
+  Talk_PracticalFRP -> PracticalFRP_Part1 :/ ()
+  Talk_RealWorld -> ()
+  Talk_BrowserProgramming -> ()
+  Talk_Cochleagram -> ()
