@@ -3,7 +3,7 @@
 {-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TypeApplications #-}
-module Frontend where
+module Frontend (frontend) where
 
 import Common.Route
 import Frontend.Footer
