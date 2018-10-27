@@ -38,7 +38,6 @@ nav collapseMenu = do
     divClass "menu-toggle" $ do
       activeTab <- askRoute
       -- Build the title items, which will only be displayed on small screens
-      --TODO: these elements really shouldn't be inside the `ul`
       (currentSection, _) <- elAttr' "a" ("class" =: "current-section") $
         dynText $ routeTitle <$> activeTab
       hamburger <- icon "bars"
