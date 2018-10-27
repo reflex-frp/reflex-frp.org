@@ -5,8 +5,6 @@ import Reflex.Dom
 
 tutorials :: DomBuilder t m => m ()
 tutorials = do
-  elClass "h3" "title" $ do
-    text "Tutorials"
   el "ol" $ do
     el "li" $ do
       el "label" $ text "Installation: "

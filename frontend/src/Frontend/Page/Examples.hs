@@ -5,7 +5,6 @@ import Reflex.Dom
 
 examples :: DomBuilder t m => m ()
 examples = do
-  elClass "h3" "title" $ text "Check Out Some Example Code"
   el "ul" $ do
    el "li" $ do
      el "label" $ text "Basic ToDo List: "
