@@ -11,4 +11,4 @@ examples = do
      elAttr "a" ("href" =: "https://github.com/reflex-frp/reflex-examples/blob/master/BasicTodo/BasicTodo.hs") $ text "See Code Here"
    el "li" $ do
      el "label" $ text "JSON API - NASA Pic of the Day: "
-     elAttr "a" ("href" =: "https://github.com/reflex-frp/reflex-examples/blob/master/nasa-pod/workshop.hs") $ text "See Code Here"
+     elAttr "a" ("href" =: "https://github.com/reflex-frp/reflex-examples/tree/master/nasa-pod") $ text "See Code Here"
