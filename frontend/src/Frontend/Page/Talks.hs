@@ -1,19 +1,22 @@
+{-# LANGUAGE DataKinds #-}
 {-# LANGUAGE GADTs #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE TypeOperators #-}
 module Frontend.Page.Talks (talks) where
 
 import Common.Route
 import Control.Monad (forM_)
 import Control.Monad.Fix
 import Data.Dependent.Sum (DSum(..))
-import Data.Functor.Identity (Identity(..))
 import Data.Some (Some)
 import qualified Data.Some as Some
 import Data.Text (Text)
 import Data.Universe (universe)
 import Obelisk.Route.Frontend
+import Obelisk.Generated.Static
 import Reflex.Dom
 
 talks
@@ -84,20 +87,9 @@ linkToButton
   -> m ()
 linkToButton r = linkTo r . text
 
--- | The youtube video identifiers for each talk
-youtubeId :: R Talk -> Text
-youtubeId = \case
-  Talk_PracticalFRP :=> Identity pfrp -> case pfrp of
-    PracticalFRP_Part1 :=> _ -> "mYvkcskJbc4"
-    PracticalFRP_Part2 :=> _ -> "3qfc9XFVo2c"
-  Talk_RealWorld :=> _ -> "dNBUDAU9sv4"
-  Talk_BrowserProgramming :=> _ -> "dNGClNsnn24"
-  Talk_Cochleagram :=> _ -> "MfXxuy_CJSk"
-  Talk_ReflexDomWithCss :=> _ -> "QNQaJLNKJQA"
-
 -- | Embed a Talk's youtube video
 talkEmbed :: (DomBuilder t m, PostBuild t m) => Dynamic t (R Talk) -> m ()
-talkEmbed = youtubeEmbed . fmap youtubeId
+talkEmbed = youtubeEmbed . fmap talkYoutubeId
 
 -- | Embed an automatically-sized youtube video
 -- For CSS, see https://www.h3xed.com/web-development/how-to-make-a-responsive-100-width-youtube-iframe-embed
@@ -118,14 +110,23 @@ youtubeEmbed videoId = elAttr "div" divAttrs $ elDynAttr "iframe" (iframeAttrs <
       , "allowfullscreen" =: "allowfullscreen"
       ]
 
+-- | The video thumbnail for each talk
+-- NB: The executable 'youtubepreviews' in 'backend/src-bin' can be
+-- used to retrieve these youtube preview images. Add the talk's youtube
+-- identifier to 'talkYoutubeId' and then run 'youtubepreviews'.
+talkImage :: Some Talk -> Text
+talkImage (Some.This t) = case t of
+  Talk_PracticalFRP -> static @ "img/talk/mYvkcskJbc4.jpg"
+  Talk_RealWorld -> static @ "img/talk/dNBUDAU9sv4.jpg"
+  Talk_BrowserProgramming -> static @ "img/talk/dNGClNsnn24.jpg"
+  Talk_Cochleagram -> static @ "img/talk/MfXxuy_CJSk.jpg"
+  Talk_ReflexDomWithCss -> static @ "img/talk/QNQaJLNKJQA.jpg"
+
 -- | Retrieve the preview image for a talk
--- TODO: These images should be served by this app, not by ytimg
 talkPreviewImage :: DomBuilder t m => Some Talk -> m ()
 talkPreviewImage t =
-  let imgSrc = "http://i3.ytimg.com/vi/" <> youtubeId (talkHomepage t) <> "/hqdefault.jpg"
-      attrs = mconcat
-        [ "src" =: imgSrc
-          -- TODO Download youtube preview images
+  let attrs = mconcat
+        [ "src" =: talkImage t
         , "alt" =: talkTitle t
         ]
   in elAttr "img" attrs blank

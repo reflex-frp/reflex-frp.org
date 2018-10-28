@@ -125,3 +125,14 @@ talkHomepage (Some.This talk) = talk :/ case talk of
   Talk_BrowserProgramming -> ()
   Talk_Cochleagram -> ()
   Talk_ReflexDomWithCss -> ()
+
+-- | The youtube video identifiers for each talk
+talkYoutubeId :: R Talk -> Text
+talkYoutubeId = \case
+  Talk_PracticalFRP :=> Identity pfrp -> case pfrp of
+    PracticalFRP_Part1 :=> _ -> "mYvkcskJbc4"
+    PracticalFRP_Part2 :=> _ -> "3qfc9XFVo2c"
+  Talk_RealWorld :=> _ -> "dNBUDAU9sv4"
+  Talk_BrowserProgramming :=> _ -> "dNGClNsnn24"
+  Talk_Cochleagram :=> _ -> "MfXxuy_CJSk"
+  Talk_ReflexDomWithCss :=> _ -> "QNQaJLNKJQA"
