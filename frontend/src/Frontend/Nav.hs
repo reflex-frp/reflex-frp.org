@@ -28,7 +28,7 @@ nav
      , Routed t (R Route) m
      , SetRoute t (R Route) m
      )
-  => Event t () -- ^ When thie event fires, collapse the menu
+  => Event t () -- ^ When this event fires, collapse the menu
   -> m ()
 nav collapseMenu = do
   openMenu <- divClass "logo-menu" $ do
