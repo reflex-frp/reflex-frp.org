@@ -13,6 +13,7 @@
 /* General */
 html {
   height: 100%;
+  overflow: hidden;
 }
 body {
   height: 100%;
@@ -109,6 +110,10 @@ header .current-section {
     color: var(--selection);
     font-weight: bold;
   }
+}
+.link {
+  cursor: pointer;
+  text-decoration: underline;
 }
 
 /* Footer */

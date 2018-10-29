@@ -85,7 +85,7 @@ linkToButton
   => Maybe (R Talk)
   -> Text
   -> m ()
-linkToButton r = linkTo r . text
+linkToButton r = elClass "span" "link" . linkTo r . text
 
 -- | Embed a Talk's youtube video
 talkEmbed :: (DomBuilder t m, PostBuild t m) => Dynamic t (R Talk) -> m ()
