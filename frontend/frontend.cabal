@@ -27,6 +27,7 @@ library
     Frontend.FontAwesome
     Frontend.Footer
     Frontend.Head
+    Frontend.Link
     Frontend.Nav
     Frontend.Page.Documentation
     Frontend.Page.Examples
