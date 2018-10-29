@@ -101,6 +101,8 @@ header .current-section {
     display: block;
     text-align: right;
     padding-right: var(--menupadding);
+    padding-top: 10px;
+    padding-bottom: 10px;
   }
   header nav a.nav-link.active {
     border: 0;
