@@ -14,11 +14,10 @@ import qualified Data.Some as Some
 import Data.Universe (universe)
 import Obelisk.Generated.Static
 import Obelisk.Route
-import Obelisk.Route.Frontend (Routed (askRoute), R, SetRoute)
+import Obelisk.Route.Frontend
 import Reflex.Dom
 
 import Frontend.FontAwesome
-import Frontend.Link
 
 -- | Build the entire nav bar, with hamburger menu for expanding on mobile
 nav
@@ -27,6 +26,7 @@ nav
      , MonadFix m
      , PostBuild t m
      , Routed t (R Route) m
+     , RouteToUrl (R Route) m
      , SetRoute t (R Route) m
      )
   => Event t () -- ^ When this event fires, collapse the menu
@@ -52,14 +52,14 @@ nav collapseMenu = do
   elDynAttr "nav" openAttrs menu
 
 -- | Displays the logo and returns an event that fires when the logo is clicked
-logo :: (DomBuilder t m, SetRoute t (R Route) m) => m ()
+logo :: (DomBuilder t m, SetRoute t (R Route) m, RouteToUrl (R Route) m) => m ()
 logo = do
   let logoAttrs = mconcat
         [ "class" =: "logo"
         , "src" =: static @"img/logo.svg"
         , "alt" =: "Reflex"
         ]
-  routedLink (Route_Home :/ ()) $ elAttr "img" logoAttrs blank
+  routeLink (Route_Home :/ ()) $ elAttr "img" logoAttrs blank
 
 -- | Build the nav's tabs
 menu
@@ -67,6 +67,7 @@ menu
      , PostBuild t m
      , SetRoute t (R Route) m
      , Routed t (R Route) m
+     , RouteToUrl (R Route) m
      )
   => m ()
 menu = do
@@ -80,4 +81,4 @@ menu = do
         highlight = ffor thisTabIsSelected $ \case
           True -> "class" =: "nav-link active"
           False -> "class" =: "nav-link"
-    elDynAttr "span" highlight $ routedLink (sectionHomepage section) $ text $ sectionTitle section
+    elDynAttr "span" highlight $ routeLink (sectionHomepage section) $ text $ sectionTitle section
