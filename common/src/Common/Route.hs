@@ -40,6 +40,7 @@ data Talk :: * -> * where
   Talk_RealWorld :: Talk ()
   Talk_BrowserProgramming :: Talk ()
   Talk_Cochleagram :: Talk ()
+  Talk_ReflexDomWithCss :: Talk ()
 deriving instance Show (Talk a)
 
 data PracticalFRP :: * -> * where
@@ -66,6 +67,7 @@ backendRouteEncoder = handleEncoder (\_ -> InR (ObeliskRoute_App Route_Home) :/ 
       Talk_RealWorld -> PathSegment "real-world" $ unitEncoder mempty
       Talk_BrowserProgramming -> PathSegment "browser-programming" $ unitEncoder mempty
       Talk_Cochleagram -> PathSegment "cochleagram" $ unitEncoder mempty
+      Talk_ReflexDomWithCss -> PathSegment "reflex-dom-with-css" $ unitEncoder mempty
     Route_FAQ -> PathSegment "faq" $ unitEncoder mempty
 
 -- | Provide a human-readable name for a given section
@@ -78,8 +80,23 @@ sectionTitle (Some.This sec) = case sec of
   Route_Talks -> "Talks"
   Route_FAQ -> "FAQ"
 
+-- | Provide a human-readable name for a route
 routeTitle :: R Route -> Text
 routeTitle (sec :=> _) = sectionTitle $ Some.This sec
+
+-- | Provide a human-readable description for a given section
+sectionDescription :: Some Route -> Text
+sectionDescription (Some.This sec) = case sec of
+  Route_Home -> "Reflex: Practical Functional Reactive Programming"
+  Route_Tutorials -> "Tutorials and Guides"
+  Route_Examples -> "Examples and Explanations"
+  Route_Documentation -> "Documentation and Reference"
+  Route_Talks -> "Talks and Presentations"
+  Route_FAQ -> "Frequently Asked Questions"
+
+-- | Provide a human-readable description for a given route
+routeDescription :: R Route -> Text
+routeDescription (sec :=> _) = sectionDescription $ Some.This sec
 
 -- | Given a section, provide its default route
 sectionHomepage :: Some Route -> R Route
@@ -98,6 +115,7 @@ talkTitle (Some.This talk) = case talk of
   Talk_RealWorld -> "Real World Reflex (Doug Beardsley)"
   Talk_BrowserProgramming -> "FRP Browser Programming (Niklas Hambüchen)"
   Talk_Cochleagram -> "Reflex Cochleagram (Greg Hale)"
+  Talk_ReflexDomWithCss -> "Using Reflex-Dom with CSS (Kat Chuang)"
 
 -- | Given a section, provide its default route
 talkHomepage :: Some Talk -> R Talk
@@ -106,3 +124,15 @@ talkHomepage (Some.This talk) = talk :/ case talk of
   Talk_RealWorld -> ()
   Talk_BrowserProgramming -> ()
   Talk_Cochleagram -> ()
+  Talk_ReflexDomWithCss -> ()
+
+-- | The youtube video identifiers for each talk
+talkYoutubeId :: R Talk -> Text
+talkYoutubeId = \case
+  Talk_PracticalFRP :=> Identity pfrp -> case pfrp of
+    PracticalFRP_Part1 :=> _ -> "mYvkcskJbc4"
+    PracticalFRP_Part2 :=> _ -> "3qfc9XFVo2c"
+  Talk_RealWorld :=> _ -> "dNBUDAU9sv4"
+  Talk_BrowserProgramming :=> _ -> "dNGClNsnn24"
+  Talk_Cochleagram :=> _ -> "MfXxuy_CJSk"
+  Talk_ReflexDomWithCss :=> _ -> "QNQaJLNKJQA"

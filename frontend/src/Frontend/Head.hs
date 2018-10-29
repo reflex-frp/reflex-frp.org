@@ -6,7 +6,6 @@ module Frontend.Head (pageHead) where
 import Data.Map (Map)
 import Data.Text
 import qualified Data.Text as T
-import qualified Frontend.FontAwesome as FA
 import Obelisk.Generated.Static
 import Reflex.Dom
 
@@ -17,10 +16,11 @@ pageHead = do
   elAttr "meta" metaDesc blank
   elAttr "meta" metaKeywords blank
   elAttr "meta" viewport blank
-  FA.fontAwesomeCDN
   pageIcons
-  styleSheet $ static @"style.css"
-  styleSheet $ static @"font.css"
+  styleSheet $ static @"css/normalize.css"
+  styleSheet $ static @"css/fontawesome.min.css"
+  styleSheet $ static @"css/font.css"
+  styleSheet $ static @"css/style.css"
 
 -- | Link to icons for this page (favicons, etc.)
 pageIcons :: DomBuilder t m => m ()

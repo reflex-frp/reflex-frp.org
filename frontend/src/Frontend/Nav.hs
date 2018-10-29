@@ -1,7 +1,9 @@
+{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecursiveDo #-}
-{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE TypeApplications #-}
 module Frontend.Nav (nav) where
 
 import Common.Route
@@ -10,9 +12,12 @@ import Control.Monad.Fix (MonadFix)
 import Data.Dependent.Sum (DSum ((:=>)))
 import qualified Data.Some as Some
 import Data.Universe (universe)
-import qualified Frontend.FontAwesome as FA
-import Obelisk.Route.Frontend (Routed (askRoute), R, SetRoute (setRoute))
+import Obelisk.Generated.Static
+import Obelisk.Route
+import Obelisk.Route.Frontend
 import Reflex.Dom
+
+import Frontend.FontAwesome
 
 -- | Build the entire nav bar, with hamburger menu for expanding on mobile
 nav
@@ -21,26 +26,40 @@ nav
      , MonadFix m
      , PostBuild t m
      , Routed t (R Route) m
+     , RouteToUrl (R Route) m
      , SetRoute t (R Route) m
      )
-  => m ()
-nav = do
-  rec isOpen <- toggle False $ domEvent Click modalButtonAndBackground
-      let openAttrs = ffor isOpen $ \case
-            True -> "class" =: "sections"
-            False -> "class" =: "noshow"
-      (modalButtonAndBackground, _) <- elDynAttr' "div" openAttrs $ do
-        elDynAttr "ul" openAttrs $ do
-          -- Build the title items, which will only be displayed on small screens
-          --TODO: these elements really shouldn't be inside the `ul`
-          el "div" $ text " "
-          activeTab <- askRoute
-          el "p" $ dynText $ routeTitle <$> activeTab
-          _ <- FA.faIcon' FA.FaBars def
+  => Event t () -- ^ When this event fires, collapse the menu
+  -> m ()
+nav collapseMenu = do
+  openMenu <- divClass "logo-menu" $ do
+    logo
+    divClass "menu-toggle" $ do
+      activeTab <- askRoute
+      -- Build the title items, which will only be displayed on small screens
+      (currentSection, _) <- elAttr' "a" ("class" =: "current-section") $
+        dynText $ routeTitle <$> activeTab
+      hamburger <- icon "bars"
+      foldDyn ($) False $ leftmost
+        [ not <$ domEvent Click currentSection
+        , not <$ domEvent Click hamburger
+        , const False <$ updated activeTab
+        , const False <$ collapseMenu
+        ]
+  let openAttrs = ffor openMenu $ \case
+        True -> "class" =: "active"
+        False -> mempty
+  elDynAttr "nav" openAttrs menu
 
-          -- Build the actual tabs
-          menu
-  return ()
+-- | Displays the logo and returns an event that fires when the logo is clicked
+logo :: (DomBuilder t m, SetRoute t (R Route) m, RouteToUrl (R Route) m) => m ()
+logo = do
+  let logoAttrs = mconcat
+        [ "class" =: "logo"
+        , "src" =: static @"img/logo.svg"
+        , "alt" =: "Reflex"
+        ]
+  routeLink (Route_Home :/ ()) $ elAttr "img" logoAttrs blank
 
 -- | Build the nav's tabs
 menu
@@ -48,6 +67,7 @@ menu
      , PostBuild t m
      , SetRoute t (R Route) m
      , Routed t (R Route) m
+     , RouteToUrl (R Route) m
      )
   => m ()
 menu = do
@@ -55,13 +75,10 @@ menu = do
   currentTab <- askRoute
   let currentTabDemux = demux $ fmap (\(sec :=> _) -> Some.This sec) currentTab
   -- Iterate over all the top-level routes
-  forM_ universe $ \section -> el "li" $ do
+  forM_ universe $ \section -> do
     -- Create a link that is highlighted if it is the current section
     let thisTabIsSelected = demuxed currentTabDemux section
         highlight = ffor thisTabIsSelected $ \case
-          True -> "class" =: "chosenOne"
-          False -> mempty
-    (linkEl, _) <- elDynAttr' "a" highlight $ do
-      text $ sectionTitle section
-    -- When clicked, go to that section's homepage
-    setRoute $ sectionHomepage section <$ domEvent Click linkEl
+          True -> "class" =: "nav-link active"
+          False -> "class" =: "nav-link"
+    elDynAttr "span" highlight $ routeLink (sectionHomepage section) $ text $ sectionTitle section
