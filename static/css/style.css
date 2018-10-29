@@ -31,6 +31,18 @@ img {
   width: auto;
   height: auto;
 }
+a[href] {
+  text-decoration: none;
+  color: var(--primary);
+}
+a[href]:hover {
+  color: var(--selection);
+}
+.link {
+  cursor: pointer;
+  text-decoration: underline;
+}
+
 
 /* Header and navigation */
 header {
@@ -64,12 +76,12 @@ header nav {
   flex-direction: row;
 }
 
-header nav a.nav-link {
+header nav .nav-link a {
   padding: 5px;
   cursor: pointer;
 }
 
-header nav a.nav-link.active {
+header nav .nav-link.active a {
   border-bottom: 3px solid var(--selection);
 }
 
@@ -92,28 +104,24 @@ header .current-section {
   header .current-section {
     display: block;
   }
-  header nav a.nav-link {
+  header nav .nav-link a {
     display: none;
   }
   header nav.active {
     flex-direction: column;
   }
-  header nav.active a.nav-link {
+  header nav.active .nav-link a {
     display: block;
     text-align: right;
     padding-right: var(--menupadding);
     padding-top: 10px;
     padding-bottom: 10px;
   }
-  header nav a.nav-link.active {
+  header nav .nav-link.active a {
     border: 0;
     color: var(--selection);
     font-weight: bold;
   }
-}
-.link {
-  cursor: pointer;
-  text-decoration: underline;
 }
 
 /* Footer */

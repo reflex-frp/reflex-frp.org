@@ -7,7 +7,6 @@
 {-# LANGUAGE TypeOperators #-}
 module Frontend.Page.Talks (talks) where
 
-import Common.Route
 import Control.Monad (forM_)
 import Control.Monad.Fix
 import Data.Dependent.Sum (DSum(..))
@@ -18,6 +17,9 @@ import Data.Universe (universe)
 import Obelisk.Route.Frontend
 import Obelisk.Generated.Static
 import Reflex.Dom
+
+import Common.Route
+import Frontend.Link
 
 talks
   :: ( DomBuilder t m
@@ -72,10 +74,7 @@ linkTo
   => Maybe (R Talk)
   -> m ()
   -> m ()
-linkTo route w = do
-  let baseRoute = Route_Talks
-  (l, _) <- el' "a"  w
-  setRoute $ (baseRoute :/ route) <$ domEvent Click l
+linkTo route w = routedLink (Route_Talks :/ route) w
 
 -- | A button linking to a particular Talk section
 linkToButton

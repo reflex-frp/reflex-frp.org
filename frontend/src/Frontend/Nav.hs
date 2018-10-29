@@ -14,10 +14,11 @@ import qualified Data.Some as Some
 import Data.Universe (universe)
 import Obelisk.Generated.Static
 import Obelisk.Route
-import Obelisk.Route.Frontend (Routed (askRoute), R, SetRoute (setRoute))
+import Obelisk.Route.Frontend (Routed (askRoute), R, SetRoute)
 import Reflex.Dom
 
 import Frontend.FontAwesome
+import Frontend.Link
 
 -- | Build the entire nav bar, with hamburger menu for expanding on mobile
 nav
@@ -32,9 +33,7 @@ nav
   -> m ()
 nav collapseMenu = do
   openMenu <- divClass "logo-menu" $ do
-    -- When the logo is clicked, go to the homepage
-    setRoute . fmap (const $ Route_Home :/ ()) =<< logo
-
+    logo
     divClass "menu-toggle" $ do
       activeTab <- askRoute
       -- Build the title items, which will only be displayed on small screens
@@ -53,14 +52,14 @@ nav collapseMenu = do
   elDynAttr "nav" openAttrs menu
 
 -- | Displays the logo and returns an event that fires when the logo is clicked
-logo :: DomBuilder t m => m (Event t ())
+logo :: (DomBuilder t m, SetRoute t (R Route) m) => m ()
 logo = do
   let logoAttrs = mconcat
         [ "class" =: "logo"
         , "src" =: static @"img/logo.svg"
         , "alt" =: "Reflex"
         ]
-  domEvent Click . fst <$> elAttr' "img" logoAttrs blank
+  routedLink (Route_Home :/ ()) $ elAttr "img" logoAttrs blank
 
 -- | Build the nav's tabs
 menu
@@ -81,7 +80,4 @@ menu = do
         highlight = ffor thisTabIsSelected $ \case
           True -> "class" =: "nav-link active"
           False -> "class" =: "nav-link"
-    (linkEl, _) <- elDynAttr' "a" highlight $ do
-      text $ sectionTitle section
-    -- When clicked, go to that section's homepage
-    setRoute $ sectionHomepage section <$ domEvent Click linkEl
+    elDynAttr "span" highlight $ routedLink (sectionHomepage section) $ text $ sectionTitle section
