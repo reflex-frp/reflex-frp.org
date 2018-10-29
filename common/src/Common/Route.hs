@@ -115,7 +115,7 @@ talkTitle (Some.This talk) = case talk of
   Talk_RealWorld -> "Real World Reflex (Doug Beardsley)"
   Talk_BrowserProgramming -> "FRP Browser Programming (Niklas Hambüchen)"
   Talk_Cochleagram -> "Reflex Cochleagram (Greg Hale)"
-  Talk_ReflexDomWithCss -> "Using Reflex-Dom with CSS"
+  Talk_ReflexDomWithCss -> "Using Reflex-Dom with CSS (Kat Chuang)"
 
 -- | Given a section, provide its default route
 talkHomepage :: Some Talk -> R Talk
