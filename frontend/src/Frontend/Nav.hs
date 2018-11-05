@@ -82,3 +82,15 @@ menu = do
           True -> "class" =: "nav-link active"
           False -> "class" =: "nav-link"
     elDynAttr "span" highlight $ routeLink (sectionHomepage section) $ text $ sectionTitle section
+  forkMeOnGithub
+
+forkMeOnGithub
+  :: ( DomBuilder t m)
+  => m ()
+forkMeOnGithub = elClass "span" "fork-link" $
+  elAttr "a" ("href" =: href) $
+  elAttr "img" (("src" =: src) <> ("alt" =: alt)) $ return ()
+  where
+    href = "https://github.com/reflex-frp/reflex-frp.org"
+    src = "https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png"
+    alt = "Fork me on GitHub"

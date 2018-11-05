@@ -85,6 +85,13 @@ header nav .nav-link.active a {
   border-bottom: 3px solid var(--selection);
 }
 
+header nav .fork-link a img {
+    position: absolute;
+    top: 0;
+    right: 0;
+    border: 0;
+}
+
 header i.fa {
   display: none;
 }
@@ -93,7 +100,7 @@ header .current-section {
   display: none;
 }
 
-@media (max-width: 600px) {
+@media (max-width: 750px) {
   header {
     flex-direction: column;
     align-items: normal;
@@ -106,6 +113,9 @@ header .current-section {
   }
   header nav .nav-link a {
     display: none;
+  }
+  header nav .fork-link a {
+      display: none;
   }
   header nav.active {
     flex-direction: column;
