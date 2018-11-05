@@ -35,6 +35,7 @@ data Route :: * -> * where
   Route_FAQ :: Route ()
 deriving instance Show (Route a)
 
+-- | These videos can be played in the embedded mode
 data Talk :: * -> * where
   Talk_PracticalFRP :: Talk (R PracticalFRP)
   Talk_RealWorld :: Talk ()
@@ -51,6 +52,12 @@ deriving instance Show (PracticalFRP a)
 deriveRouteComponent ''Route
 deriveRouteComponent ''Talk
 deriveRouteComponent ''PracticalFRP
+
+-- | Link to external videos
+--   since these cannot be embedded, it is not part of the Route
+data ExternalLink =
+  ExtLink_GonimoArchitecture
+  deriving (Show)
 
 backendRouteEncoder :: (check ~ Either Text) => Encoder check Identity (R (Sum Void1 (ObeliskRoute Route))) PageName
 backendRouteEncoder = handleEncoder (\_ -> InR (ObeliskRoute_App Route_Home) :/ ()) $ pathComponentEncoder $ \case
@@ -108,9 +115,14 @@ sectionHomepage (Some.This sec) = sec :/ case sec of
   Route_Talks -> Nothing
   Route_FAQ -> ()
 
+type EitherEmbeddedOrExtTalk = Either ExternalLink (Some Talk)
+
 -- | Provide a human-readable name for a given talk
-talkTitle :: Some Talk -> Text
-talkTitle (Some.This talk) = case talk of
+talkTitle :: EitherEmbeddedOrExtTalk -> Text
+talkTitle (Left talk) = case talk of
+  ExtLink_GonimoArchitecture -> "The Gonimo Architecture"
+
+talkTitle (Right (Some.This talk)) = case talk of
   Talk_PracticalFRP -> "Reflex: Practical Functional Reactive Programming (Ryan Trinkle)"
   Talk_RealWorld -> "Real World Reflex (Doug Beardsley)"
   Talk_BrowserProgramming -> "FRP Browser Programming (Niklas Hambüchen)"
