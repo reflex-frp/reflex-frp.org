@@ -61,12 +61,6 @@ deriveRouteComponent ''EmbeddedTalk
 deriveRouteComponent ''Route
 deriveRouteComponent ''PracticalFRP
 
--- | Link to external videos
---   since these cannot be embedded, it is not part of the Route
-data ExternalLink =
-  ExtLink_GonimoArchitecture
-  deriving (Show)
-
 backendRouteEncoder :: (check ~ Either Text) => Encoder check Identity (R (Sum Void1 (ObeliskRoute Route))) PageName
 backendRouteEncoder = handleEncoder (\_ -> InR (ObeliskRoute_App Route_Home) :/ ()) $ pathComponentEncoder $ \case
   InL v -> case v of {}
