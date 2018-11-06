@@ -31,26 +31,34 @@ data Route :: * -> * where
   Route_Tutorials :: Route ()
   Route_Examples :: Route ()
   Route_Documentation :: Route ()
-  Route_Talks :: Route (Maybe (R Talk))
+  Route_Talks :: Route (Maybe (R EmbeddedTalk))
   Route_FAQ :: Route ()
 deriving instance Show (Route a)
 
--- | These videos can be played in the embedded mode
-data Talk :: * -> * where
-  Talk_PracticalFRP :: Talk (R PracticalFRP)
-  Talk_RealWorld :: Talk ()
-  Talk_BrowserProgramming :: Talk ()
-  Talk_Cochleagram :: Talk ()
-  Talk_ReflexDomWithCss :: Talk ()
-deriving instance Show (Talk a)
+data EmbeddedTalk :: * -> * where
+  EmbeddedTalk_PracticalFRP :: EmbeddedTalk (R PracticalFRP)
+  EmbeddedTalk_RealWorld :: EmbeddedTalk ()
+  EmbeddedTalk_BrowserProgramming :: EmbeddedTalk ()
+  EmbeddedTalk_Cochleagram :: EmbeddedTalk ()
+  EmbeddedTalk_ReflexDomWithCss :: EmbeddedTalk ()
+deriving instance Show (EmbeddedTalk a)
+
+data Talk =
+  Talk_PracticalFRP
+  | Talk_RealWorld
+  | Talk_GonimoArchitecture
+  | Talk_BrowserProgramming
+  | Talk_Cochleagram
+  | Talk_ReflexDomWithCss
+  deriving (Enum, Bounded)
 
 data PracticalFRP :: * -> * where
   PracticalFRP_Part1 :: PracticalFRP ()
   PracticalFRP_Part2 :: PracticalFRP ()
 deriving instance Show (PracticalFRP a)
 
+deriveRouteComponent ''EmbeddedTalk
 deriveRouteComponent ''Route
-deriveRouteComponent ''Talk
 deriveRouteComponent ''PracticalFRP
 
 -- | Link to external videos
@@ -68,13 +76,13 @@ backendRouteEncoder = handleEncoder (\_ -> InR (ObeliskRoute_App Route_Home) :/ 
     Route_Examples -> PathSegment "examples" $ unitEncoder mempty
     Route_Documentation -> PathSegment "documentation" $ unitEncoder mempty
     Route_Talks -> PathSegment "talks" $ maybeEncoder (unitEncoder mempty) $ pathComponentEncoder $ \case
-      Talk_PracticalFRP -> PathSegment "practical-frp" $ pathComponentEncoder $ \case
+      EmbeddedTalk_PracticalFRP -> PathSegment "practical-frp" $ pathComponentEncoder $ \case
         PracticalFRP_Part1 -> PathSegment "part-1" $ unitEncoder mempty
         PracticalFRP_Part2 -> PathSegment "part-2" $ unitEncoder mempty
-      Talk_RealWorld -> PathSegment "real-world" $ unitEncoder mempty
-      Talk_BrowserProgramming -> PathSegment "browser-programming" $ unitEncoder mempty
-      Talk_Cochleagram -> PathSegment "cochleagram" $ unitEncoder mempty
-      Talk_ReflexDomWithCss -> PathSegment "reflex-dom-with-css" $ unitEncoder mempty
+      EmbeddedTalk_RealWorld -> PathSegment "real-world" $ unitEncoder mempty
+      EmbeddedTalk_BrowserProgramming -> PathSegment "browser-programming" $ unitEncoder mempty
+      EmbeddedTalk_Cochleagram -> PathSegment "cochleagram" $ unitEncoder mempty
+      EmbeddedTalk_ReflexDomWithCss -> PathSegment "reflex-dom-with-css" $ unitEncoder mempty
     Route_FAQ -> PathSegment "faq" $ unitEncoder mempty
 
 -- | Provide a human-readable name for a given section
@@ -115,36 +123,54 @@ sectionHomepage (Some.This sec) = sec :/ case sec of
   Route_Talks -> Nothing
   Route_FAQ -> ()
 
-type EitherEmbeddedOrExtTalk = Either ExternalLink (Some Talk)
-
 -- | Provide a human-readable name for a given talk
-talkTitle :: EitherEmbeddedOrExtTalk -> Text
-talkTitle (Left talk) = case talk of
-  ExtLink_GonimoArchitecture -> "The Gonimo Architecture"
-
-talkTitle (Right (Some.This talk)) = case talk of
+talkTitle :: Talk -> Text
+talkTitle = \case
   Talk_PracticalFRP -> "Reflex: Practical Functional Reactive Programming (Ryan Trinkle)"
   Talk_RealWorld -> "Real World Reflex (Doug Beardsley)"
+  Talk_GonimoArchitecture -> "The Gonimo Architecture"
   Talk_BrowserProgramming -> "FRP Browser Programming (Niklas Hambüchen)"
   Talk_Cochleagram -> "Reflex Cochleagram (Greg Hale)"
   Talk_ReflexDomWithCss -> "Using Reflex-Dom with CSS (Kat Chuang)"
 
--- | Given a section, provide its default route
-talkHomepage :: Some Talk -> R Talk
-talkHomepage (Some.This talk) = talk :/ case talk of
-  Talk_PracticalFRP -> PracticalFRP_Part1 :/ ()
-  Talk_RealWorld -> ()
-  Talk_BrowserProgramming -> ()
-  Talk_Cochleagram -> ()
-  Talk_ReflexDomWithCss -> ()
+-- | Given a talk, provide its default route or url
+talkHomepage :: Talk -> Either Text (R EmbeddedTalk)
+talkHomepage = \case
+  Talk_PracticalFRP -> Right $ EmbeddedTalk_PracticalFRP :/ PracticalFRP_Part1 :/ ()
+  Talk_RealWorld -> Right $ EmbeddedTalk_RealWorld :/ ()
+  Talk_GonimoArchitecture ->
+    Left "https://skillsmatter.com/skillscasts/12637-the-gonimo-architecture"
+  Talk_BrowserProgramming -> Right $ EmbeddedTalk_BrowserProgramming :/ ()
+  Talk_Cochleagram -> Right $ EmbeddedTalk_Cochleagram :/ ()
+  Talk_ReflexDomWithCss -> Right $ EmbeddedTalk_ReflexDomWithCss :/ ()
 
--- | The youtube video identifiers for each talk
-talkYoutubeId :: R Talk -> Text
+-- | The youtube video identifiers for each embedded talk
+talkYoutubeId :: R EmbeddedTalk -> Text
 talkYoutubeId = \case
-  Talk_PracticalFRP :=> Identity pfrp -> case pfrp of
+  EmbeddedTalk_PracticalFRP :=> Identity pfrp -> case pfrp of
     PracticalFRP_Part1 :=> _ -> "mYvkcskJbc4"
     PracticalFRP_Part2 :=> _ -> "3qfc9XFVo2c"
-  Talk_RealWorld :=> _ -> "dNBUDAU9sv4"
-  Talk_BrowserProgramming :=> _ -> "dNGClNsnn24"
-  Talk_Cochleagram :=> _ -> "MfXxuy_CJSk"
-  Talk_ReflexDomWithCss :=> _ -> "QNQaJLNKJQA"
+  EmbeddedTalk_RealWorld :=> _ -> "dNBUDAU9sv4"
+  EmbeddedTalk_BrowserProgramming :=> _ -> "dNGClNsnn24"
+  EmbeddedTalk_Cochleagram :=> _ -> "MfXxuy_CJSk"
+  EmbeddedTalk_ReflexDomWithCss :=> _ -> "QNQaJLNKJQA"
+
+talkForEmbeddedTalk :: R EmbeddedTalk -> Talk
+talkForEmbeddedTalk (t :=> _) = case t of
+  EmbeddedTalk_PracticalFRP -> Talk_PracticalFRP
+  EmbeddedTalk_RealWorld -> Talk_RealWorld
+  EmbeddedTalk_BrowserProgramming -> Talk_BrowserProgramming
+  EmbeddedTalk_Cochleagram -> Talk_Cochleagram
+  EmbeddedTalk_ReflexDomWithCss -> Talk_ReflexDomWithCss
+
+-- | Returns a tuple containing thumbnail download url and file name to save in static/img/talk
+talkThumbnail :: Talk -> (Text, Text)
+talkThumbnail t = case t of
+  Talk_GonimoArchitecture ->
+    ("http://i.vimeocdn.com/video/731745473_640.jpg", "gonimoTalkThumbnail")
+  _ -> case (talkHomepage t) of
+      (Left _) -> error "talkThumbnail: Add thumbnail URL for non-youtube videos"
+      (Right r) -> (url, yId)
+        where
+          yId = talkYoutubeId r
+          url = "http://i3.ytimg.com/vi/" <> yId <> "/hqdefault.jpg"

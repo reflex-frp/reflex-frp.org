@@ -26,17 +26,9 @@ talks
      , RouteToUrl (R Route) m
      , SetRoute t (R Route) m
      )
-  => RoutedT t (Maybe (R Talk)) m ()
+  => RoutedT t (Maybe (R EmbeddedTalk)) m ()
 talks = do
-  let index = forM_ talkList $ elClass "article" "talk" . talkPreview
-      talkList = [ f Talk_PracticalFRP
-                 , f Talk_RealWorld
-                 , Left ExtLink_GonimoArchitecture
-                 , f Talk_BrowserProgramming
-                 , f Talk_Cochleagram
-                 , f Talk_ReflexDomWithCss
-                 ]
-      f = Right . Some.This
+  let index = forM_ [minBound..maxBound] $ elClass "article" "talk" . talkPreview
   maybeRoute_ index $ talk =<< askRoute
 
 -- | Shows a preview image and title for a given Talk
@@ -45,13 +37,13 @@ talkPreview
      , RouteToUrl (R Route) m
      , SetRoute t (R Route) m
      )
-  => EitherEmbeddedOrExtTalk
+  => Talk
   -> m ()
-talkPreview t = linkToTalk (talkHomepage <$> t) $ el "figure" $ do
+talkPreview t = linkToTalk (talkHomepage t) $ el "figure" $ do
   talkPreviewImage t
   el "figcaption" $ text $ talkTitle t
 
--- | Displays the video for a given Talk
+-- | Displays the video for a given EmbeddedTalk
 talk
   :: ( DomBuilder t m
      , PostBuild t m
@@ -60,19 +52,19 @@ talk
      , RouteToUrl (R Route) m
      , SetRoute t (R Route) m
      )
-  => Dynamic t (R Talk)
-  -> RoutedT t (R Talk) m ()
+  => Dynamic t (R EmbeddedTalk)
+  -> RoutedT t (R EmbeddedTalk) m ()
 talk r = do
-    let title (k :=> _) = talkTitle $ (Right . Some.This) k
+    let title = talkTitle . talkForEmbeddedTalk
     el "h4" $ dynText $ fmap title r
     talkEmbed r
     let textLink target = elClass "span" "link" . linkToTalk (Right target) . text
     subRoute_ $ \case
-      Talk_PracticalFRP -> subRoute_ $ \case
+      EmbeddedTalk_PracticalFRP -> subRoute_ $ \case
         PracticalFRP_Part1 ->
-          textLink (Talk_PracticalFRP :/ PracticalFRP_Part2 :/ () :: R Talk) "Go to Part 2"
+          textLink (EmbeddedTalk_PracticalFRP :/ PracticalFRP_Part2 :/ () :: R EmbeddedTalk) "Go to Part 2"
         PracticalFRP_Part2 ->
-          textLink (Talk_PracticalFRP :/ PracticalFRP_Part1 :/ () :: R Talk) "Go to Part 1"
+          textLink (EmbeddedTalk_PracticalFRP :/ PracticalFRP_Part1 :/ () :: R EmbeddedTalk) "Go to Part 1"
       _ -> return ()
 
 -- | Wraps a widget so that it becomes a link to a particular Talk section
@@ -81,15 +73,14 @@ linkToTalk
      , RouteToUrl (R Route) m
      , SetRoute t (R Route) m
      )
-  => Either ExternalLink (R Talk)
+  => Either Text (R EmbeddedTalk)
   -> m ()
   -> m ()
 linkToTalk (Right route) w = routeLink (Route_Talks :/ Just route) w
-linkToTalk (Left talk) w = elAttr "a" ("href" =: (externalTalkTarget talk)) w
-
+linkToTalk (Left url) w = elAttr "a" (("href" =: url) <> ("target" =: "_blank")) w
 
 -- | Embed a Talk's youtube video
-talkEmbed :: (DomBuilder t m, PostBuild t m) => Dynamic t (R Talk) -> m ()
+talkEmbed :: (DomBuilder t m, PostBuild t m) => Dynamic t (R EmbeddedTalk) -> m ()
 talkEmbed = youtubeEmbed . fmap talkYoutubeId
 
 -- | Embed an automatically-sized youtube video
@@ -115,26 +106,20 @@ youtubeEmbed videoId = elAttr "div" divAttrs $ elDynAttr "iframe" (iframeAttrs <
 -- NB: The executable 'youtubepreviews' in 'backend/src-bin' can be
 -- used to retrieve these youtube preview images. Add the talk's youtube
 -- identifier to 'talkYoutubeId' and then run 'youtubepreviews'.
-talkImage :: EitherEmbeddedOrExtTalk -> Text
-talkImage (Left talk) = case talk of
-  ExtLink_GonimoArchitecture -> static @ "img/talk/gonimoTalkThumbnail.jpg"
-
-talkImage (Right (Some.This talk)) = case talk of
+talkImage :: Talk -> Text
+talkImage = \case
   Talk_PracticalFRP -> static @ "img/talk/mYvkcskJbc4.jpg"
   Talk_RealWorld -> static @ "img/talk/dNBUDAU9sv4.jpg"
+  Talk_GonimoArchitecture -> static @ "img/talk/gonimoTalkThumbnail.jpg"
   Talk_BrowserProgramming -> static @ "img/talk/dNGClNsnn24.jpg"
   Talk_Cochleagram -> static @ "img/talk/MfXxuy_CJSk.jpg"
   Talk_ReflexDomWithCss -> static @ "img/talk/QNQaJLNKJQA.jpg"
 
 -- | Retrieve the preview image for a talk
-talkPreviewImage :: DomBuilder t m => EitherEmbeddedOrExtTalk -> m ()
+talkPreviewImage :: DomBuilder t m => Talk -> m ()
 talkPreviewImage t =
   let attrs = mconcat
         [ "src" =: talkImage t
         , "alt" =: talkTitle t
         ]
   in elAttr "img" attrs blank
-
-externalTalkTarget :: ExternalLink -> Text
-externalTalkTarget ExtLink_GonimoArchitecture =
-  "https://skillsmatter.com/skillscasts/12637-the-gonimo-architecture"

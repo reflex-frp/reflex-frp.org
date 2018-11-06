@@ -85,7 +85,7 @@ menu = do
   forkMeOnGithub
 
 forkMeOnGithub
-  :: ( DomBuilder t m)
+  :: DomBuilder t m
   => m ()
 forkMeOnGithub = elClass "span" "fork-link" $
   elAttr "a" ("href" =: href) $
