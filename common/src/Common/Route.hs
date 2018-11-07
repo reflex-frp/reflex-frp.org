@@ -12,7 +12,6 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE StandaloneDeriving #-}
 {-# LANGUAGE TemplateHaskell #-}
-{-# LANGUAGE DeriveAnyClass #-}
 module Common.Route where
 
 import Data.Text (Text)
@@ -53,7 +52,8 @@ deriving instance Show (PracticalFRP a)
 data ExternalTalk =
   ExternalTalk_GonimoArchitecture
   deriving (Eq, Ord, Show, Enum, Bounded)
-deriving instance Universe (ExternalTalk)
+
+instance Universe (ExternalTalk)
 
 deriveRouteComponent ''Route
 deriveRouteComponent ''Talk
