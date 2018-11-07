@@ -53,7 +53,7 @@ data ExternalTalk =
   ExternalTalk_GonimoArchitecture
   deriving (Eq, Ord, Show, Enum, Bounded)
 
-instance Universe (ExternalTalk)
+instance Universe ExternalTalk
 
 deriveRouteComponent ''Route
 deriveRouteComponent ''Talk

@@ -16,6 +16,7 @@ import Data.Text (Text)
 import Obelisk.Route.Frontend
 import Obelisk.Generated.Static
 import Reflex.Dom
+import Frontend.FontAwesome
 
 import Common.Route
 
@@ -42,7 +43,11 @@ talkPreview
   -> m ()
 talkPreview t = linkToTalk (talkDefaultTarget t) $ el "figure" $ do
   talkPreviewImage t
-  el "figcaption" $ text $ talkTitle t
+  el "figcaption" $ do
+    text $ talkTitle t
+    case (talkDefaultTarget t) of
+      (Left _) -> icon_ "external-link-alt"
+      _ -> blank
 
 -- | Displays the video for a given Talk
 talk
