@@ -13,7 +13,6 @@ import Data.Dependent.Sum (DSum(..))
 import Data.Some (Some)
 import qualified Data.Some as Some
 import Data.Text (Text)
-import Data.Universe (universe)
 import Obelisk.Route.Frontend
 import Obelisk.Generated.Static
 import Reflex.Dom
@@ -30,7 +29,7 @@ talks
      )
   => RoutedT t (Maybe (R Talk)) m ()
 talks = do
-  let index = forM_ universe $ elClass "article" "talk" . talkPreview
+  let index = forM_ orderedTalks $ elClass "article" "talk" . talkPreview
   maybeRoute_ index $ talk =<< askRoute
 
 -- | Shows a preview image and title for a given Talk
@@ -39,9 +38,9 @@ talkPreview
      , RouteToUrl (R Route) m
      , SetRoute t (R Route) m
      )
-  => Some Talk
+  => Either ExternalTalk (Some Talk)
   -> m ()
-talkPreview t = linkToTalk (talkHomepage t) $ el "figure" $ do
+talkPreview t = linkToTalk (talkDefaultTarget t) $ el "figure" $ do
   talkPreviewImage t
   el "figcaption" $ text $ talkTitle t
 
@@ -57,10 +56,10 @@ talk
   => Dynamic t (R Talk)
   -> RoutedT t (R Talk) m ()
 talk r = do
-    let title (k :=> _) = talkTitle $ Some.This k
+    let title (k :=> _) = talkTitle $ Right . Some.This $ k
     el "h4" $ dynText $ fmap title r
     talkEmbed r
-    let textLink target = elClass "span" "link" . linkToTalk target . text
+    let textLink target = elClass "span" "link" . linkToTalk (Right target) . text
     subRoute_ $ \case
       Talk_PracticalFRP -> subRoute_ $ \case
         PracticalFRP_Part1 ->
@@ -75,10 +74,11 @@ linkToTalk
      , RouteToUrl (R Route) m
      , SetRoute t (R Route) m
      )
-  => R Talk
+  => Either Text (R Talk)
   -> m ()
   -> m ()
-linkToTalk route w = routeLink (Route_Talks :/ Just route) w
+linkToTalk (Right route) w = routeLink (Route_Talks :/ Just route) w
+linkToTalk (Left url) w = elAttr "a" (("href" =: url) <> ("target" =: "_blank")) w
 
 -- | Embed a Talk's youtube video
 talkEmbed :: (DomBuilder t m, PostBuild t m) => Dynamic t (R Talk) -> m ()
@@ -107,8 +107,11 @@ youtubeEmbed videoId = elAttr "div" divAttrs $ elDynAttr "iframe" (iframeAttrs <
 -- NB: The executable 'youtubepreviews' in 'backend/src-bin' can be
 -- used to retrieve these youtube preview images. Add the talk's youtube
 -- identifier to 'talkYoutubeId' and then run 'youtubepreviews'.
-talkImage :: Some Talk -> Text
-talkImage (Some.This t) = case t of
+talkImage :: Either ExternalTalk (Some Talk) -> Text
+talkImage (Left talk) = case talk of
+  ExternalTalk_GonimoArchitecture -> static @ "img/talk/gonimoTalkThumbnail.jpg"
+
+talkImage (Right (Some.This talk)) = case talk of
   Talk_PracticalFRP -> static @ "img/talk/mYvkcskJbc4.jpg"
   Talk_RealWorld -> static @ "img/talk/dNBUDAU9sv4.jpg"
   Talk_BrowserProgramming -> static @ "img/talk/dNGClNsnn24.jpg"
@@ -116,7 +119,7 @@ talkImage (Some.This t) = case t of
   Talk_ReflexDomWithCss -> static @ "img/talk/QNQaJLNKJQA.jpg"
 
 -- | Retrieve the preview image for a talk
-talkPreviewImage :: DomBuilder t m => Some Talk -> m ()
+talkPreviewImage :: DomBuilder t m => Either ExternalTalk (Some Talk) -> m ()
 talkPreviewImage t =
   let attrs = mconcat
         [ "src" =: talkImage t
