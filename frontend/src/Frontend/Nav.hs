@@ -85,11 +85,15 @@ menu = do
   forkMeOnGithub
 
 forkMeOnGithub
-  :: ( DomBuilder t m)
+  :: DomBuilder t m
   => m ()
-forkMeOnGithub = elClass "span" "fork-link" $
-  elAttr "a" ("href" =: href) $
-  elAttr "img" (("src" =: src) <> ("alt" =: alt)) $ return ()
+forkMeOnGithub = do
+  -- The banner is only shown on the bigger screens on top right corner
+  elClass "span" "fork-link" $ elAttr "a" (("href" =: href) <> ("target" =: "_blank")) $
+    elAttr "img" (("src" =: src) <> ("alt" =: alt)) $ return ()
+  -- The inline link is only shown on mobile screens along with other menu options
+  elClass "span" "fork-link-inline" $ elAttr "a" (("href" =: href) <> ("target" =: "_blank")) $
+    text "Fork me on Github"
   where
     href = "https://github.com/reflex-frp/reflex-frp.org"
     src = "https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png"

@@ -81,6 +81,10 @@ header nav .nav-link a {
   cursor: pointer;
 }
 
+header nav .fork-link-inline a {
+    display: none;
+}
+
 header nav .nav-link.active a {
   border-bottom: 3px solid var(--selection);
 }
@@ -116,6 +120,16 @@ header .current-section {
   }
   header nav .fork-link a {
       display: none;
+  }
+  header nav .fork-link-inline a {
+      display: none;
+  }
+  header nav.active .fork-link-inline a {
+      display: block;
+      text-align: right;
+      padding-right: var(--menupadding);
+      padding-top: 10px;
+      padding-bottom: 10px;
   }
   header nav.active {
     flex-direction: column;
@@ -188,7 +202,7 @@ article.talk {
   text-align: center;
 }
 
-@media (max-width: 600px) {
+@media (max-width: 750px) {
   article.talk {
     max-width: 100%;
   }
