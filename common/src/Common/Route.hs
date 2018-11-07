@@ -14,8 +14,6 @@
 {-# LANGUAGE TemplateHaskell #-}
 module Common.Route where
 
-import Prelude hiding ((.))
-
 import Data.Text (Text)
 
 import Obelisk.Route
@@ -24,6 +22,9 @@ import Data.Dependent.Sum (DSum (..))
 import Data.Functor.Sum
 import Data.Functor.Identity
 import Data.Some (Some)
+import Data.List (nub)
+import Data.Bifunctor (bimap)
+import Data.Universe (universe, Universe)
 import qualified Data.Some as Some
 
 data Route :: * -> * where
@@ -47,6 +48,12 @@ data PracticalFRP :: * -> * where
   PracticalFRP_Part1 :: PracticalFRP ()
   PracticalFRP_Part2 :: PracticalFRP ()
 deriving instance Show (PracticalFRP a)
+
+data ExternalTalk =
+  ExternalTalk_GonimoArchitecture
+  deriving (Eq, Ord, Show, Enum, Bounded)
+
+instance Universe ExternalTalk
 
 deriveRouteComponent ''Route
 deriveRouteComponent ''Talk
@@ -109,16 +116,28 @@ sectionHomepage (Some.This sec) = sec :/ case sec of
   Route_FAQ -> ()
 
 -- | Provide a human-readable name for a given talk
-talkTitle :: Some Talk -> Text
-talkTitle (Some.This talk) = case talk of
+talkTitle :: Either ExternalTalk (Some Talk) -> Text
+talkTitle (Left talk) = case talk of
+  ExternalTalk_GonimoArchitecture -> "The Gonimo Architecture"
+
+talkTitle (Right (Some.This talk)) = case talk of
   Talk_PracticalFRP -> "Reflex: Practical Functional Reactive Programming (Ryan Trinkle)"
   Talk_RealWorld -> "Real World Reflex (Doug Beardsley)"
   Talk_BrowserProgramming -> "FRP Browser Programming (Niklas Hambüchen)"
   Talk_Cochleagram -> "Reflex Cochleagram (Greg Hale)"
   Talk_ReflexDomWithCss -> "Using Reflex-Dom with CSS (Kat Chuang)"
 
--- | Given a section, provide its default route
-talkHomepage :: Some Talk -> R Talk
+talkDefaultTarget :: Either ExternalTalk (Some Talk) -> Either Text (R Talk)
+talkDefaultTarget = bimap talkExternalUrl talkHomepage
+
+-- | Given a Talk, provide its external url
+talkExternalUrl :: ExternalTalk -> Text
+talkExternalUrl = \case
+  ExternalTalk_GonimoArchitecture ->
+    "https://skillsmatter.com/skillscasts/12637-the-gonimo-architecture"
+
+-- | Given a Talk, provide its default route
+talkHomepage :: Some Talk -> (R Talk)
 talkHomepage (Some.This talk) = talk :/ case talk of
   Talk_PracticalFRP -> PracticalFRP_Part1 :/ ()
   Talk_RealWorld -> ()
@@ -136,3 +155,18 @@ talkYoutubeId = \case
   Talk_BrowserProgramming :=> _ -> "dNGClNsnn24"
   Talk_Cochleagram :=> _ -> "MfXxuy_CJSk"
   Talk_ReflexDomWithCss :=> _ -> "QNQaJLNKJQA"
+
+externalTalkThumbnailUrl :: ExternalTalk -> (Text, Text)
+externalTalkThumbnailUrl = \case
+  ExternalTalk_GonimoArchitecture ->
+    ("gonimoTalkThumbnail", "http://i.vimeocdn.com/video/731745473_640.jpg")
+
+-- | Gives all talks which can be optionally ordered as per need
+orderedTalks :: [Either ExternalTalk (Some Talk)]
+orderedTalks = nub (firstOnes ++ universe)
+  where
+    firstOnes = [ f Talk_PracticalFRP
+                , f Talk_RealWorld
+                , Left ExternalTalk_GonimoArchitecture
+                ]
+    f = Right . Some.This
