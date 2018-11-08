@@ -113,14 +113,14 @@ youtubeEmbed videoId = elAttr "div" divAttrs $ elDynAttr "iframe" (iframeAttrs <
 -- used to retrieve these youtube preview images. Add the talk's youtube
 -- identifier to 'talkYoutubeId' and then run 'youtubepreviews'.
 talkImage :: Either ExternalTalk (Some Talk) -> Text
-talkImage (Left talk) = case talk of
-  ExternalTalk_GonimoArchitecture -> static @ "img/talk/gonimoTalkThumbnail.jpg"
-
-talkImage (Right (Some.This talk)) = case talk of
-  Talk_PracticalFRP -> static @ "img/talk/mYvkcskJbc4.jpg"
-  Talk_RealWorld -> static @ "img/talk/dNBUDAU9sv4.jpg"
-  Talk_BrowserProgramming -> static @ "img/talk/dNGClNsnn24.jpg"
-  Talk_Cochleagram -> static @ "img/talk/MfXxuy_CJSk.jpg"
+talkImage = \case
+  Left t -> case t of
+    ExternalTalk_GonimoArchitecture -> static @ "img/talk/gonimoTalkThumbnail.jpg"
+  Right (Some.This t) -> case t of
+    Talk_PracticalFRP -> static @ "img/talk/mYvkcskJbc4.jpg"
+    Talk_RealWorld -> static @ "img/talk/dNBUDAU9sv4.jpg"
+    Talk_BrowserProgramming -> static @ "img/talk/dNGClNsnn24.jpg"
+    Talk_Cochleagram -> static @ "img/talk/MfXxuy_CJSk.jpg"
 
 -- | Retrieve the preview image for a talk
 talkPreviewImage :: DomBuilder t m => Either ExternalTalk (Some Talk) -> m ()
