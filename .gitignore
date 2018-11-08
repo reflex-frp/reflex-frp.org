@@ -4,3 +4,6 @@ result-android
 result-ios
 .attr-cache
 ghcid-output.txt
+tags
+TAGS
+ctags
