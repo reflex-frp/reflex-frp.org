@@ -121,7 +121,6 @@ talkImage (Right (Some.This talk)) = case talk of
   Talk_RealWorld -> static @ "img/talk/dNBUDAU9sv4.jpg"
   Talk_BrowserProgramming -> static @ "img/talk/dNGClNsnn24.jpg"
   Talk_Cochleagram -> static @ "img/talk/MfXxuy_CJSk.jpg"
-  Talk_ReflexDomWithCss -> static @ "img/talk/QNQaJLNKJQA.jpg"
 
 -- | Retrieve the preview image for a talk
 talkPreviewImage :: DomBuilder t m => Either ExternalTalk (Some Talk) -> m ()

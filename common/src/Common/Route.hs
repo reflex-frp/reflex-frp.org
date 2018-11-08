@@ -41,7 +41,6 @@ data Talk :: * -> * where
   Talk_RealWorld :: Talk ()
   Talk_BrowserProgramming :: Talk ()
   Talk_Cochleagram :: Talk ()
-  Talk_ReflexDomWithCss :: Talk ()
 deriving instance Show (Talk a)
 
 data PracticalFRP :: * -> * where
@@ -74,7 +73,6 @@ backendRouteEncoder = handleEncoder (\_ -> InR (ObeliskRoute_App Route_Home) :/ 
       Talk_RealWorld -> PathSegment "real-world" $ unitEncoder mempty
       Talk_BrowserProgramming -> PathSegment "browser-programming" $ unitEncoder mempty
       Talk_Cochleagram -> PathSegment "cochleagram" $ unitEncoder mempty
-      Talk_ReflexDomWithCss -> PathSegment "reflex-dom-with-css" $ unitEncoder mempty
     Route_FAQ -> PathSegment "faq" $ unitEncoder mempty
 
 -- | Provide a human-readable name for a given section
@@ -125,7 +123,6 @@ talkTitle (Right (Some.This talk)) = case talk of
   Talk_RealWorld -> "Real World Reflex (Doug Beardsley)"
   Talk_BrowserProgramming -> "FRP Browser Programming (Niklas Hambüchen)"
   Talk_Cochleagram -> "Reflex Cochleagram (Greg Hale)"
-  Talk_ReflexDomWithCss -> "Using Reflex-Dom with CSS (Kat Chuang)"
 
 talkDefaultTarget :: Either ExternalTalk (Some Talk) -> Either Text (R Talk)
 talkDefaultTarget = bimap talkExternalUrl talkHomepage
@@ -143,7 +140,6 @@ talkHomepage (Some.This talk) = talk :/ case talk of
   Talk_RealWorld -> ()
   Talk_BrowserProgramming -> ()
   Talk_Cochleagram -> ()
-  Talk_ReflexDomWithCss -> ()
 
 -- | The youtube video identifiers for each talk
 talkYoutubeId :: R Talk -> Text
@@ -154,7 +150,6 @@ talkYoutubeId = \case
   Talk_RealWorld :=> _ -> "dNBUDAU9sv4"
   Talk_BrowserProgramming :=> _ -> "dNGClNsnn24"
   Talk_Cochleagram :=> _ -> "MfXxuy_CJSk"
-  Talk_ReflexDomWithCss :=> _ -> "QNQaJLNKJQA"
 
 externalTalkThumbnailUrl :: ExternalTalk -> (Text, Text)
 externalTalkThumbnailUrl = \case
