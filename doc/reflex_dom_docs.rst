@@ -109,7 +109,7 @@ DOM Input elements
 To create input form elements and use them to create ``Event`` and ``Dynamic``
 values use the widgets provided by ``Reflex.Dom.Widget.Input``
 
-See `input_widgets.hs <https://github.com/reflex-frp/reflex-frp.org/blob/master/code-snippets/input_widgets.hs>`_ for usage of these widgets
+See `input_widgets.hs <https://github.com/dfordivam/reflexfrp.org/blob/master/code-snippets/input_widgets.hs>`_ for usage of these widgets
 
 The various input elements usually contain these two values::
 
@@ -295,7 +295,7 @@ This way the server can serve the generated HTML, so that the page `opens` insta
 
 To create widget which support static rendering, the ``prerender`` API will be required internally to separate the static code from the Immediate DomBuilder one.
 
-See `StaticBuilder.hs <https://github.com/reflex-frp/reflex-frp.org/blob/master/code-snippets/StaticBuilder.hs>`_ for an example usage::
+See `StaticBuilder.hs <https://github.com/dfordivam/reflexfrp.org/blob/master/code-snippets/StaticBuilder.hs>`_ for an example usage::
 
   prerender :: forall js m a. Prerender js m =>
     m a -> (PrerenderClientConstraint js m => m a) -> m a

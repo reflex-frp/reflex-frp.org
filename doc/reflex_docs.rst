@@ -319,7 +319,7 @@ use ``foldDyn``
 
 Even nested state machines can be designed if your have a state with nested ``Dynamic`` value by using ``foldDynM``
 
-See `nested_dynamic.hs <https://github.com/reflex-frp/reflex-frp.org/blob/master/code-snippets/nested_dynamics.hs>`_
+See `nested_dynamic.hs <https://github.com/dfordivam/reflexfrp.org/blob/master/code-snippets/nested_dynamics.hs>`_
 
 Use ``foldDynMaybe``, ``foldDynMaybeM`` in cases where you want to filter input
 events, such that they don't modify the state of application.
