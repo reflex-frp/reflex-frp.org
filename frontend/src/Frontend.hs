@@ -11,6 +11,7 @@ import Common.Route
 import Data.Dependent.Sum (DSum(..))
 import Frontend.Head
 import Frontend.Nav
+import Frontend.Footer
 import Frontend.Page.Documentation
 import Frontend.Page.Examples
 import Frontend.Page.Faq
@@ -36,6 +37,7 @@ frontend = Frontend
               Route_Examples -> examples
               Route_Documentation -> documentation
               Route_FAQ -> faq
+          el "footer" footer
       return ()
   }
 
