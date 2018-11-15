@@ -13,10 +13,9 @@ import Frontend.Head
 import Frontend.Nav
 import Frontend.Page.Documentation
 import Frontend.Page.Examples
-import Frontend.Page.Faq
 import Frontend.Page.Home
-import Frontend.Page.Talks
-import Frontend.Page.Tutorials
+import Frontend.Page.GetStarted
+
 import Obelisk.Frontend
 import Obelisk.Route
 import Obelisk.Route.Frontend
@@ -31,11 +30,9 @@ frontend = Frontend
           click <- mainContainer $ do
             article $ subRoute_ $ \case
               Route_Home -> home
-              Route_Talks -> talks
-              Route_Tutorials -> tutorials
+              Route_GetStarted -> getStarted
               Route_Examples -> examples
               Route_Documentation -> documentation
-              Route_FAQ -> faq
       return ()
   }
 
@@ -57,9 +54,7 @@ article c = el "article" $ do
   el "h3" $ dynText $ routeDescription <$> r
   let sectionClass = ffor r $ ("class" =:) . \(r' :=> _) -> case r' of
         Route_Home -> "home"
-        Route_Talks -> "talks"
-        Route_Tutorials -> "tutorials"
+        Route_GetStarted -> "getStarted"
         Route_Examples -> "examples"
         Route_Documentation -> "documentation"
-        Route_FAQ -> "faq"
   elDynAttr "section" sectionClass c

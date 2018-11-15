@@ -5,7 +5,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE TypeOperators #-}
-module Frontend.Page.Talks (talks) where
+module Frontend.Page.GetStarted (getStarted) where
 
 import Control.Monad (forM_)
 import Control.Monad.Fix
@@ -20,6 +20,44 @@ import Frontend.FontAwesome
 
 import Common.Route
 
+getStarted
+  :: ( DomBuilder t m
+     , MonadFix m
+     , MonadHold t m
+     , PostBuild t m
+     , RouteToUrl (R Route) m
+     , SetRoute t (R Route) m
+     )
+  => RoutedT t (Maybe (R Talk)) m ()
+getStarted = do
+  installation
+  tutorials
+  t <- talks
+  faq
+  return t
+
+installation :: DomBuilder t m => m ()
+installation = el "div" $ do
+  el "h3" $ text "Install"
+  el "p" $ do
+    text "Please install "
+    let obSrc = "https://github.com/obsidiansystems/obelisk"
+    elAttr "a" ("href" =: obSrc <> "target" =: "_blank") $ text "Obelisk"
+    icon_ "external-link-alt"
+    text " to quickly get started with Reflex."
+
+tutorials :: DomBuilder t m => m ()
+tutorials = el "div" $ do
+  el "h3" $ text "Tutorials"
+  el "p" $ do
+    el "ol" $ do
+      el "li" $ do
+        el "label" $ text "Installation: "
+        elAttr "a" ("href" =: "https://github.com/reflex-frp/reflex-platform/blob/develop/README.md") $ text "setup-instructions"
+      el "li" $ do
+        el "label" $ text "Beginner Friendly Tutorial: "
+        elAttr "a" ("href" =: "https://github.com/hansroland/reflex-dom-inbits/blob/master/tutorial.md") $ text "reflex-dom-inbits"
+
 talks
   :: ( DomBuilder t m
      , MonadFix m
@@ -29,9 +67,11 @@ talks
      , SetRoute t (R Route) m
      )
   => RoutedT t (Maybe (R Talk)) m ()
-talks = do
-  let index = forM_ orderedTalks $ elClass "article" "talk" . talkPreview
-  maybeRoute_ index $ talk =<< askRoute
+talks = el "div" $ do
+  el "h3" $ routeLink (Route_GetStarted :/ Nothing) $ text "Talks and Presentations"
+  divClass "talks" $ do
+    let index = forM_ orderedTalks $ elClass "article" "talk" . talkPreview
+    maybeRoute_ index $ talk =<< askRoute
 
 -- | Shows a preview image and title for a given Talk
 talkPreview
@@ -82,7 +122,7 @@ linkToTalk
   => Either Text (R Talk)
   -> m ()
   -> m ()
-linkToTalk (Right route) w = routeLink (Route_Talks :/ Just route) w
+linkToTalk (Right route) w = routeLink (Route_GetStarted :/ Just route) w
 linkToTalk (Left url) w = elAttr "a" (("href" =: url) <> ("target" =: "_blank")) w
 
 -- | Embed a Talk's youtube video
@@ -130,3 +170,8 @@ talkPreviewImage t =
         , "alt" =: talkTitle t
         ]
   in elAttr "img" attrs blank
+
+faq :: DomBuilder t m => m ()
+faq = el "div" $ do
+  el "h3" $ text "FAQs"
+  el "p" $ text "FAQ questions coming soon! For now, feel free to ask questions within the Reflex-FRP IRC chat provided below. Thank you!"

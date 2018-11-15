@@ -74,8 +74,9 @@ menu = do
   -- Get the current route, so that we can highlight the corresponding tab
   currentTab <- askRoute
   let currentTabDemux = demux $ fmap (\(sec :=> _) -> Some.This sec) currentTab
-  -- Iterate over all the top-level routes
-  forM_ universe $ \section -> do
+  -- Iterate over all the top-level routes except Home
+  -- Home is reached by clicking logo
+  forM_ (filter (/= (Some.This Route_Home)) universe) $ \section -> do
     -- Create a link that is highlighted if it is the current section
     let thisTabIsSelected = demuxed currentTabDemux section
         highlight = ffor thisTabIsSelected $ \case
