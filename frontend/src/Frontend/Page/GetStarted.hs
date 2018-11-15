@@ -42,8 +42,7 @@ installation = el "div" $ do
   el "p" $ do
     text "Please install "
     let obSrc = "https://github.com/obsidiansystems/obelisk"
-    elAttr "a" ("href" =: obSrc <> "target" =: "_blank") $ text "Obelisk"
-    icon_ "external-link-alt"
+    extLink obSrc $ text "Obelisk"
     text " to quickly get started with Reflex."
 
 tutorials :: DomBuilder t m => m ()
@@ -52,11 +51,12 @@ tutorials = el "div" $ do
   el "p" $ do
     el "ol" $ do
       el "li" $ do
-        el "label" $ text "Installation: "
-        elAttr "a" ("href" =: "https://github.com/reflex-frp/reflex-platform/blob/develop/README.md") $ text "setup-instructions"
+        el "label" $ text "QFPL: "
+        extLink "https://qfpl.io/projects/reflex/" $
+          text "Blog posts and tutorials covering basics of FRP and Reflex"
       el "li" $ do
         el "label" $ text "Beginner Friendly Tutorial: "
-        elAttr "a" ("href" =: "https://github.com/hansroland/reflex-dom-inbits/blob/master/tutorial.md") $ text "reflex-dom-inbits"
+        extLink "https://github.com/hansroland/reflex-dom-inbits/blob/master/tutorial.md" $ text "reflex-dom-inbits"
 
 talks
   :: ( DomBuilder t m
@@ -123,7 +123,7 @@ linkToTalk
   -> m ()
   -> m ()
 linkToTalk (Right route) w = routeLink (Route_GetStarted :/ Just route) w
-linkToTalk (Left url) w = elAttr "a" (("href" =: url) <> ("target" =: "_blank")) w
+linkToTalk (Left url) w = extLink url w
 
 -- | Embed a Talk's youtube video
 talkEmbed :: (DomBuilder t m, PostBuild t m) => Dynamic t (R Talk) -> m ()
@@ -175,3 +175,7 @@ faq :: DomBuilder t m => m ()
 faq = el "div" $ do
   el "h3" $ text "FAQs"
   el "p" $ text "FAQ questions coming soon! For now, feel free to ask questions within the Reflex-FRP IRC chat provided below. Thank you!"
+
+extLink :: DomBuilder t m => Text -> m a -> m a
+extLink href m =
+  elAttr "a" ("href" =: href <> "target" =: "_blank") $ m
