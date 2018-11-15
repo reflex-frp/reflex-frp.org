@@ -4,6 +4,7 @@ module Frontend.Page.Examples (examples) where
 import Reflex.Dom
 import Control.Monad (forM_)
 import Data.Text (Text)
+import Frontend.CommonWidgets
 
 examples :: DomBuilder t m => m ()
 examples = do
@@ -16,8 +17,6 @@ examples = do
        text ")"
      el "dd" $ text d
    el "br" blank
-  where
-    extLink h m = elAttr "a" ("href" =: h <> "target" =: "_blank") m
 
 exList :: [(Text, Text, Text, Text)]
 exList =

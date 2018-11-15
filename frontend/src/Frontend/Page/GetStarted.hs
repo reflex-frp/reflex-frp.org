@@ -17,6 +17,7 @@ import Obelisk.Route.Frontend
 import Obelisk.Generated.Static
 import Reflex.Dom
 import Frontend.FontAwesome
+import Frontend.CommonWidgets
 
 import Common.Route
 
@@ -175,7 +176,3 @@ faq :: DomBuilder t m => m ()
 faq = el "div" $ do
   el "h3" $ text "FAQs"
   el "p" $ text "FAQ questions coming soon! For now, feel free to ask questions within the Reflex-FRP IRC chat provided below. Thank you!"
-
-extLink :: DomBuilder t m => Text -> m a -> m a
-extLink href m =
-  elAttr "a" ("href" =: href <> "target" =: "_blank") $ m

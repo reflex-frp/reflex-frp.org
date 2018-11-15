@@ -2,13 +2,14 @@
 module Frontend.Page.Documentation (documentation) where
 
 import Reflex.Dom
+import Frontend.CommonWidgets
 
 documentation :: DomBuilder t m => m ()
 documentation = do
   el "ul" $ do
     el "li" $ do
-      el "label" $ text "Reflex Basic Documentation: "
-      elAttr "a" ("href" =: "https://reflex-frp.readthedocs.io/en/latest/overview.html#reflex-basics") $ text "View Here"
+      extLink "https://github.com/reflex-frp/reflex/blob/develop/Quickref.md" $ text "Reflex Quick Reference"
     el "li" $ do
-      el "label" $ text "Quick Reference: "
-      elAttr "a" ("href" =: "https://github.com/reflex-frp/reflex-dom/blob/develop/Quickref.md") $ text "View Here"
+      extLink "https://github.com/reflex-frp/reflex-dom/blob/develop/Quickref.md" $ text "Reflex-Dom Quick Reference"
+    el "li" $ do
+      extLink "http://docs.reflex-frp.org/en/latest/reflex_docs.html" $ text "Reflex Basic Documentation (work-in-progress)"
