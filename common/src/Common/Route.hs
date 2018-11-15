@@ -87,7 +87,7 @@ routeTitle (sec :=> _) = sectionTitle $ Some.This sec
 sectionDescription :: Some Route -> Text
 sectionDescription (Some.This sec) = case sec of
   Route_Home -> "Reflex: Practical Functional Reactive Programming"
-  Route_Examples -> "Examples and open source websited built using Reflex"
+  Route_Examples -> "Examples and open source websites built using Reflex"
   Route_Documentation -> "Documentation and Quick Reference"
   Route_GetStarted -> "Installation, Tutorials / Talks and FAQs"
 
