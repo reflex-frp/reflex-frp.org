@@ -55,7 +55,7 @@ In general its possible to create a loop by mistake with this kind of code in a 
 
 But thanks to ``MonadFix`` (``RecursiveDo``) this is a very common problem, even in a "monadic" code.
 
-Basically for doing anything useful one has to introduce cycle in the event propagation graph.
+Basically for doing anything useful one has to introduce a feedback in the event propagation graph.
 And often this can lead to either a loop or a deadlock.
 
 To fix this
@@ -64,16 +64,6 @@ To fix this
   Moving the code in a separate functions can also help simplify the ``rec`` block.
 
   Also see: using :ref:`new_trigger_event` to break down a big ``rec`` block.
-
-* Introduce ``delay``.
-
-  For example in this kind of loop in event propagation there is a need of ``delay``::
-
-    rec
-      let someEv = updated d
-          ev = someFun <$> someEv
-
-      d <- holdDyn 0 ev
 
 * Avoid using ``switchPromptlyDyn`` / ``tagPromptlyDyn``, instead use ``switch . current`` / ``tag . current``
 
@@ -191,12 +181,6 @@ Web APIs and FFI
 
   See https://github.com/ghcjs/ghcjs/blob/master/doc/foreign-function-interface.md
 
-If you access a DOM element via FFI which has just been created, then it might result in an error. This is because the ``getPostBuild`` is fired before the DOM has been put in the Window. To solve this add ``delay``::
-
-  evPB <- delay 0.2 =<< getPostBuild
-  elAttr ("id" =: "some-uniq-id") $ text "example"
-  performEvent_ (someFFI <$ evPB)
-
 Capturing DOM events with FFI
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -253,7 +237,7 @@ Integrating CSS and embed in HTML
   mainWidgetWithHead' :: (a -> Widget () b, b -> Widget () a) -> IO ()
   
   -- import Data.FileEmbed -- from file-embed package
-  -- This required TemplateHaskell
+  -- This requires TemplateHaskell
   -- customCss :: ByteString
   -- customCss = $(embedFile "src/custom.css")
   mainWidgetWithCss :: ByteString -> (forall x. Widget x ()) -> IO ()

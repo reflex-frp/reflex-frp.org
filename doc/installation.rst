@@ -1,7 +1,6 @@
 Installation
 ============
 
-.. todo:: Add ways to use reflex without nix / reflex-plarform
 
 Overview
 --------
@@ -17,22 +16,48 @@ The essential components required for developing ``reflex`` based application ar
 
    The current supported ``reflex`` and ``reflex-dom`` packages (version 0.5 and 0.4 respectively) are available only through Github, as they are not yet published on Hackage.
 
-   To obtain the current ``reflex`` packages, along with all its dependecies, ``reflex-platform`` is the recommended method.
+To quickly get started with developing full-stack web apps using reflex,
+`Obelisk <https://github.com/obsidiansystems/obelisk>`_
+is the recommended method.
 
-``reflex-platform`` - https://github.com/reflex-frp/reflex-platform
+For a more advanced usage, ``reflex-platform`` is the recommended method.
 
-  Is a collection of ``nix`` scripts to provide ``ghc``, ``ghcjs`` and a curated set of packages for use with ``reflex-dom``.
+.. _obelisk:
+
+Obelisk
+-------
+
+  `Obelisk <https://github.com/obsidiansystems/obelisk>`_ is a command line tool and a set of libraries to make it easy to get started with full-stack web development with ``reflex``.
+  It includes features like
+
+  * Automatic installation of latest ``reflex``, ``ghc``, ``ghcjs`` and haskell dependencies/libraries using ``nix``.
+
+  * Create a skeleton project with
+
+    * frontend using ``reflex-dom``
+    * backend using ``snap``, with pre-rendering support.
+
+  * Development workflow related commands like
+
+    * ``ob run`` to automatically rebuild your application on a file write.
+      It also serves the frontend using ``jsaddle-warp``, to help in faster development.
+    * ``ob repl`` to provide a ``ghci`` shell.
+    * ``ob deploy`` to help in deployment to EC2, and create optimised/minified ``js``.
+    * Create android app ``.apk`` file, and ``iOS`` app with ``nix`` commands.
+
+  * Routing library ``obelisk-route`` to create type safe routes
+
+    see :ref:`obelisk_route`
+
+.. _reflex_platform
+
+``reflex-platform``
+-------------------
+
+  `reflex-platform <https://github.com/reflex-frp/reflex-platform>`_ is a collection of ``nix`` expressions and scripts to provide ``ghc``, ``ghcjs`` and a curated set of packages for use with ``reflex-dom``.
 
   This includes a specially modified ``text`` package which internally uses the JS string.
   The performance of this ``text`` package is significantly better on the browser.
-
-You might also need
-
-* Haddock Documentation with local hoogle
-
-* GHCi / ghcid with jsaddle-warp for faster dev cycles
-
-* IDE/Editor support
 
 .. note::
   GHCJS uses a lot of memory during compilation. 16GB of memory is recommended, with 8GB being pretty close to bare minimum.
@@ -42,96 +67,94 @@ You might also need
 ``reflex-project-skeleton``
 ---------------------------
 
-See - https://github.com/ElvishJerricco/reflex-project-skeleton
+  `reflex-project-skeleton <https://github.com/ElvishJerricco/reflex-project-skeleton>`_ is a bare repository which uses ``reflex-platform`` to provide a nice development enviroment, with both the power of ``nix`` (for binary cache of dependencies) and ``cabal new-*`` commands (for incremental builds).
 
-This is a bare repository which uses ``reflex-platform`` to provide a nice development enviroment, with both the power of ``nix`` (for binary cache of dependencies) and ``cabal new-*`` commands (for incremental builds).
+  For a project with both a ``backend`` and ``frontend`` components, this is the recommended setup.
 
-For a project with both a ``backend`` and ``frontend`` components, this is the recommended setup.
+  See README and ``reflex-project-skeleton/reflex-platform/project/default.nix`` for usage details.
 
-See README and ``reflex-project-skeleton/reflex-platform/project/default.nix`` for usage details.
+  This also supports cross-compiling the ``frontend`` part to android and iOS platforms!
 
-This also supports cross-compiling the ``frontend`` part to android and iOS platforms!
+  The following contains information of creating a project-skeleton from scratch and also more details about its working.
 
-The following contains information of creating a project-skeleton from scratch and also more details about its working.
-
-https://github.com/reflex-frp/reflex-platform/blob/develop/docs/project-development.md
+  https://github.com/reflex-frp/reflex-platform/blob/develop/docs/project-development.md
 
 Minimal dev-env using ``reflex-platform``
 -----------------------------------------
 
-Please refer to `reflex-platform' README <https://github.com/reflex-frp/reflex-platform/blob/develop/README.md#setup>`_
+  Please refer to `reflex-platform' README <https://github.com/reflex-frp/reflex-platform/blob/develop/README.md#setup>`_
 
-The ``try-reflex`` script can create a development environment with ``ghc`` and ``ghcjs``. You can use this to have a quick starting setup to compile code-snippets and smaller projects.
+  The ``try-reflex`` script can create a development environment with ``ghc`` and ``ghcjs``. You can use this to have a quick starting setup to compile code-snippets and smaller projects.
 
-When using this for the first time, setup can take considerable time to download all the dependencies from the binary cache.
+  When using this for the first time, setup can take considerable time to download all the dependencies from the binary cache.
 
-
-But for a non-trivial project it is recommended to use ``cabal``.
+  But for a non-trivial project it is recommended to use ``cabal``.
 
 
 Using cabal with ``reflex-platform``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If you dont have a project with cabal file then use ``cabal init`` to create one.
+  If you dont have a project with cabal file then use ``cabal init`` to create one.
 
-1. Use the ``workon`` script from reflex-platform to create a development environment (nix shell) according to the dependencies specified in cabal file.
-::
+  Then use the ``workon`` script from reflex-platform to create a development environment (nix-shell) according to the dependencies specified in cabal file.
+  ::
 
-  $ ~/reflex-platform/work-on ghcjs ./your-project
+    $ ~/reflex-platform/scripts/work-on ghcjs ./your-project
 
-  # or just "cabal configure" if working on ghc
-  <nix-shell> $ cabal configure --ghcjs
-  <nix-shell> $ cabal build
+    # or just "cabal configure" if working on ghc
+    <nix-shell> $ cabal configure --ghcjs
+    <nix-shell> $ cabal build
 
-This will use your package's cabal file to determine dependencies. If you have a ``default.nix``, it will use that instead. Note that your project's path must include at least one slash (``/``) so that work-on can detect that it is a path, rather than a package name.
+  .. note:: The ``cabal update`` and ``cabal install`` commands should not be used, as the task of fetching and installing dependecies is done by ``nix``.
 
-This will give you the exact environment needed to work with the given package and platform, rather than the general-purpose environment provided by the Reflex Platform.
+  This will use your package's cabal file to determine dependencies. If you have a ``default.nix``, it will use that instead. Note that your project's path must include at least one slash (``/``) so that work-on can detect that it is a path, rather than a package name.
 
-You can replace ghcjs with ghc to hack on the native GHC version of the package (including with GHCi if you want). You can also use a package name instead of a path, which will drop you into the standard build environment of that package; this works even if you don't yet have the source for that package.
+  This will give you the exact environment needed to work with the given package and platform, rather than the general-purpose environment provided by the Reflex Platform.
 
-.. note:: The ``cabal update`` and ``cabal install`` commands should not be used as the task of fetching and installing dependecies is done by ``nix``.
+  You can replace ghcjs with ghc to hack on the native GHC version of the package (including with GHCi if you want). You can also use a package name instead of a path, which will drop you into the standard build environment of that package; this works even if you don't yet have the source for that package.
+
 
 Add reflex-platform to project
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. note
-  The ``reflex-project-skeleton`` does this, and has many additional benefits
+  .. note
+    The ``reflex-project-skeleton`` does this, and has many additional benefits
 
-Since the build environment is dependent on the reflex-platform, it is important to keep this dependency as a part of the project. Moreover the version of libraries will change with time in the reflex-platform so it is important to keep a reference to the reflex-platform' "version" which has been used to build the project.
+  Since the build environment is dependent on the reflex-platform, it is important to keep this dependency as a part of the project. Moreover the version of libraries will change with time in the reflex-platform so it is important to keep a reference to the reflex-platform' "version" which has been used to build the project.
 
-The simplest way to do this is to create a submodule in your project, and use the ``workon`` script from it to create a shell with proper build dependencies.
+  The simplest way to do this is to create a submodule in your project, and use the ``workon`` script from it to create a shell with proper build dependencies.
 
-Assuming you are using git for versioning::
+  Assuming you are using git for versioning::
 
-  git submodule add https://github.com/reflex-frp/reflex-platform
+    git submodule add https://github.com/reflex-frp/reflex-platform
 
-  # Then use the workon script to get the nix-shell
-  ./reflex-platform/workon ghcjs ./.
+    # Then use the workon script to get the nix-shell
+    ./reflex-platform/workon ghcjs ./.
 
-A better way is to use the ``nix`` commands, see :ref:`reflex_project_skeleton` or `project-development.md <https://github.com/reflex-frp/reflex-platform/blob/develop/docs/project-development.md>`_
- 
+  A better way is to use the ``nix`` commands, see :ref:`reflex_project_skeleton` or `project-development.md <https://github.com/reflex-frp/reflex-platform/blob/develop/docs/project-development.md>`_
+
 
 .. _haddock_and_hoogle:
 
 Local Haddock and Hoogle
 ------------------------
 
-Local hoogle server can be run from the shell created for development environment by ::
+  Local hoogle server can be run from the shell created for development environment by ::
 
-  $ hoogle server --local
+    $ hoogle server --local
 
-To obtain a shell; if you are using
+  To obtain a shell; if you are using
 
-* ``reflex-project-skeleton`` then do::
+  * ``reflex-project-skeleton`` or ``obelisk`` then do::
 
-  $ nix-shell -A shells.ghc
+    $ nix-shell -A shells.ghc
 
-* ``reflex-platform``: Create a shell from either ``try-reflex`` or ``workon``::
+  * ``reflex-platform``: Create a shell from either ``try-reflex`` or ``workon``::
 
-From this shell the path of local haddock documentation can also be obtained using::
+  From this shell the path of local haddock documentation can also be obtained using::
 
-  # or use ghcjs-pkg
-  $ ghc-pkg field <package> haddock-html
+    # or use ghcjs-pkg
+    $ ghc-pkg field <package> haddock-html
 
 
 GHCi / ghcid with ``jsaddle-warp``
@@ -163,10 +186,10 @@ With ``jsaddle-warp`` package you can run your app in browser without using ``gh
 You need to modify the ``main`` like the code below. Then you can run it via ``ghci`` or ``ghcid``, and open your application from browser via http://127.0.0.1:3911/::
 
   module Main where
-  
+
   import Reflex.Dom.Core
   import Language.Javascript.JSaddle.Warp
-  
+
   main = run 3911 $ mainWidget $ text "hello"
 
 This should works fine on Chrome/Chromium, but might not work with firefox.
@@ -175,3 +198,15 @@ IDE tools support
 -----------------
 
 Instructions for setting emacs/spacemacs are here : https://github.com/reflex-frp/reflex-platform/pull/237
+
+Contributing to Reflex
+----------------------
+
+To contribute to ``reflex`` or ``reflex-dom`` packages, it is best to use ``reflex-platform``.
+The ``hack-on`` script will checkout the source of the package in your local ``reflex-platform`` directory as a git submodule, and use it to provide the development environment.::
+
+  $ ./scripts/hack-on reflex -- or reflex-dom
+
+You can then patch the source code, test your changes and send a PR from the git submodule.
+
+.. todo:: Add ways to use reflex without nix / reflex-plarform

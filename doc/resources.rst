@@ -52,10 +52,18 @@ Full-Stack Haskell Apps
 
   Code: https://github.com/mightybyte/hsnippet
 
+* http://hexplore.mightybyte.net/
+
+  An experimental interface to browse haskell packages (registered on hackage)
+
+  Code: https://gitlab.com/mightybyte/hexplore/
+
 * https://tenjinreader.com
 
   An application to read Japanese books.
   Uses :ref:`reflex_project_skeleton`.
+
+  It has a web + android version of the reflex app
 
   Code: https://github.com/blueimpact/tenjinreader
 

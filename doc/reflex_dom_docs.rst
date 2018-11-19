@@ -29,7 +29,7 @@ Here is a simple example of using some of the static-dom widgets::
   main = mainWidget $ do
     simple
 
-  simple :: (MonadWidget t m) => m ()
+  simple :: (DomBuilder t m) => m ()
   simple = do
     el "div" $
       -- Specify attributes in a (Map Text Text)
@@ -48,7 +48,6 @@ Here is a simple example of using some of the static-dom widgets::
 
       dtdd "Reflex" $ do
         text "Haskell + awesome FRP!"
-        -- Should we have a 'textbr' API with line break at the end?
         el "br" $ blank -- Add line break, blank == return ()
         -- A simple URL link
         elAttr "a" ("href" =: "http://reflexfrp.org") (text "Reflex-FRP")
@@ -69,10 +68,9 @@ values as input.::
 
   display $ someDynValueWithShowInstance
 
-  -- The value of input element can be modified from an external Dynamic t text
-  txtInpEl <- textInput $ def
-    & textInputConfig_initialValue .~ "Button Text"
-    & textInputConfig_setValue .~ someOtherDynText
+  -- The value of input element can be modified from an external Event t text
+  txtInpEl <- inputElement $ def
+    & inputElementConfig_setValue .~ changeValueEv
 
 
 Also you can create dynamic widgets by using static widgets, ie the widget
@@ -109,7 +107,7 @@ DOM Input elements
 To create input form elements and use them to create ``Event`` and ``Dynamic``
 values use the widgets provided by ``Reflex.Dom.Widget.Input``
 
-See `input_widgets.hs <https://github.com/dfordivam/reflexfrp.org/blob/master/code-snippets/input_widgets.hs>`_ for usage of these widgets
+.. Add an example in reflex-examples?
 
 The various input elements usually contain these two values::
 
@@ -144,11 +142,11 @@ Create a widget which updates whenever ``Event`` occurs.
 If you have a widget which depends on some event (like server response), but you
 need to display something else instead of a blank. ::
 
-  -- ajaxResponseEv :: Event t SomeData
+  -- responseEv :: Event t SomeData
   -- displaySomeData :: SomeData -> m ()
 
   -- widgetHold :: m a -> Event t (m a) -> m (Dynamic t a)
-  widgetHold (text "Loading...") (displaySomeData <$> ajaxResponseEv)
+  widgetHold (text "Loading...") (displaySomeData <$> responseEv)
 
 Every time the ``widgetHold`` event fires, it removes the old DOM fragment and builds a new one in-place
 
@@ -161,7 +159,7 @@ Resize Detector
 ::
 
   -- Reflex.Dom.Widget.Resize
-  resizeDetector :: (_) => m a -> m (Event t (), a)
+  resizeDetector :: (...) => m a -> m (Event t (), a)
 
 This is useful to respond to changes in size of a widget.
 
@@ -175,6 +173,25 @@ Host / URL / Location
 Client side routes
 ~~~~~~~~~~~~~~~~~~
 
+.. _obelisk_route:
+
+obelisk-route
+^^^^^^^^^^^^^
+
+  `Obelisk <https://github.com/obsidiansystems/obelisk>`_ is packaged with a set of routing libraries ``obelisk-route``, ``obelisk-route-frontend`` and ``obelisk-route-backend``.
+  These libraries provide the following features
+
+  * Type safety in routes design.
+  * Derive encoding/decoding of routes from a single definition.
+  * Share the routes between frontend and backend.
+  * Compile time checking of routes to static files.
+
+  For example usage of ``obelisk-route`` please see source code of
+  `reflex-frp.org <https://github.com/reflex-frp/reflex-frp.org>`_
+  or
+  `reflex-examples <https://github.com/reflex-frp/reflex-examples>`_.
+
+Apart from this the 
 `Reflex.Dom.Contrib.Router <https://github.com/reflex-frp/reflex-dom-contrib/blob/master/src/Reflex/Dom/Contrib/Router.hs>`_ provides APIs to manipulate and track the URL.
 
 Also checkout https://github.com/3noch/reflex-dom-nested-routing
@@ -233,13 +250,13 @@ connection closes.
 Manually closing a websocket that is configured to reconnect will cause it to reconnect.
 If you want to be able to close it permanently you need to set ``_webSocketConfig_reconnect = False``.
 
-See `reflex-examples <https://github.com/reflex-frp/reflex-examples/blob/master/websocket-echo/src/Main.hs>`_ for an echo example.
+See `reflex-examples <https://github.com/reflex-frp/reflex-examples/blob/master/frontend/src/Frontend/Examples/WebSocketEcho/Main.hs>`_ for an echo example.
 
 
 Integration with Backend
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-One of the big strength of ``reflex-dom`` is that a common code base can be shared between backend and frontend.
+One of the big strength of ``reflex-dom`` is that a common code can be shared between backend and frontend.
 
 Quoting `mightybyte <https://github.com/mightybyte>`_ again.
 See `hsnippet.com source code here <https://github.com/mightybyte/hsnippet/blob/master/shared/src/HSnippet/Shared/WsApi.hs>`_
@@ -250,6 +267,13 @@ See `hsnippet.com source code here <https://github.com/mightybyte/hsnippet/blob/
   client/server or server/client message couldn't be more simple.
 
 The simplest form of integration with backend is to define the message data in the ``common`` package, along with its serialisation functions (eg ``deriving instance`` of ``ToJSON`` and ``FromJSON``).
+
+`servent-reflex`
+^^^^^^^^^^^^^^^^
+
+https://github.com/imalsogreg/servant-reflex
+
+  `servant-reflex` lets you share your `servant` APIs with the frontend. See the readme for more details.
 
 .. _reflex_websocket_interface:
 
@@ -273,19 +297,10 @@ Going a few steps further in this integration is the library `reflex-websocket-i
 
 * It further ensures that the type of response for a request is consistent between frontend and backend.
 
-`servent-reflex`
-^^^^^^^^^^^^^^^^
-
-https://github.com/imalsogreg/servant-reflex
-
-  `servant-reflex` lets you share your `servant` APIs with the frontend. See the readme for more details.
-
-
-
 Performance
 -----------
 
-Static  / Server side rendering
+Prerendering / Server side rendering
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The ``renderStatic`` API can be used to render the DOM parts of the application to plain HTML.
@@ -293,14 +308,14 @@ This way the server can serve the generated HTML, so that the page `opens` insta
 
   renderStatic :: StaticWidget x a -> IO (a, ByteString)
 
-To create widget which support static rendering, the ``prerender`` API will be required internally to separate the static code from the Immediate DomBuilder one.
-
-See `StaticBuilder.hs <https://github.com/dfordivam/reflexfrp.org/blob/master/code-snippets/StaticBuilder.hs>`_ for an example usage::
+To create widget which support static rendering, the ``prerender`` API will be required internally to separate the static code from the Immediate DomBuilder one. ::
 
   prerender :: forall js m a. Prerender js m =>
     m a -> (PrerenderClientConstraint js m => m a) -> m a
 
 Here the first widget supports Static rendering, and the second one has the actual JSM functionality.
+
+See `reflex-examples <https://github.com/reflex-frp/reflex-examples>`_ for example usage.
 
   
 lazy

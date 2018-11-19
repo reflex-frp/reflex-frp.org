@@ -1,9 +1,10 @@
 Reflex
 ======
 
-The reflex package provides APIs to create the FRP control logic which is independent of the DOM.
+The ``reflex`` library provides the foundation Classes and their implementation APIs to do Functional Reactive Programming.
+This is independent of the DOM creation code, and can be used to implement FRP architecture in non-web related apps also.
 
-The `Quick Ref <https://github.com/reflex-frp/reflex/blob/develop/Quickref.md>`_ provides a really nice overview.
+The `Quick Ref <https://github.com/reflex-frp/reflex/blob/develop/Quickref.md>`_ provides a really nice overview of its APIs.
 
 
 FRP Basics
@@ -95,7 +96,7 @@ From DOM widgets
   
     See :ref:`xhr_websocket`
   
-  * Arbitrary `on` events from the browser
+  * Arbitrary ``on`` events from the browser
   
     See :ref:`ffi`
 
@@ -104,13 +105,13 @@ Manipulation
 
 Using these primary ``Event``\s you can create secondary / derived events by
 
-#. Manipulated the value using fmap::
+#. Manipulating the value using ``Functor`` / ``fmap``::
 
     -- inputValueEv :: Event t Int
 
     doubledInputValueEv = ffor inputValue (* 2)
 
-#. Filter the value::
+#. Filtering the value::
 
     -- inputValueEv :: Event t Int
 
@@ -194,7 +195,7 @@ Manipulation
 
   Using some primary ``Dynamic`` values you can create secondary / derived values by
   
-  * ``fmap`` - Simply use functor instance when only one ``Dynamic`` value is being manipulated.
+  * ``fmap`` - Simply use ``Functor`` instance when only one ``Dynamic`` value is being manipulated.
   
   * Combine multiple ``Dynamic`` values using::
     
@@ -289,7 +290,12 @@ The actual usage is quite simple::
 in this example the ``ev1`` is used to create a ``Dynamic`` value ``d1``, which is then shown to the user using ``viewD1Widget``.
 This widget can in turn modify the value using the ``Event`` ``ev2``.
 
-But there are some pitfalls too, see debugging :ref:`hang_stack_overflow`
+But there are some pitfalls too, especially if you use 'Promptly' APIs like ``tagPromptlyDyn``, ``switchPromptlyDyn``, ``attachPromptlyDyn``, etc.
+All these APIs take a ``Dynamic`` value as input, and if used incorrectly they can cause problems like hang, stack overflow, etc.
+
+In most cases you would want to use their corresponding APIs like ``tag``, ``switch``, ``attach``, etc (which all work on the ``Behavior`` values), along with ``current :: Dynamic t a -> Behavior t a``.
+
+see debugging :ref:`hang_stack_overflow`
 
 For more details checkout the articles on :ref:`monad_fix`
 
@@ -319,7 +325,7 @@ use ``foldDyn``
 
 Even nested state machines can be designed if your have a state with nested ``Dynamic`` value by using ``foldDynM``
 
-See `nested_dynamic.hs <https://github.com/dfordivam/reflexfrp.org/blob/master/code-snippets/nested_dynamics.hs>`_
+.. See ` DisplayGameUpdates/Main.hs <https://github.com/reflex-frp/reflex-examples/blob/master/frontend/src/Frontend/Examples/DisplayGameUpdates/Main.hs>`_
 
 Use ``foldDynMaybe``, ``foldDynMaybeM`` in cases where you want to filter input
 events, such that they don't modify the state of application.
@@ -366,7 +372,7 @@ Debounce, Delay, BatchOccurence
 
   searchTextEv <- debounce 0.5 (_textInput_input someTextInput)
 
-When doing FFI ``delay`` is required::
+When doing FFI calls ``delay`` may be required::
 
   delay :: (_) => NominalDiffTime -> Event t a -> m (Event t a) 
 
@@ -377,7 +383,7 @@ When doing FFI ``delay`` is required::
   
 When handling a set of events from external sources many times the sequence of events is not deterministic,
 or perhaps we want a ``debounce`` kind of functionality but dont want to miss any ``Event``.
-In such cases we need to use ``batchOccurrences`` to properly model the logic.::
+In such cases we need to use ``batchOccurrences`` to properly model the logic. ::
 
   batchOccurrences :: (_) => NominalDiffTime -> Event t a -> m (Event t (Seq a)) 
 

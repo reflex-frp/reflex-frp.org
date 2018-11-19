@@ -73,7 +73,7 @@ In Reflex this response can be expressed or implemented by
 1. Firing another ``Event``.
 2. Modification of a ``Dynamic`` Value.
 
-Note that there is no explicit callbacks or function calls in response to the
+Note that there are no explicit callbacks or function calls in response to the
 incoming events. Instead there is generation of new Events and modification of
 Dynamic values. These Event and Dynamic values are then propagated to widgets
 which provide the appropriate response to the event.
@@ -115,27 +115,21 @@ controller.
 
 Also see the reddit thread `how to structure a reflex application. <https://www.reddit.com/r/reflexfrp/comments/6l5ddn/how_to_structure_a_reflex_application/>`_
 
-Monadic DOM
------------
+DOM Creation
+------------
 
 The HTML DOM is constructed as a tree of "Objects" in which both the "sequence" of objects in the tree and their "heirarchy" has to be specified.
 
-In ``reflex-dom``, DOM creation works in a Monad ``MonadWidget``. Since it is monadic, the sequence of function calls directly correspond to the sequence of DOM elements.
+In ``reflex-dom``, DOM creation works in a Monad ``DomBuilder``. Since it is monadic, the sequence of function calls directly correspond to the sequence of DOM elements.
 To create heirarchy a lot of basic widgets take an addition argument of type (m a) which will be nested inside it.
 
 For example::
 
   let myText = do -- Specifies sequence
-     el "h1" (text "Header") -- Nesting
-     text "Content"
+        el "h1" (text "Header") -- Nesting
+        text "Content"
 
   el "div" myText -- Nesting
-
-
-The top widget is created in the beginning when the browser opens the app.
-But its contents can be modified with "time" ie the nested widgets can be a Dynamically varying
-
-
 
 View-Controller Architecture
 ----------------------------
@@ -261,7 +255,7 @@ Quoting `mightybyte <https://github.com/mightybyte>`_
 
 
 Overview of ``ghcjs`` and ``jsaddle`` Packages
------------------------------------------
+----------------------------------------------
 
 
 ``ghcjs``
@@ -270,9 +264,9 @@ Overview of ``ghcjs`` and ``jsaddle`` Packages
 
 ``ghcjs-dom``
 
-  Provides the interface APIs to work with DOM and Web APIs, either on a browser (by compiling with ``ghcjs``) or natively using webkitgtk (when compiled with ``ghc``)
+  Is the library which provides the interface APIs to work with DOM and Web APIs, either on a browser (by compiling with ``ghcjs``) or natively using webkitgtk (when compiled with ``ghc``)
 
-  Applications should use the ``ghcjs-dom`` package and the ``GHCJS.DOM.*`` modules it contains; to get the best mix of protability and performance (rather than using the ``jsaddle-dom``, ``ghcjs-dom-jsaddle`` and ``ghcjs-dom-jsffi`` directly).
+  Applications should use the ``ghcjs-dom`` package and the ``GHCJS.DOM.*`` modules it contains; to get the best mix of portability and performance (rather than using the ``jsaddle-dom``, ``ghcjs-dom-jsaddle`` and ``ghcjs-dom-jsffi`` directly).
 
 
 .. note:: The below package descriptions are provided for information only. For using reflex-dom in applications ghcjs-dom should be sufficient.
