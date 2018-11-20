@@ -1,7 +1,7 @@
 {
   "owner": "obsidiansystems",
   "repo": "obelisk",
-  "branch": "aa-routetourl",
-  "rev": "b483dceaf9c805c9dbdaa88a1860666f98ee434a",
-  "sha256": "1qad3nnbam2gamw02dpyhy46fhbac0pwpky49pknhq4ydj23pg2m"
+  "branch": "ts-hydration",
+  "rev": "d16addc900a7c7e3d1c26d0c103a97eeeb91842f",
+  "sha256": "0993bz0wm5m9c2nl72iw5z2vwnl2wrjd2mk66p7jgdsqi6ixjkxn"
 }
