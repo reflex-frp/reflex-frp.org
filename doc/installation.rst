@@ -129,7 +129,7 @@ Add reflex-platform to project
     git submodule add https://github.com/reflex-frp/reflex-platform
 
     # Then use the workon script to get the nix-shell
-    ./reflex-platform/workon ghcjs ./.
+    ./reflex-platform/scripts/work-on ghcjs ./.
 
   A better way is to use the ``nix`` commands, see :ref:`reflex_project_skeleton` or `project-development.md <https://github.com/reflex-frp/reflex-platform/blob/develop/docs/project-development.md>`_
 
