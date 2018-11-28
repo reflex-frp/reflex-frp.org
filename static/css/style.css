@@ -150,9 +150,12 @@ header .current-section {
 
 /* Footer */
 footer {
-  display: flex;
-  flex-direction: row;
-  flex: 0 0 auto;
+  padding: 10px;
+  text-align: center;
+}
+
+footer a {
+  padding: 0px 10px;
 }
 
 /* Main content area */
