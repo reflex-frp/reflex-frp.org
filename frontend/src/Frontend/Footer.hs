@@ -11,8 +11,8 @@ footer = do
         [ ("Freenode/#reflex-frp", "http://webchat.freenode.net/?channels=%23reflex-frp&uio=d4")
         , ("Hackage", "https://hackage.haskell.org/package/reflex")
         ]
-  forM_ links $ \(name, url) -> elAttr "a" ("href" =: url <> ("target" =: "_blank")) $ text name
-  let socialIcon i title url = elAttr "a" ("href" =: url <> "title" =: title
+  forM_ links $ \(name, url) -> elAttr "a" ("href" =: url <> ("target" =: "_blank") <> ("rel" =: "noopener")) $ text name
+  let socialIcon i title url = elAttr "a" ("href" =: url <> "title" =: title <> ("rel" =: "noopener")
                                            <> ("target" =: "_blank")) $ brandIcon_ i
   socialIcon "twitter" "Twitter" "https://twitter.com/search?q=%23reflexfrp"
   socialIcon "github" "GitHub" "http://github.com/reflex-frp"
