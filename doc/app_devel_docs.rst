@@ -145,10 +145,10 @@ Web APIs and FFI
     import qualified GHCJS.DOM.DOMRectReadOnly as DOM
     import qualified GHCJS.DOM.Element as DOM
 
-      (_,e) <- el' "div" $ text "Hello"
+      (e,_) <- el' "div" $ text "Hello"
       
       let getCoords e = DOM.liftJSM $ do
-            rect <- DOM.getBoundingClientRect (_raw_element e)
+            rect <- DOM.getBoundingClientRect (_element_raw e)
             y <- DOM.getY rect
             h <- DOM.getHeight rect
             return (y,h)
