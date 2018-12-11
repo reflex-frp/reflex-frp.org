@@ -18,6 +18,7 @@ import Obelisk.Route.Frontend
 import Reflex.Dom
 
 import Frontend.FontAwesome
+import Frontend.CommonWidgets
 
 -- | Build the entire nav bar, with hamburger menu for expanding on mobile
 nav
@@ -74,8 +75,9 @@ menu = do
   -- Get the current route, so that we can highlight the corresponding tab
   currentTab <- askRoute
   let currentTabDemux = demux $ fmap (\(sec :=> _) -> Some.This sec) currentTab
-  -- Iterate over all the top-level routes
-  forM_ universe $ \section -> do
+  -- Iterate over all the top-level routes except Home
+  -- Home is reached by clicking logo
+  forM_ (filter (/= (Some.This Route_Home)) universe) $ \section -> do
     -- Create a link that is highlighted if it is the current section
     let thisTabIsSelected = demuxed currentTabDemux section
         highlight = ffor thisTabIsSelected $ \case
@@ -89,10 +91,10 @@ forkMeOnGithub
   => m ()
 forkMeOnGithub = do
   -- The banner is only shown on the bigger screens on top right corner
-  elClass "span" "fork-link" $ elAttr "a" (("href" =: href) <> ("target" =: "_blank")) $
+  elClass "span" "fork-link" $ extLink href $
     elAttr "img" (("src" =: src) <> ("alt" =: alt)) $ return ()
   -- The inline link is only shown on mobile screens along with other menu options
-  elClass "span" "fork-link-inline" $ elAttr "a" (("href" =: href) <> ("target" =: "_blank")) $
+  elClass "span" "fork-link-inline" $ extLink href $
     text "Fork me on Github"
   where
     href = "https://github.com/reflex-frp/reflex-frp.org"
