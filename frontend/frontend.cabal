@@ -24,16 +24,15 @@ library
                , universe
   exposed-modules:
     Frontend
+    Frontend.CommonWidgets
     Frontend.FontAwesome
     Frontend.Footer
     Frontend.Head
     Frontend.Nav
     Frontend.Page.Documentation
     Frontend.Page.Examples
-    Frontend.Page.Faq
+    Frontend.Page.GetStarted
     Frontend.Page.Home
-    Frontend.Page.Talks
-    Frontend.Page.Tutorials
   ghc-options: -Wall
 
 executable frontend
