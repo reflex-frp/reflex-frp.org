@@ -26,7 +26,7 @@ exList =
     , "This web site"
     )
   , ( "reflex-examples"
-    , "https://github.com/reflex-frp/reflex-examples"
+    , "https://examples.reflex-frp.org/"
     , "https://github.com/reflex-frp/reflex-examples"
     , "Contains a number of simple examples to show reflex usage"
     )
