@@ -65,4 +65,9 @@ exList =
     , "https://github.com/rvl/flatris"
     , ""
     )
+  , ( "Forbes Flatlands 2018"
+    , "http://2018-forbes.flaretiming.com/"
+    , "https://github.com/BlockScope/flare-timing/tree/master/app-view"
+    , "A hang gliding competition with the longest task"
+    )
   ]
