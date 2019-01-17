@@ -49,15 +49,14 @@ installation = el "div" $ do
 tutorials :: DomBuilder t m => m ()
 tutorials = el "div" $ do
   el "h3" $ text "Tutorials"
-  el "p" $ do
-    el "ol" $ do
-      el "li" $ do
-        el "label" $ text "QFPL: "
-        extLink "https://qfpl.io/projects/reflex/" $
-          text "Blog posts and tutorials covering basics of FRP and Reflex"
-      el "li" $ do
-        el "label" $ text "Beginner Friendly Tutorial: "
-        extLink "https://github.com/hansroland/reflex-dom-inbits/blob/master/tutorial.md" $ text "reflex-dom-inbits"
+  el "ol" $ do
+    el "li" $ do
+      el "label" $ text "QFPL: "
+      extLink "https://qfpl.io/projects/reflex/" $
+        text "Blog posts and tutorials covering basics of FRP and Reflex"
+    el "li" $ do
+      el "label" $ text "Beginner Friendly Tutorial: "
+      extLink "https://github.com/hansroland/reflex-dom-inbits/blob/master/tutorial.md" $ text "reflex-dom-inbits"
 
 talks
   :: ( DomBuilder t m
