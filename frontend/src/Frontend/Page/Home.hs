@@ -23,7 +23,7 @@ home = divClass "" $ do
         el "p" $ text $ "Fast to prototype; thanks to strong static typing, avoid frustrating runtime errors while doing modifications."
           <> ""
 
-        el "p" $ text $ "Haskell' advanced type-system and compile time checks help create easy to maintain apps."
+        el "p" $ text $ "Haskell's advanced type-system and compile time checks help create easy to maintain apps."
 
       el "li" $ do
         el "h4" $ text "Works on Web, Desktop, Android and iOS"
