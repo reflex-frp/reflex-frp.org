@@ -16,11 +16,11 @@ pageHead = do
   elAttr "meta" metaDesc blank
   elAttr "meta" metaKeywords blank
   elAttr "meta" viewport blank
+  pageIcons
   styleSheet $ static @"css/normalize.css"
   styleSheet $ static @"css/fontawesome.min.css"
   styleSheet $ static @"css/font.css"
   styleSheet $ static @"css/style.css"
-  pageIcons
 
 -- | Link to icons for this page (favicons, etc.)
 pageIcons :: DomBuilder t m => m ()
