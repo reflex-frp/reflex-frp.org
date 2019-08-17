@@ -97,7 +97,7 @@ Additionally there are some pieces of code (equivalent to a controller) which
 does not have a Dom view, but can process input events, maintain a state and
 generate output events or dynamic values.
 
-These controller can encapsulate the logic behind handling of incoming events,
+These controllers can encapsulate the logic behind handling of incoming events,
 they can transform (using Functor) or filter (using Applicative) these events
 and dynamic values as per the need. This way user has the power to create custom
 event flows which can be either restricted/local to some widgets or span the
