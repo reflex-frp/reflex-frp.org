@@ -213,7 +213,7 @@ Manipulation
       -- textFont :: Dynamic t Text
       -- textColor :: Dynamic t Text
   
-      getAttr (f,c) = ("style" =: ("font-family: " <> f "; color: " <> c))
+      getAttr (f,c) = ("style" =: ("font-family: " <> f <> "; color: " <> c))
   
       elDynAttr "div" (getAttr <$> (zipDyn textFont textColor)) $ text "Text"
   
