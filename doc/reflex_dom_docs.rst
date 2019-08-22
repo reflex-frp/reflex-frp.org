@@ -268,7 +268,7 @@ See `hsnippet.com source code here <https://github.com/mightybyte/hsnippet/blob/
 
 The simplest form of integration with backend is to define the message data in the ``common`` package, along with its serialisation functions (eg ``deriving instance`` of ``ToJSON`` and ``FromJSON``).
 
-`servent-reflex`
+`servant-reflex`
 ^^^^^^^^^^^^^^^^
 
 https://github.com/imalsogreg/servant-reflex
