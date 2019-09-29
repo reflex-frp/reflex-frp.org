@@ -16,6 +16,7 @@ import Obelisk.Generated.Static
 import Obelisk.Route
 import Obelisk.Route.Frontend
 import Reflex.Dom
+import Data.Text (Text)
 
 import Frontend.FontAwesome
 import Frontend.CommonWidgets
@@ -84,12 +85,14 @@ menu = do
           True -> "class" =: "nav-link active"
           False -> "class" =: "nav-link"
     elDynAttr "span" highlight $ routeLink (sectionHomepage section) $ text $ sectionTitle section
-  forkMeOnGithub
 
+--TODO: Factor out into a library or something
 forkMeOnGithub
   :: DomBuilder t m
-  => m ()
-forkMeOnGithub = do
+  => Text
+  -> Text
+  -> m ()
+forkMeOnGithub repoOwner repoName = do
   -- The banner is only shown on the bigger screens on top right corner
   elClass "span" "fork-link" $ extLink href $
     elAttr "img" (("src" =: src) <> ("alt" =: alt)) $ return ()
@@ -97,6 +100,6 @@ forkMeOnGithub = do
   elClass "span" "fork-link-inline" $ extLink href $
     text "Fork me on Github"
   where
-    href = "https://github.com/reflex-frp/reflex-frp.org"
+    href = "https://github.com/" <> repoOwner <> "/" <> repoName
     src = "https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png"
     alt = "Fork me on GitHub"

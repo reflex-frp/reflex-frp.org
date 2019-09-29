@@ -11,8 +11,6 @@ import Common.Route
 import Data.Dependent.Sum (DSum(..))
 import Frontend.Head
 import Frontend.Nav
-import Frontend.Page.Documentation
-import Frontend.Page.Examples
 import Frontend.Page.Home
 import Frontend.Page.GetStarted
 
@@ -31,8 +29,6 @@ frontend = Frontend
             article $ subRoute_ $ \case
               Route_Home -> home
               Route_GetStarted -> getStarted
-              Route_Examples -> examples
-              Route_Documentation -> documentation
       return ()
   }
 
@@ -44,17 +40,7 @@ mainContainer w = domEvent Click . fst <$> el' "main" w
 -- @<section>@ based on the current route
 article
   :: ( DomBuilder t m
-     , Routed t (R Route) m
-     , PostBuild t m
      )
   => m () -- ^ Article content widget
   -> m ()
-article c = el "article" $ do
-  r <- askRoute
-  el "h3" $ dynText $ routeDescription <$> r
-  let sectionClass = ffor r $ ("class" =:) . \(r' :=> _) -> case r' of
-        Route_Home -> "home"
-        Route_GetStarted -> "getStarted"
-        Route_Examples -> "examples"
-        Route_Documentation -> "documentation"
-  elDynAttr "section" sectionClass c
+article = el "article"
