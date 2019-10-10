@@ -23,24 +23,34 @@ frontend :: Frontend (R Route)
 frontend = Frontend
   { _frontend_head = pageHead
   , _frontend_body = do
-      -- The recursion here allows us to send a click event from the content area "up" into the header
-      rec el "header" $ nav click
-          click <- mainContainer $ do
-            article $ subRoute_ $ \case
-              Route_Home -> home
-              Route_GetStarted -> getStarted
-      return ()
+      el "header" nav
+      el "main" $ do
+        subRoute_ $ \case
+          Route_Home -> home
+          Route_GetStarted -> sectionPage getStarted
+      el "footer" footer
   }
 
--- | The @<main>@ tag that will contain most of the site's content
-mainContainer :: DomBuilder t m => m () -> m (Event t ())
-mainContainer w = domEvent Click . fst <$> el' "main" w
-
--- | An @<article>@ tag that will set its title and the class of its child
--- @<section>@ based on the current route
-article
-  :: ( DomBuilder t m
-     )
-  => m () -- ^ Article content widget
-  -> m ()
-article = el "article"
+footer :: (RouteToUrl (R Route) m, SetRoute t (R Route) m, DomBuilder t m) => m ()
+footer = do
+  text "REFLEX" -- TODO logo
+  elClass "section" "social" $ do
+    externalLinkWithTitle "Twitter" "https://twitter.com" $ elClass "i" "icon-twitter" blank -- TODO
+    externalLinkWithTitle "Medium" "https://medium.com" $ elClass "i" "icon-medium" blank -- TODO
+  elClass "section" "links" $ do
+    let category title content = el "article" $ do
+          el "h5" $ text title
+          content
+    category "Ecosystem" $ do
+      routeLink (Route_Home :/ ()) $ text "Home"
+      routeLink (Route_GetStarted :/ ()) $ text "Get Started"
+      routeLink (Route_Resources :/ ()) $ text "Docs" -- TODO is this correct?
+    category "Community" $ do
+      externalLink "https://reflex-frp.org" $ text "Reflex Blog" -- TODO
+      externalLink "https://reddit.com/r/reflexfrp" $ text "Reddit"
+      externalLink "http://webchat.freenode.net?channels=%23reflex-frp&uio=d4" $ text "IRC"
+      externalLink "https://reflex-frp.org" $ text "Events" -- TODO
+      externalLink "https://reflex-frp.org" $ text "Use Cases" -- TODO
+  where
+    externalLink url = elAttr "a" ("href" =: url)
+    externalLinkWithTitle title url = elAttr "a" ("href" =: url <> "title" =: title)

@@ -21,6 +21,9 @@ pageHead = do
   styleSheet $ static @"css/fontawesome.min.css"
   styleSheet $ static @"css/font.css"
   styleSheet $ static @"css/style.css"
+  styleSheet $ static @"css/icomoon.css"
+  styleSheet $ "https://fonts.googleapis.com/css?family=Alegreya&display=swap"
+
 
 -- | Link to icons for this page (favicons, etc.)
 pageIcons :: DomBuilder t m => m ()

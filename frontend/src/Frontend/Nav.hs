@@ -21,7 +21,7 @@ import Data.Text (Text)
 import Frontend.FontAwesome
 import Frontend.CommonWidgets
 
--- | Build the entire nav bar, with hamburger menu for expanding on mobile
+-- | Build the entire nav bar
 nav
   :: ( DomBuilder t m
      , MonadHold t m
@@ -31,27 +31,10 @@ nav
      , RouteToUrl (R Route) m
      , SetRoute t (R Route) m
      )
-  => Event t () -- ^ When this event fires, collapse the menu
-  -> m ()
-nav collapseMenu = do
-  openMenu <- divClass "logo-menu" $ do
-    logo
-    divClass "menu-toggle" $ do
-      activeTab <- askRoute
-      -- Build the title items, which will only be displayed on small screens
-      (currentSection, _) <- elAttr' "a" ("class" =: "current-section") $
-        dynText $ routeTitle <$> activeTab
-      hamburger <- icon "bars"
-      foldDyn ($) False $ leftmost
-        [ not <$ domEvent Click currentSection
-        , not <$ domEvent Click hamburger
-        , const False <$ updated activeTab
-        , const False <$ collapseMenu
-        ]
-  let openAttrs = ffor openMenu $ \case
-        True -> "class" =: "active"
-        False -> mempty
-  elDynAttr "nav" openAttrs menu
+  => m ()
+nav = do
+  --text "REFLEX" -- TODO
+  el "nav" menu
 
 -- | Displays the logo and returns an event that fires when the logo is clicked
 logo :: (DomBuilder t m, SetRoute t (R Route) m, RouteToUrl (R Route) m) => m ()
@@ -78,13 +61,13 @@ menu = do
   let currentTabDemux = demux $ fmap (\(sec :=> _) -> Some.This sec) currentTab
   -- Iterate over all the top-level routes except Home
   -- Home is reached by clicking logo
-  forM_ (filter (/= (Some.This Route_Home)) universe) $ \section -> do
+  forM_ universe $ \section -> do
     -- Create a link that is highlighted if it is the current section
     let thisTabIsSelected = demuxed currentTabDemux section
         highlight = ffor thisTabIsSelected $ \case
-          True -> "class" =: "nav-link active"
-          False -> "class" =: "nav-link"
-    elDynAttr "span" highlight $ routeLink (sectionHomepage section) $ text $ sectionTitle section
+          True -> "selected"
+          False -> ""
+    elDynClass "span" highlight $ routeLink (sectionHomepage section) $ text $ sectionTitle section
 
 --TODO: Factor out into a library or something
 forkMeOnGithub
