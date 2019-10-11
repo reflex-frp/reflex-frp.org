@@ -8,7 +8,6 @@ module Frontend.Nav (nav) where
 
 import Common.Route
 import Control.Monad (forM_)
-import Control.Monad.Fix (MonadFix)
 import Data.Dependent.Sum (DSum ((:=>)))
 import qualified Data.Some as Some
 import Data.Universe (universe)
@@ -18,14 +17,11 @@ import Obelisk.Route.Frontend
 import Reflex.Dom
 import Data.Text (Text)
 
-import Frontend.FontAwesome
 import Frontend.CommonWidgets
 
 -- | Build the entire nav bar
 nav
   :: ( DomBuilder t m
-     , MonadHold t m
-     , MonadFix m
      , PostBuild t m
      , Routed t (R Route) m
      , RouteToUrl (R Route) m
@@ -33,7 +29,7 @@ nav
      )
   => m ()
 nav = do
-  --text "REFLEX" -- TODO
+  unfinished "needs logo" $ text "REFLEX" -- TODO ensure the correct colours on each page
   el "nav" menu
 
 -- | Displays the logo and returns an event that fires when the logo is clicked
@@ -58,7 +54,7 @@ menu
 menu = do
   -- Get the current route, so that we can highlight the corresponding tab
   currentTab <- askRoute
-  let currentTabDemux = demux $ fmap (\(sec :=> _) -> Some.This sec) currentTab
+  let currentTabDemux = demux $ fmap (\(sec :=> _) -> Some.Some sec) currentTab
   -- Iterate over all the top-level routes except Home
   -- Home is reached by clicking logo
   forM_ universe $ \section -> do

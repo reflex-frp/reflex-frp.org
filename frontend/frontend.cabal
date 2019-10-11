@@ -32,6 +32,7 @@ library
     Frontend.Page.Documentation
     Frontend.Page.Examples
     Frontend.Page.GetStarted
+    Frontend.Page.Resources
     Frontend.Page.Home
   ghc-options: -Wall
 

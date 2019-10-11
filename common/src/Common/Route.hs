@@ -20,12 +20,8 @@ import Data.Text (Text)
 import Obelisk.Route
 import Obelisk.Route.TH
 import Data.Dependent.Sum (DSum (..))
-import Data.Functor.Sum
 import Data.Functor.Identity
 import Data.Some (Some)
-import Data.List (nub)
-import Data.Bifunctor (bimap)
-import Data.Universe (universe, Universe)
 import qualified Data.Some as Some
 
 data BackendRoute :: * -> * where
@@ -52,29 +48,18 @@ fullRouteEncoder = mkFullRouteEncoder
 
 -- | Provide a human-readable name for a given section
 sectionTitle :: Some Route -> Text
-sectionTitle (Some.This sec) = case sec of
+sectionTitle (Some.Some sec) = case sec of
   Route_Home -> "Home"
   Route_GetStarted -> "Get Started"
   Route_Resources -> "Resources"
 
 -- | Provide a human-readable name for a route
 routeTitle :: R Route -> Text
-routeTitle (sec :=> _) = sectionTitle $ Some.This sec
-
--- | Provide a human-readable description for a given section
---sectionDescription :: Some Route -> Text
---sectionDescription (Some.This sec) = case sec of
---  Route_Home -> "Reflex: Practical Functional Reactive Programming"
---  Route_GetStarted -> "Installation, Tutorials / Talks and FAQs"
---  Route_GetStarted -> "Installation, Tutorials / Talks and FAQs"
-
--- | Provide a human-readable description for a given route
---routeDescription :: R Route -> Text
---routeDescription (sec :=> _) = sectionDescription $ Some.This sec
+routeTitle (sec :=> _) = sectionTitle $ Some.Some sec
 
 -- | Given a section, provide its default route
 sectionHomepage :: Some Route -> R Route
-sectionHomepage (Some.This sec) = sec :/ case sec of
+sectionHomepage (Some.Some sec) = sec :/ case sec of
   Route_Home -> ()
   Route_GetStarted -> ()
   Route_Resources -> ()

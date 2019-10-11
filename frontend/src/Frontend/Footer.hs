@@ -1,18 +1,33 @@
+{-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE OverloadedStrings #-}
+
 module Frontend.Footer (footer) where
 
-import Control.Monad (forM_)
-import Frontend.FontAwesome
+import Obelisk.Route.Frontend
 import Reflex.Dom
 
-footer :: DomBuilder t m => m ()
+import Common.Route
+import Frontend.CommonWidgets
+
+footer :: (RouteToUrl (R Route) m, SetRoute t (R Route) m, DomBuilder t m) => m ()
 footer = do
-  let links =
-        [ ("Hackage", "https://hackage.haskell.org/package/reflex")
-        , ("#reflex-frp", "http://webchat.freenode.net/?channels=%23reflex-frp&uio=d4")
-        ]
-  forM_ links $ \(name, url) -> elAttr "a" ("href" =: url) $ text name
-  let socialIcon i title url = elAttr "a" ("href" =: url <> "title" =: title) $ brandIcon_ i
-  socialIcon "twitter" "Twitter" "https://twitter.com/search?q=%23reflexfrp"
-  socialIcon "github" "GitHub" "http://github.com/reflex-frp"
-  socialIcon "reddit" "Reddit" "http://reddit.com/r/reflexfrp"
+  unfinished "needs logo" $ text "REFLEX"
+  elClass "section" "social" $ do
+    externalLinkWithTitle "Twitter" "https://twitter.com/search?q=%23reflexfrp" $ unfinished "unsure of URL" $ elClass "i" "icon-twitter" blank
+    externalLinkWithTitle "Medium" "https://medium.com" $ unfinished "where does this point?" $ elClass "i" "icon-medium" blank
+  elClass "section" "links" $ do
+    let category title content = el "article" $ do
+          el "h5" $ text title
+          content
+    category "Ecosystem" $ do
+      routeLink (Route_Home :/ ()) $ text "Home"
+      routeLink (Route_GetStarted :/ ()) $ text "Get Started"
+      routeLink (Route_Resources :/ ()) $ text "Resources"
+    category "Community" $ do
+      extLink "https://reflex-frp.org" $ unfinished "where is this?" $ text "Reflex Blog"
+      extLink "https://reddit.com/r/reflexfrp" $ text "Reddit"
+      extLink "http://webchat.freenode.net?channels=%23reflex-frp&uio=d4" $ text "IRC"
+      extLink "https://reflex-frp.org" $ unfinished "where is this?" $ text "Events"
+      extLink "https://reflex-frp.org" $ unfinished "where is this?" $ text "Use Cases"
+  where
+    externalLinkWithTitle title url = elAttr "a" ("href" =: url <> "title" =: title)

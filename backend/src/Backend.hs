@@ -6,7 +6,6 @@ module Backend where
 import Common.Route
 import Data.Dependent.Sum (DSum (..))
 import Obelisk.Backend
-import Obelisk.Route
 
 backend :: Backend BackendRoute Route
 backend = Backend
