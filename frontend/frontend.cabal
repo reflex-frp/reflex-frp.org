@@ -15,7 +15,9 @@ library
                , jsaddle
                , lens
                , mtl
+               , obelisk-executable-config-lookup
                , obelisk-frontend
+               , obelisk-google-analytics
                , obelisk-route
                , reflex
                , reflex-dom

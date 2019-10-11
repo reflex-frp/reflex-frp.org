@@ -6,11 +6,14 @@ module Frontend.Head (pageHead) where
 import Data.Map (Map)
 import Data.Text
 import qualified Data.Text as T
+import Obelisk.Configs
+import Obelisk.Frontend.GoogleAnalytics
 import Obelisk.Generated.Static
 import Reflex.Dom
 
-pageHead :: DomBuilder t m => m ()
+pageHead :: (DomBuilder t m, HasConfigs m) => m ()
 pageHead = do
+  requireGoogleAnalytics
   elAttr "base" ("href" =: "/") blank --TODO: Update obelisk to automatically inject this
   el "title" $ text "Reflex FRP"
   elAttr "meta" metaDesc blank
