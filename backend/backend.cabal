@@ -34,15 +34,3 @@ executable backend
                , obelisk-backend
                , obelisk-route
                , text
-
-executable youtubepreviews
-  main-is: src-bin/youtubepreviews.hs
-  if impl(ghcjs)
-    buildable: false
-  build-depends: base
-               , bytestring
-               , common
-               , HTTP
-               , network-uri
-               , text
-               , universe
