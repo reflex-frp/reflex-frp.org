@@ -1,9 +1,8 @@
 /* Variables */
 :root {
   /* Colors */
-  --primary: #423838;
   --background: #fff;
-  --darkbackground: #fbfbfb;
+  --bghighlight: #fbfbfb;
   --purple: #8d68fd;
 }
 
@@ -24,11 +23,6 @@ h1,h2,h3,h4,h5 {
   margin: 60px 0 20px;
   color: #000;
 }
-
-/* h1
-  text-align: center;
-  margin: 47px;
-  */
 
 .centered { text-align: center; }
 
@@ -99,7 +93,7 @@ a {
 
 .toc > nav {
   width: 210px;
-  background-color: var(--darkbackground);
+  background-color: var(--bghighlight);
   font-size: 14px;
   line-height: 22px;
 }
@@ -251,7 +245,7 @@ section.cards {
 }
 
 section.cards > article.card {
-  background-color: var(--darkbackground);
+  background-color: var(--bghighlight);
   width: 290px;
   padding: 20px 10px;
 }
@@ -292,9 +286,6 @@ article.alternating > h3 {
 
 article.alternating > p {
   margin: 0;
-  font-size: 20px;
-  line-height: 30px;
-  color: #898989;
 }
 
 article.alternating.left {

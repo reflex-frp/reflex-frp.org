@@ -54,17 +54,17 @@ valueProp = do
 
 benefits :: DomBuilder t m => m ()
 benefits = do
-  elClass "h1" "centered" $ unfinished "title case" $ text "The Ecosystem Built for Evolution"
+  elClass "h1" "centered" $ unfinished "title case" $ text "The Ecosystem Built for Evolution."
   let article side url title child = elAttr "article" ("class" =: ("alternating " <> side) <> "style" =: ("background-image: url(" <> url <> ")")) $ do
         el "h3" $ text title
         child
   article "left" (static @"img/graphics/undraw_speed_test_wxl0.svg") "Build fast without breaking things." $ do
-    el "p" $ text "You don’t have to choose between building quickly or sustainably anymore. Reflex-FRP allows you to write production quality code from the get-go, with less technical debt."
+    elClass "p" "description" $ text "You don’t have to choose between building quickly or sustainably anymore. Reflex-FRP allows you to write production quality code from the get-go, with less technical debt."
   article "right" (static @"img/graphics/undraw_code_typing_7jnv.svg") "Never lost in translation." $ do
-    el "p" $ text "Reflex platform allows you to write entirely in Haskell, everywhere. Using one language does away with client / server protocol mismatches and separate engineering teams. Code becomes easier to write, with fewer kinds of bugs possible."
+    elClass "p" "description" $ text "Reflex platform allows you to write entirely in Haskell, everywhere. Using one language does away with client / server protocol mismatches and separate engineering teams. Code becomes easier to write, with fewer kinds of bugs possible."
   article "left" (static @"img/graphics/undraw_good_team_m7uu.svg") "Jump the complexity wall." $ do
-    el "p" $ text "As you add to your codebase it inevitably becomes more complex, but it shouldn’t become harder to manage. No matter the size of your App, Reflex allows for individual pieces of code to be independently understandable."
+    elClass "p" "description" $ text "As you add to your codebase it inevitably becomes more complex, but it shouldn’t become harder to manage. No matter the size of your App, Reflex allows for individual pieces of code to be independently understandable."
   article "right" (static @"img/graphics/undraw_investment_xv9d.svg") "Code for the only constant." $ do
-    el "p" $ text "The only constants are time and change, what if your code could account for them? Functional reactive programming lets you write code that understands real world dynamics as naturally as you do, but isn’t any harder to write."
+    elClass "p" "description" $ text "The only constants are time and change, what if your code could account for them? Functional reactive programming lets you write code that understands real world dynamics as naturally as you do, but isn’t any harder to write."
   article "left" (static @"img/graphics/undraw_to_the_moon_v1mv.svg") "Batteries included." $ do
-    el "p" $ text "Obelisk is the full-stack framework for building Reflex apps using the entire ecosystem. Designed to work ‘out of the box’, with best practices and starter templates included. This is the best option for developing and deploying serious real world applications, quickly."
+    elClass "p" "description" $ text "Obelisk is the full-stack framework for building Reflex apps using the entire ecosystem. Designed to work ‘out of the box’, with best practices and starter templates included. This is the best option for developing and deploying serious real world applications, quickly."
