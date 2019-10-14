@@ -39,9 +39,9 @@ createANewApp = Section
   { _section_title = "Create a New Reflex App"
   , _section_content = do
     el "p" $ do
-    text "Get started with "
-    extLink "https://github.com/obsidiansystems/obelisk" $ text "Obelisk"
-    text " to build a full-stack web and mobile application powered by Reflex. Obelisk will set you up with access to Reflex libraries, developer tools, and everything you need to begin work on your client and server."
+      text "Get started with "
+      extLink "https://github.com/obsidiansystems/obelisk" $ text "Obelisk"
+      text " to build a full-stack web and mobile application powered by Reflex. Obelisk will set you up with access to Reflex libraries, developer tools, and everything you need to begin work on your client and server."
     el "p" $ do
       text "Obelisk has built-in support for deployments, server-side rendering, routing, and smooth developer workflow. It’s the best way to both develop and deploy your Reflex project for web or mobile, and "
       extLink "https://github.com/obsidiansystems/obelisk#installing-obelisk" $ text "getting started"
