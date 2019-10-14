@@ -1,7 +1,7 @@
 {
   "owner": "obsidiansystems",
   "repo": "obelisk",
-  "branch": "ts-export-exe-config",
-  "rev": "5cb2b1bbd47acc873ffc1b99efbef9a3be4cb13a",
-  "sha256": "08m7y2m9nw69hb686860grqy3jk63b2bqh5qqlxxpqzci7iz4ivw"
+  "branch": "ts-data-ssr",
+  "rev": "b4f7acbe3e9dc029335dc6f54ecaebc96980964b",
+  "sha256": "1dzs8bx29f92ph56k7w0j0a8qw225jd9jsrzyzgj2dq1shw086jg"
 }
