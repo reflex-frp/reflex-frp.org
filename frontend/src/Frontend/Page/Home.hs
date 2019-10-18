@@ -12,7 +12,6 @@ import Common.Route
 import Reflex.Dom
 import Obelisk.Route.Frontend
 import Obelisk.Generated.Static
-import Frontend.CommonWidgets
 
 home :: (DomBuilder t m, RouteToUrl (R Route) m, SetRoute t (R Route) m) => m ()
 home = do
@@ -22,10 +21,6 @@ home = do
   elClass "hr" "short" blank
   benefits
   callToAction "" --TODO: The bottom-of-page call-to-action should probably be different from the top-of-page one
-
-bigLogo :: DomBuilder t m => m ()
-bigLogo = do
-  elAttr "img" ("src" =: static @"img/logo.svg" <> "alt" =: "Reflex") blank
 
 slogan :: DomBuilder t m => m ()
 slogan = do

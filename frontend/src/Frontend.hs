@@ -8,7 +8,6 @@
 module Frontend (frontend) where
 
 import Common.Route
-import Frontend.CommonWidgets
 import Frontend.Head
 import Frontend.Footer
 import Frontend.Nav
