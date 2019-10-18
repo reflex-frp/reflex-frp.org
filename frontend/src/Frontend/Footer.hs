@@ -25,7 +25,7 @@ footer = do
       routeLink (Route_Resources :/ ()) $ text "Resources"
     category "Community" $ do
       extLink "https://reddit.com/r/reflexfrp" $ text "Reddit"
-      extLink "http://webchat.freenode.net?channels=%23reflex-frp&uio=d4" $ text "IRC"
+      extLink "http://webchat.freenode.net?channels=%23reflex-frp&uio=d4" $ text "#reflex-frp on IRC"
       extLink "https://reflex-frp.org" $ unfinished "where is this?" $ text "Use Cases"
   where
     externalLinkWithTitle title url = elAttr "a" ("href" =: url <> "title" =: title)

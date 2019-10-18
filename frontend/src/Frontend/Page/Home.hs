@@ -54,7 +54,7 @@ valueProp = do
 
 benefits :: DomBuilder t m => m ()
 benefits = do
-  elClass "h1" "centered" $ unfinished "title case" $ text "The Ecosystem Built for Evolution."
+  elClass "h1" "centered" $ text "The ecosystem built for evolution."
   let article side url title child = elAttr "article" ("class" =: ("alternating " <> side) <> "style" =: ("background-image: url(" <> url <> ")")) $ do
         el "h3" $ text title
         child
