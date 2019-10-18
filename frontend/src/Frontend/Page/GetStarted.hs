@@ -15,14 +15,14 @@ import Frontend.CommonWidgets
 
 import Common.Route
 
-getStarted :: (DomBuilder t m, RouteToUrl (R Route) m, SetRoute t (R Route) m) => Section m
+getStarted :: (DomBuilder t m, RouteToUrl (R Route) m, SetRoute t (R Route) m, Prerender js t m) => Section m
 getStarted = Section
   { _section_title = "Getting Started"
   , _section_content = do
     elClass "p" "description" $ text "This page provides links to information on Reflex documentation and related resources."
     elClass "p" "description" $ do
       text "Reflex-FRP is a Haskell-based ecosystem for building user interfaces and web apps. Learn what makes Reflex unique on our "
-      routeLink (Route_Home :/ ()) $ text "home page"
+      routeLinkScrollToTop (Route_Home :/ ()) $ text "home page"
       text "."
   , _section_subsections = [tryReflexFRP, learnReflexFRP]
   }
@@ -94,7 +94,7 @@ testDrive = Section
   , _section_subsections = []
   }
 
-learnReflexFRP :: forall t m. (DomBuilder t m, SetRoute t (R Route) m, RouteToUrl (R Route) m) => Section m
+learnReflexFRP :: forall js t m. (DomBuilder t m, SetRoute t (R Route) m, RouteToUrl (R Route) m, Prerender js t m) => Section m
 learnReflexFRP = Section
   { _section_title = "Learn Reflex-FRP"
   , _section_content = elClass "p" "description" $ do
@@ -177,14 +177,14 @@ haskellForBeginners = Section
   , _section_subsections = []
   }
 
-theTutorial :: (DomBuilder t m, SetRoute t (R Route) m, RouteToUrl (R Route) m) => Section m
+theTutorial :: (DomBuilder t m, SetRoute t (R Route) m, RouteToUrl (R Route) m, Prerender js t m) => Section m
 theTutorial = Section
   { _section_title = "The Tutorial"
   , _section_content = do
     el "p" $ text "If you feel comfortable with your Haskell abilities and have done all the ‘reading up’ on FRP you care to, get started on our Reflex tutorial! The tutorial walks you through building a simple functional reactive calculator that can be used in a web browser, beginning with the download instructions for Nix and Obelisk."
     el "p" $ do
       text "Even if you don’t plan to build a calculator for your own project, this tutorial is helpful as it teaches the fundamentals of building a Reflex application, and the key concepts at play. A familiarity with this process will make developing other applications much easier. If you get stuck, try referencing our "
-      routeLink (Route_Resources :/ ()) $ text "resources page"
+      routeLinkScrollToTop (Route_Resources :/ ()) $ text "resources page"
       text ", or "
       extLink "http://webchat.freenode.net?channels=%23reflex-frp&uio=d4" $ text "#reflex-frp on IRC"
       text "."

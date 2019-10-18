@@ -9,7 +9,7 @@ import Reflex.Dom
 import Common.Route
 import Frontend.CommonWidgets
 
-footer :: (RouteToUrl (R Route) m, SetRoute t (R Route) m, DomBuilder t m) => m ()
+footer :: (RouteToUrl (R Route) m, SetRoute t (R Route) m, DomBuilder t m, Prerender js t m) => m ()
 footer = do
   unfinished "needs logo" $ text "REFLEX"
   elClass "section" "social" $ do
@@ -20,9 +20,9 @@ footer = do
           el "h5" $ text title
           content
     category "Ecosystem" $ do
-      routeLink (Route_Home :/ ()) $ text "Home"
-      routeLink (Route_GetStarted :/ ()) $ text "Get Started"
-      routeLink (Route_Resources :/ ()) $ text "Resources"
+      routeLinkScrollToTop (Route_Home :/ ()) $ text "Home"
+      routeLinkScrollToTop (Route_GetStarted :/ ()) $ text "Get Started"
+      routeLinkScrollToTop (Route_Resources :/ ()) $ text "Resources"
     category "Community" $ do
       extLink "https://reddit.com/r/reflexfrp" $ text "Reddit"
       extLink "http://webchat.freenode.net?channels=%23reflex-frp&uio=d4" $ text "#reflex-frp on IRC"

@@ -13,7 +13,7 @@ import Reflex.Dom
 import Obelisk.Route.Frontend
 import Obelisk.Generated.Static
 
-home :: (DomBuilder t m, RouteToUrl (R Route) m, SetRoute t (R Route) m) => m ()
+home :: (DomBuilder t m, RouteToUrl (R Route) m, SetRoute t (R Route) m, Prerender js t m) => m ()
 home = do
   slogan
   callToAction "jumbotron"
@@ -26,9 +26,9 @@ slogan :: DomBuilder t m => m ()
 slogan = do
   elClass "h1" "tagline" $ text "The world changes, your apps should keep up."
 
-callToAction :: (DomBuilder t m, RouteToUrl (R Route) m, SetRoute t (R Route) m) => Text -> m ()
+callToAction :: (DomBuilder t m, RouteToUrl (R Route) m, SetRoute t (R Route) m, Prerender js t m) => Text -> m ()
 callToAction c = do
-  divClass ("call-to-action " <> c) $ routeLink (Route_GetStarted :/ ()) $ text "Checkout the Get Started guide"
+  divClass ("call-to-action " <> c) $ routeLinkScrollToTop (Route_GetStarted :/ ()) $ text "Checkout the Get Started guide"
 
 valueProp :: DomBuilder t m => m ()
 valueProp = do

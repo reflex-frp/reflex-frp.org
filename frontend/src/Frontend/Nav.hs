@@ -24,6 +24,7 @@ nav
      , Routed t (R Route) m
      , RouteToUrl (R Route) m
      , SetRoute t (R Route) m
+     , Prerender js t m
      )
   => m ()
 nav = do
@@ -37,6 +38,7 @@ menu
      , SetRoute t (R Route) m
      , Routed t (R Route) m
      , RouteToUrl (R Route) m
+     , Prerender js t m
      )
   => m ()
 menu = do
@@ -51,4 +53,4 @@ menu = do
         highlight = ffor thisTabIsSelected $ \case
           True -> "selected"
           False -> ""
-    elDynClass "span" highlight $ routeLink (sectionHomepage section) $ text $ sectionTitle section
+    elDynClass "span" highlight $ routeLinkScrollToTop (sectionHomepage section) $ text $ sectionTitle section
