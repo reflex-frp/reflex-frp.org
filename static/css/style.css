@@ -10,16 +10,6 @@
   --helvetica: "Helvetica Neue", Helvetica, sans-serif;
 }
 
-h1.tagline {
-  margin-top: 150px;
-  margin-bottom: 0;
-  font-family: var(--helvetica);
-  font-weight: bold;
-  font-size: 38px;
-  color: #4d4d4d;
-  text-align: center;
-}
-
 h1,h2,h3,h4,h5 {
   font-family: Alegreya, serif;
   letter-spacing: 0.5px; /* Not sure why this is needed. */
@@ -60,21 +50,44 @@ p.description {
 
 a {
   color: var(--purple);
-  font-weight: 500;
+  font-weight: bolder;
   text-decoration: none;
 }
 a:visited { color: var(--visited); }
 a:hover { color: var(--hover); }
 a:active { color: var(--visited); }
 
-.call-to-action {
-  margin: 80px 0;
+.jumbotron {
+  position: relative;
+  height: calc(100vh - 160px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.jumbotron > canvas {
+  position: absolute;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+}
+
+.jumbotron > h1.tagline {
+  font-family: var(--helvetica);
+  font-weight: bold;
+  font-size: 38px;
+  color: #4d4d4d;
   text-align: center;
 }
 
-.call-to-action.jumbotron {
+.jumbotron > .call-to-action {
   margin-top: 110px;
-  margin-bottom: 160px;
+}
+
+.call-to-action {
+  margin: 80px 0;
+  text-align: center;
 }
 
 .call-to-action > a {
@@ -149,7 +162,7 @@ header > nav {
   justify-content: center;
   font-family: var(--helvetica);
   font-size: 14px;
-  font-weight: 500;
+  font-weight: bolder;
 }
 
 header > nav > span > a:visited,
@@ -246,7 +259,7 @@ footer > section.links > article > h5 {
 footer > section.links > article > a {
   color: #a2a2a2;
   font-family: var(--helvetica);
-  font-weight: 500;
+  font-weight: bolder;
   font-size: 14px;
   text-decoration: none;
   margin-bottom: 19px;

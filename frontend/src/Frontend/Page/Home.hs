@@ -16,15 +16,16 @@ import Obelisk.Generated.Static
 home :: (DomBuilder t m, RouteToUrl (R Route) m, SetRoute t (R Route) m, Prerender js t m) => m ()
 home = do
   slogan
-  callToAction "jumbotron"
   valueProp
   elClass "hr" "short" blank
   benefits
   callToAction "" --TODO: The bottom-of-page call-to-action should probably be different from the top-of-page one
 
-slogan :: DomBuilder t m => m ()
-slogan = do
+slogan :: (DomBuilder t m, RouteToUrl (R Route) m, SetRoute t (R Route) m, Prerender js t m) => m ()
+slogan = divClass "jumbotron" $ do
+  elAttr "canvas" ("data-processing-sources" =: static @"js/app.pde") blank
   elClass "h1" "tagline" $ text "The world changes, your apps should keep up."
+  callToAction ""
 
 callToAction :: (DomBuilder t m, RouteToUrl (R Route) m, SetRoute t (R Route) m, Prerender js t m) => Text -> m ()
 callToAction c = do

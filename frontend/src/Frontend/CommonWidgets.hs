@@ -49,7 +49,7 @@ data Section m = Section
 sectionPage
   :: (DomBuilder t m, RouteToUrl r m)
   => r -> Section m -> m ()
-sectionPage r mainSection = do
+sectionPage r mainSection = el "main" $ do
   header 1 $ _section_title mainSection
   _section_content mainSection
   el "hr" blank

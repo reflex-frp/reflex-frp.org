@@ -25,10 +25,9 @@ frontend = Frontend
   { _frontend_head = pageHead
   , _frontend_body = do
       el "header" nav
-      el "main" $ do
-        subRoute_ $ \case
-          Route_Home -> home
-          Route_GetStarted -> sectionPage (Route_GetStarted :/ ()) getStarted
-          Route_Resources -> sectionPage (Route_Resources :/ ()) resources
+      subRoute_ $ \case
+        Route_Home -> home
+        Route_GetStarted -> sectionPage (Route_GetStarted :/ ()) getStarted
+        Route_Resources -> sectionPage (Route_Resources :/ ()) resources
       el "footer" footer
   }
