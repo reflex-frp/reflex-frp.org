@@ -1,7 +1,7 @@
 {
   "owner": "obsidiansystems",
   "repo": "obelisk",
-  "branch": "ts-data-ssr",
-  "rev": "c96f2c01c3f53e44287df170f956067b525c6da2",
-  "sha256": "1sj8hkqisyif2ia1vvllm9y4d1iksh1p7x2wrpfrl0dh988w6qhw"
+  "branch": "ts-reflex-frp",
+  "rev": "c80deb11d2749857d9259951c79ab0f0476c8917",
+  "sha256": "0zfn2a521p76hrav5hlnmrp6w1b9rigmd2xb57givxbw7pak6zwv"
 }
