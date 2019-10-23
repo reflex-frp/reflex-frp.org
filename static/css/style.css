@@ -67,6 +67,7 @@ a:active { color: var(--visited); }
 }
 
 .jumbotron > canvas {
+  outline: none;
   position: absolute;
   top: 0;
   width: 100%;
