@@ -28,7 +28,7 @@ nav
      )
   => m ()
 nav = do
-  unfinished "needs logo" $ text "REFLEX" -- TODO ensure the correct colours on each page
+  reflexLogo
   el "nav" menu
 
 -- | Build the nav's tabs

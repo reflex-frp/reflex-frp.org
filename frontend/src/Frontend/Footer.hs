@@ -11,7 +11,7 @@ import Frontend.CommonWidgets
 
 footer :: (RouteToUrl (R Route) m, SetRoute t (R Route) m, DomBuilder t m, Prerender js t m) => m ()
 footer = do
-  unfinished "needs logo" $ text "REFLEX"
+  reflexLogo
   elClass "section" "social" $ do
     externalLinkWithTitle "Twitter" "https://twitter.com/reflexfrp" $ elClass "i" "icon-twitter" blank
     externalLinkWithTitle "Medium" "https://medium.com/@obsidian.systems" $ elClass "i" "icon-medium" blank

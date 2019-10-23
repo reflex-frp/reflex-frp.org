@@ -1,13 +1,16 @@
+{-# LANGUAGE DataKinds #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE TypeApplications #-}
 
 module Frontend.CommonWidgets where
 
 import Data.Foldable (for_)
 import Data.Text (Text)
 import Obelisk.Route.Frontend
+import Obelisk.Generated.Static
 import Reflex.Dom
 import qualified Data.Text as T
 
@@ -19,6 +22,9 @@ extLink href m =
 -- should be removed
 unfinished :: DomBuilder t m => Text -> m a -> m a
 unfinished t = elAttr "span" ("style" =: "background: red" <> "title" =: t)
+
+reflexLogo :: DomBuilder t m => m ()
+reflexLogo = elAttr "img" ("class" =: "reflex-logo" <> "src" =: static @"img/logo.svg" <> "alt" =: "Reflex") blank
 
 routeFragment
   :: (DomBuilder t m, RouteToUrl r m)

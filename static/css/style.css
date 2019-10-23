@@ -146,14 +146,19 @@ main, header {
   width: 990px;
 }
 
+img.reflex-logo {
+  width: 95px;
+}
+
 header {
   margin-top: 75px;
   margin-bottom: 50px;
+  position: relative;
 }
 
-header > img.logo {
-  float: left;
-  width: 95px;
+header > img.reflex-logo {
+  position: absolute;
+  left: 0;
 }
 
 header > nav {
