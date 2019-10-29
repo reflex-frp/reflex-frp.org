@@ -22,8 +22,9 @@ import qualified Language.Javascript.JSaddle as JS
 home :: (DomBuilder t m, RouteToUrl (R Route) m, SetRoute t (R Route) m, Prerender js t m) => m ()
 home = do
   slogan
+  elClass "hr" "short top-container" blank
   valueProp
-  elClass "hr" "short" blank
+  elClass "hr" "short bottom-container" blank
   benefits
   callToAction "" --TODO: The bottom-of-page call-to-action should probably be different from the top-of-page one
 
@@ -50,7 +51,7 @@ slogan = divClass "jumbotron" $ do
       JS.push i instances
       pure ()
     pure ()
-  elClass "h1" "tagline" $ text "The world changes, your apps should keep up."
+  elClass "h1" "tagline" $ text "The world changes," >> el "br" blank >> text "your apps should keep up."
   callToAction ""
 
 callToAction :: (DomBuilder t m, RouteToUrl (R Route) m, SetRoute t (R Route) m, Prerender js t m) => Text -> m ()
@@ -59,18 +60,18 @@ callToAction c = do
 
 valueProp :: DomBuilder t m => m ()
 valueProp = do
-  elClass "h1" "centered" $ text "Reflex adapts to changes in your..."
+  elClass "h3" "centered close" $ text "Reflex adapts to changes in your..."
   elClass "section" "cards" $ do
     let card icon title child = elClass "article" "card" $ do
           el "h3" $ elClass "i" icon blank >> text title
           child
-    card "icon-stats" "Data" $ do
+    card "icon-stats blueish" "Data" $ do
       el "p" $ text "Reflex apps automatically react to changing data. This keeps every interaction current, accurately representing the relationship between your data and the real world."
       el "p" $ text "Reflex is the key to writing self-updating user interfaces."
-    card "icon-list" "Requirements" $ do
+    card "icon-list redish" "Requirements" $ do
       el "p" $ text "Reflex components are modular and reusable. If your requirements change, your app can quickly and easily be reworked. The modularity of Reflex lets you iterate quickly, without wasting code."
       el "p" $ text "Develop efficiently no matter how many times you pivot."
-    card "icon-devices" "Platform" $ do
+    card "icon-devices greenish" "Platform" $ do
       el "p" $ text "Reflex has been built to seamlessly support interfaces on desktop, mobile, web, and other platforms, all in Haskell. Regardless of your platform needs, Reflex lets you take your team and your code with you."
       el "p" $ text "One team, one code base, every platform."
 

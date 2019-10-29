@@ -6,12 +6,19 @@
   --purple: #8d68fd;
   --visited: #AF96FA;
   --hover: #602FF4;
+  --blueish: #6878fd;
+  --redish: #fd6868;
+  --greenish: #5cdcb0;
   /* Fonts */
   --helvetica: "Helvetica Neue", Helvetica, sans-serif;
+  --headerFont: 'DM Serif Display', serif;
+  --contentHeaderFont: 'Poppins', sans-serif;
 }
 
 h1,h2,h3,h4,h5 {
-  font-family: Alegreya, serif;
+  font-family: var(--contentHeaderFont);
+  font-weight: 600;
+  line-height: 1.5;
   letter-spacing: 0.5px; /* Not sure why this is needed. */
   color: rgba(0, 0, 0, 0.87);
   margin: 60px 0 20px;
@@ -21,18 +28,18 @@ h1,h2,h3,h4,h5 {
 .centered { text-align: center; }
 
 h1 {
-  font-size: 42px;
-  line-height: 63px;
+  font-size: 52px;
+  line-height: 1.21;
+  font-family: var(--headerFont);
+  font-weight: normal;
 }
 
 h2 {
   font-size: 34px;
-  line-height: 51px;
 }
 
 h3 {
   font-size: 28px;
-  line-height: 42px;
 }
 
 p {
@@ -57,6 +64,10 @@ a:visited { color: var(--visited); }
 a:hover { color: var(--hover); }
 a:active { color: var(--visited); }
 
+.blueish { color: var(--blueish) !important; }
+.redish { color: var(--redish) !important; }
+.greenish { color: var(--greenish) !important; }
+
 .jumbotron {
   position: relative;
   margin-top: -160px;
@@ -78,16 +89,12 @@ a:active { color: var(--visited); }
   width: max-content;
   margin-left: auto;
   margin-right: auto;
-  font-family: var(--helvetica);
-  font-weight: bold;
-  font-size: 38px;
-  color: #4d4d4d;
   text-align: center;
   z-index: 1;
 }
 
 .jumbotron > .call-to-action {
-  margin-top: 110px;
+  margin-top: 66px;
   z-index: 1;
 }
 
@@ -216,6 +223,17 @@ hr.short {
   background-color: #e7e7e7;
   margin: 80px auto;
 }
+hr.top-container {
+  margin-top: 40px;
+  margin-bottom: 40px;
+}
+hr.bottom-container {
+  margin-top: 59px;
+  margin-bottom: 97px;
+}
+h3.close {
+  margin-top: 0;
+}
 
 dl.links > dt {
   margin-top: 20px;
@@ -263,7 +281,6 @@ footer > section.links > article {
 }
 
 footer > section.links > article > h5 {
-  font-weight: normal;
   font-size: 12px;
   margin-bottom: 18px;
   margin-top: 0;
@@ -285,7 +302,7 @@ section.cards {
   flex-direction: row;
   width: 970px;
   justify-content: space-between;
-  margin: 50px auto 80px;
+  margin: 50px auto;
 }
 
 section.cards > article.card {
