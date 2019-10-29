@@ -69,3 +69,10 @@ sectionPage r mainSection = el "main" $ do
       goSections (prec + 1) $ _section_subsections section
     header (i :: Int) t = elAttr h ("id" =: titleFragment t) $ text t
       where h = "h" <> T.pack (show $ min 6 $ max 1 i)
+
+snippet :: DomBuilder t m => Text -> Text -> m ()
+snippet lang = el "pre" . elClass "code" languageClass . text
+  where languageClass = "language-" <> lang
+
+inlineSnippet :: DomBuilder t m => Text -> m ()
+inlineSnippet = elClass "span" "inline-code" . text

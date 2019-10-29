@@ -17,6 +17,7 @@ library
                , jsaddle
                , lens
                , mtl
+               , neat-interpolation
                , obelisk-executable-config-lookup
                , obelisk-frontend
                , obelisk-google-analytics
@@ -40,6 +41,7 @@ library
     Frontend.Page.GetStarted
     Frontend.Page.Resources
     Frontend.Page.Home
+    Frontend.Page.Tutorial
   ghc-options: -Wall
 
 executable frontend

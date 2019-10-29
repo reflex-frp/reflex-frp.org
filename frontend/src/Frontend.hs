@@ -5,6 +5,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecursiveDo #-}
 {-# LANGUAGE TypeApplications #-}
+
 module Frontend (frontend) where
 
 import Common.Route
@@ -20,6 +21,7 @@ import Frontend.Page.Tutorial
 import Obelisk.Frontend
 import Obelisk.Route
 import Obelisk.Route.Frontend
+import Obelisk.Generated.Static
 import Reflex.Dom.Core
 
 frontend :: Frontend (R Route)
@@ -33,4 +35,6 @@ frontend = Frontend
         Route_Tutorial -> sectionPage (Route_Tutorial :/ ()) tutorial
         Route_Resources -> sectionPage (Route_Resources :/ ()) resources
       el "footer" footer
+      -- Prism is in prerender so that it doesn't muck with the DOM until hydration is finished.
+      prerender_ blank $ elAttr "script" ("type" =: "text/javascript" <> "src" =: static @"js/prism.js") blank
   }
