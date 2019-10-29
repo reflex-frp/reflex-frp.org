@@ -30,6 +30,7 @@ data BackendRoute :: * -> * where
 data Route :: * -> * where
   Route_Home :: Route ()
   Route_GetStarted :: Route ()
+  Route_Tutorial :: Route ()
   Route_Resources :: Route ()
 deriving instance Show (Route a)
 
@@ -44,6 +45,7 @@ fullRouteEncoder = mkFullRouteEncoder
   (\case
     Route_Home -> PathEnd $ unitEncoder mempty
     Route_GetStarted -> PathSegment "get-started" $ unitEncoder mempty
+    Route_Tutorial -> PathSegment "tutorial" $ unitEncoder mempty
     Route_Resources -> PathSegment "resources" $ unitEncoder mempty)
 
 -- | Provide a human-readable name for a given section
@@ -51,6 +53,7 @@ sectionTitle :: Some Route -> Text
 sectionTitle (Some.Some sec) = case sec of
   Route_Home -> "Home"
   Route_GetStarted -> "Get Started"
+  Route_Tutorial -> "Tutorial"
   Route_Resources -> "Resources"
 
 -- | Provide a human-readable name for a route
@@ -62,4 +65,5 @@ sectionHomepage :: Some Route -> R Route
 sectionHomepage (Some.Some sec) = sec :/ case sec of
   Route_Home -> ()
   Route_GetStarted -> ()
+  Route_Tutorial -> ()
   Route_Resources -> ()

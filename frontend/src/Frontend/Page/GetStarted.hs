@@ -7,7 +7,7 @@
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE TypeOperators #-}
 
-module Frontend.Page.GetStarted (sectionPage, getStarted) where
+module Frontend.Page.GetStarted (getStarted) where
 
 import Obelisk.Route.Frontend
 import Reflex.Dom
