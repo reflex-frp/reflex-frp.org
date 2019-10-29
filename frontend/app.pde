@@ -13,13 +13,13 @@ void setup() {
     flock = new Flock();
     icons = [];
     shapeMode(CENTER);
-    for (int i = 1; i < 20; i++) {
-        icons.push(loadShape("static/img/vis/" + i + ".svg"));
+    for (int i = 1; i < 7; i++) {
+        icons.push(loadShape("static/img/icons/" + i + ".svg"));
     }
 
     // Add an initial set of boids into the system
     for (int i = 0; i < 50; i++) {
-        flock.addBoid(new Boid(new Vector3D(width/2,height/2),2.0f,0.05f));
+        flock.addBoid(new Boid(new Vector3D(random(0, width), random(0, height)),2.0f,0.05f));
     }
 }
 
@@ -30,7 +30,7 @@ void draw() {
 
 // Add a new boid into the System
 void mouseDragged() {
-    flock.addBoid(new Boid(new Vector3D(mouseX,mouseY),2.0f,0.05f));
+    flock.addBoid(new Boid(new Vector3D(mouseX,mouseY),5.0f,0.05f));
 }
 
 class Flock {
@@ -58,11 +58,12 @@ class Boid {
     float r;
     float maxforce;    // Maximum steering force
     float maxspeed;    // Maximum speed
-    int iconIndex = int(random(0, 19));
+    int iconIndex = int(random(0, 6));
 
     Boid(Vector3D l, float ms, float mf) {
-        acc = new Vector3D(0,0);
+        acc = new Vector3D(random(-100, 100), random(-100, 100));
         vel = new Vector3D(random(-1,1),random(-1,1));
+        // vel = new Vector3D(-1, 1);
         loc = l.copy();
         r = 2.0f;
         maxspeed = ms;
