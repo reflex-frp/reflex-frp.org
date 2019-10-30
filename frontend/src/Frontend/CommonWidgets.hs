@@ -70,9 +70,19 @@ sectionPage r mainSection = el "main" $ do
     header (i :: Int) t = elAttr h ("id" =: titleFragment t) $ text t
       where h = "h" <> T.pack (show $ min 6 $ max 1 i)
 
+-- | Code snippet
 snippet :: DomBuilder t m => Text -> Text -> m ()
-snippet lang = el "pre" . elClass "code" languageClass . text
+snippet lang = el "pre" . inlineSnippet lang
+
+-- | Inline code snippet
+inlineSnippet :: DomBuilder t m => Text -> Text -> m ()
+inlineSnippet lang = elClass "code" languageClass . text
   where languageClass = "language-" <> lang
 
-inlineSnippet :: DomBuilder t m => Text -> m ()
-inlineSnippet = elClass "span" "inline-code" . text
+-- | Inline haskell snippet. Used a lot, hence the short name.
+hs :: DomBuilder t m => Text -> m ()
+hs = inlineSnippet "haskell"
+
+-- | Generic inline monospace text
+monospace :: DomBuilder t m => Text -> m ()
+monospace = elClass "span" "monospace" . text

@@ -28,6 +28,7 @@ pageHead = do
   styleSheet $ static @"css/icomoon.css"
   styleSheet $ "https://fonts.googleapis.com/css?family=Poppins&display=swap"
   styleSheet $ "https://fonts.googleapis.com/css?family=DM+Serif+Display&display=swap"
+  styleSheet $ "https://fonts.googleapis.com/css?family=Roboto+Mono&display=swap"
   elAttr "script" ("type" =: "text/javascript" <> "src" =: static @"js/processing.min.js") blank
   styleSheet $ static @"css/prism.css"
 

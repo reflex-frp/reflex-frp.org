@@ -32,9 +32,11 @@ frontend = Frontend
       subRoute_ $ \case
         Route_Home -> home
         Route_GetStarted -> sectionPage (Route_GetStarted :/ ()) getStarted
-        Route_Tutorial -> sectionPage (Route_Tutorial :/ ()) tutorial
+        Route_Tutorial -> do
+          sectionPage (Route_Tutorial :/ ()) tutorial
+          -- Prism is in prerender so that it doesn't muck with the DOM until hydration is finished.
+          -- It's here rather than in the head such that it runs when switching to this page with JS.
+          prerender_ blank $ elAttr "script" ("type" =: "text/javascript" <> "src" =: static @"js/prism.js") blank
         Route_Resources -> sectionPage (Route_Resources :/ ()) resources
       el "footer" footer
-      -- Prism is in prerender so that it doesn't muck with the DOM until hydration is finished.
-      prerender_ blank $ elAttr "script" ("type" =: "text/javascript" <> "src" =: static @"js/prism.js") blank
   }
