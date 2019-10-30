@@ -23,7 +23,7 @@ tutorial = Section
   { _section_title = "Tutorial"
   , _section_content = do
     elClass "p" "description" $ text "This tutorial assumes a functional familiarity with Haskell."
-  , _section_subsections = [getStarted, settingUpNix, obTutorial, summary]
+  , _section_subsections = [getStarted, obTutorial, summary]
   }
 
 getStarted :: DomBuilder t m => Section m
@@ -33,7 +33,7 @@ getStarted = Section
     elClass "p" "description" $ text "This tutorial will walk you through the installation of Nix and Obelisk, and then set you up with the Reflex library."
     el "p" $ text "Once Nix is downloaded and we’re running Obelisk, we will build a simple functional reactive calculator that can be used in a web browser. Even if you don’t plan to build a calculator for your own project, this tutorial is helpful as it teaches the fundamentals of building a Reflex application. A familiarity with this process will make developing other applications much easier."
     el "p" $ text "If you already have Nix and Obelisk up and running, feel free to skip down to the Overview, or even straight to the tutorial if you're itching to write some code."
-  , _section_subsections = [theBuild]
+  , _section_subsections = [theBuild, settingUpNix, obelisk]
   }
 
 theBuild :: DomBuilder t m => Section m
@@ -110,13 +110,6 @@ settingUpNix = Section
   , _section_subsections = []
   }
 
-obTutorial :: DomBuilder t m => Section m
-obTutorial = Section
-  { _section_title = "Tutorial"
-  , _section_content = blank
-  , _section_subsections = [obelisk, basicsOfDOM, dynamicsAndEvents, numberInput, adding, multipleOps, dynAttrs]
-  }
-
 obelisk :: DomBuilder t m => Section m
 obelisk = Section
   { _section_title = "Developing in Obelisk"
@@ -127,6 +120,13 @@ obelisk = Section
     snippet "bash" "ob run"
     unfinished "TODO" $ text "*bridge* -not me"
   , _section_subsections = []
+  }
+
+obTutorial :: DomBuilder t m => Section m
+obTutorial = Section
+  { _section_title = "Tutorial"
+  , _section_content = blank
+  , _section_subsections = [basicsOfDOM, dynamicsAndEvents, numberInput, adding, multipleOps, dynAttrs]
   }
 
 basicsOfDOM :: DomBuilder t m => Section m
