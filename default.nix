@@ -14,4 +14,13 @@ project ./. ({ pkgs, hackGet, ... }: {
     obelisk-google-analytics = hackGet deps/obelisk-google-analytics;
     tutorial = hackGet deps/calculator-tutorial + "/tutorial";
   };
+
+  overrides = with pkgs.haskell.lib; self: super: {
+    conduit = dontCheck super.conduit;
+    mmark = dontCheck super.mmark;
+    mono-traversable = dontCheck super.mono-traversable;
+    unliftio = dontCheck super.unliftio;
+    yaml = dontCheck super.yaml;
+  };
+
 })

@@ -28,6 +28,9 @@ library
                , text
                , universe
                , tutorial
+               , template-haskell
+               , haskell-src-exts
+               , haskell-src-meta
   if impl(ghcjs)
     build-depends: ghcjs-base
   exposed-modules:
