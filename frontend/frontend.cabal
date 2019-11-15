@@ -27,6 +27,7 @@ library
                , obelisk-generated-static
                , text
                , universe
+               , tutorial
   if impl(ghcjs)
     build-depends: ghcjs-base
   exposed-modules:
@@ -42,6 +43,7 @@ library
     Frontend.Page.Resources
     Frontend.Page.Home
     Frontend.Page.Tutorial
+    Frontend.QQ
   ghc-options: -Wall
 
 executable frontend

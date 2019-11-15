@@ -7,18 +7,22 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE TemplateHaskell #-}
 
 module Frontend.Page.Tutorial (tutorial) where
 
-import Reflex.Dom
+import Control.Monad.Fix
 import Obelisk.Route.Frontend
-import Obelisk.Generated.Static
+import Reflex.Dom
+import qualified Data.Text as T
 import qualified NeatInterpolation as NI
 
 import Common.Route
 import Frontend.CommonWidgets
+import Frontend.QQ
+import Tutorial
 
-tutorial :: (DomBuilder t m, RouteToUrl (R Route) m, SetRoute t (R Route) m, Prerender js t m) => Section m
+tutorial :: (MonadFix m, PostBuild t m, MonadHold t m, DomBuilder t m, RouteToUrl (R Route) m, SetRoute t (R Route) m, Prerender js t m) => Section m
 tutorial = Section
   { _section_title = "Tutorial"
   , _section_content = do
@@ -33,7 +37,7 @@ getStarted = Section
     elClass "p" "description" $ text "This tutorial will walk you through the installation of Nix and Obelisk, and then set you up with the Reflex library."
     el "p" $ text "Once Nix is downloaded and we’re running Obelisk, we will build a simple functional reactive calculator that can be used in a web browser. Even if you don’t plan to build a calculator for your own project, this tutorial is helpful as it teaches the fundamentals of building a Reflex application. A familiarity with this process will make developing other applications much easier."
     el "p" $ text "If you already have Nix and Obelisk up and running, feel free to skip down to the Overview, or even straight to the tutorial if you're itching to write some code."
-  , _section_subsections = [theBuild, settingUpNix, obelisk]
+  , _section_subsections = [theBuild, settingUpNix]
   }
 
 theBuild :: DomBuilder t m => Section m
@@ -41,7 +45,11 @@ theBuild = Section
   { _section_title = "The Build"
   , _section_content = do
     el "p" $ do
-      text "In this tutorial, we’ll walk through the steps of building a functional reactive calculator with Reflex for use in a web browser.  You can see what that will look like "
+      text "In this example, we’ll be following "
+      extLink "http://weblog.luite.com/wordpress/?p=127" $ text "Luite Stegeman's lead"
+      text " and building a simple functional reactive calculator to be used in a web browser."
+    el "p" $ do
+      text "You can see what that will look like "
       unfinished "link" $ text "here"
       text ". If you scroll down and don’t see any code that makes sense to you, don’t worry, it will! The goal of this tutorial is to guide you through the basics of functional reactive programming and the Reflex syntax, all will be explained as we go along."
     el "p" $ do
@@ -110,64 +118,71 @@ settingUpNix = Section
   , _section_subsections = []
   }
 
-obelisk :: DomBuilder t m => Section m
-obelisk = Section
+obTutorial :: (MonadFix m, PostBuild t m, MonadHold t m, DomBuilder t m) => Section m
+obTutorial = Section
+  { _section_title = "Tutorial"
+  , _section_content = blank
+  , _section_subsections = [developingInObelisk, basicsOfDOM, dynamicsAndEvents, numberInputSection, adding, multipleOps, dynAttrs]
+  }
+
+developingInObelisk :: DomBuilder t m => Section m
+developingInObelisk = Section
   { _section_title = "Developing in Obelisk"
   , _section_content = do
     el "p" $ text "To create a new Obelisk project, go to an empty directory and run:"
     snippet "bash" "ob init"
     el "p" $ text "Obelisk leverages ghcid to provide a live-reloading server that handles both the frontend and backend. To run your Obelisk app and monitor the source for changes, run:"
     snippet "bash" "ob run"
-    unfinished "TODO" $ text "*bridge* -not me"
+    el "p" $ text "You can run this tutorial by:"
+    el "ol" $ do
+      el "li" $ do
+        el "p" $ unfinished "not really this repo?" $ text "Cloning this repository."
+        snippet "bash" "git clone git@github.com:reflex-frp/reflex-calculator-tutorial"
+      el "li" $ do
+        el "p" $ do
+          text "Running the application with the "
+          hs "ob"
+          text " command."
+        snippet "bash" [NI.text|
+          cd reflex-calculator-tutorial
+          ob run
+        |]
+      el "li" $ do
+        el "p" $ do
+          text "Navigating to "
+          monospace "http://localhost:8000"
+          text ". If you want to run it at a different hostname or port, modify the "
+          monospace "config/common/route"
+          text " configuration file."
+      el "p" $ do
+        text "While "
+        monospace "ob run"
+        text " is running the application, any changes to this source file will cause the code to be reloaded and the application to be restarted. If the changes have introduced any errors or warnings, you'll see those in the "
+        monospace "ob run"
+        text " window. Tinker away!"
+    el "p" $ do
+      text "Over the course of this tutorial, we're going to progressively build a calculator application. Each step in the process of constructing the calculator will be a numbered function in this document. For example, the first function is "
+      monospace "tutorial1"
+      text ", below."
+    el "p" $ do
+      text "To see what the code in "
+      monospace "tutorial1"
+      text " does when it runs, you can navigate to "
+      extLink "localhost:8000/tutorial/1" $ text "/tutorial/1"
+      text ". The same applies to any other numbered function: just change the number at the end of the url to match that of the function you'd like to see in action."
   , _section_subsections = []
-  }
-
-obTutorial :: DomBuilder t m => Section m
-obTutorial = Section
-  { _section_title = "Tutorial"
-  , _section_content = blank
-  , _section_subsections = [basicsOfDOM, dynamicsAndEvents, numberInput, adding, multipleOps, dynAttrs]
   }
 
 basicsOfDOM :: DomBuilder t m => Section m
 basicsOfDOM = Section
   { _section_title = "The Basics of DOM"
   , _section_content = do
-    el "p" $ text "Reflex’s companion library (Reflex DOM), contains a number of functions used to build and interact with the Document Object Model. Let’s start by getting a basic app up and running."
-    snippet "haskell line-numbers" [NI.text|
-      {-# LANGUAGE OverloadedStrings #-}
-      import Reflex.Dom
-      main = mainWidget $ el "div" $ text "Welcome to Reflex"
-    |]
-    el "p" $ unfinished "convert to obelisk" $ do
-      text "Save this file as "
-      monospace "source.hs"
-      text " and compile it by running "
-      monospace "ghcjs source.hs"
-      text ". If you’ve entered everything correctly, this will produce a folder named "
-      monospace "source.jsexe"
-      text " in the same directory as "
-      monospace "source.hs"
-      text "."
-    el "p" $ do
-      text "Navigate to this folder in your file manager and open "
-      monospace "index.html"
-      text " using your browser. The browser should show a page with the text “Welcome to Reflex”."
-    el "p" $ do
-      text "Most Reflex apps will start the same way: a call to "
-      hs "mainWidget"
-      text " with a starting widget"
-      text "."
-    el "p" $ do
-      text "A widget is some DOM wrapped up for easy use with Reflex. In this tutorial, we are building the argument to "
-      hs "mainWidget"
-      text " (AKA, our starting Widget), on the same line."
+    el "p" $ text "Reflex’s companion library, Reflex DOM, contains a number of functions used to build and interact with the Document Object Model. Let’s start by getting a basic app up and running."
+    demoSnippet tutorial1 tutorial1_code
     el "p" $ do
       hs "el"
       text " has the type signature:"
-    snippet "haskell" [NI.text|
-      el :: DomBuilder t m => Text -> m a -> m a
-    |]
+    snippet "haskell" $(typeSignature id 'el)
     el "p" $ do
       text "The first argument to "
       hs "el"
@@ -206,7 +221,7 @@ basicsOfDOM = Section
         text " argument, it'll work itself out."
     el "p" $ do
       text "In our example, "
-      hs [NI.text|el "div" $ text "Welcome to Reflex"|]
+      monospace "tutorial1"
       text ", the first argument to "
       hs "el"
       text " was "
@@ -220,9 +235,7 @@ basicsOfDOM = Section
       text ". The type signature of "
       hs "Text"
       text " is:"
-    snippet "haskell" [NI.text|
-      text :: DomBuilder t m => Text -> m ()
-    |]
+    snippet "haskell" $(typeSignature id 'text)
     el "p" $ do
       hs "text"
       text " takes a "
@@ -234,32 +247,16 @@ basicsOfDOM = Section
       text ", we could have used "
       hs "el"
       text " here as well to continue building arbitrarily complex DOM. For instance, if we wanted to make an unordered list:"
-    snippet "haskell line-numbers" [NI.text|
-      {-# LANGUAGE OverloadedStrings #-}
-      import Reflex.Dom
-
-      main = mainWidget $ el "div" $ do
-        el "p" $ text "Reflex is:"
-        el "ul" $ do
-          el "li" $ text "Efficient"
-          el "li" $ text "Higher-order"
-          el "li" $ text "Glitch-free"
-    |]
+    demoSnippet tutorial2 tutorial2_code
   , _section_subsections = []
   }
 
-dynamicsAndEvents :: DomBuilder t m => Section m
+dynamicsAndEvents :: (PostBuild t m, DomBuilder t m) => Section m
 dynamicsAndEvents = Section
   { _section_title = "Dynamics and Events"
   , _section_content = do
     el "p" $ text "Of course, we want to do more than just view a static webpage. Let’s start by getting some user input and then printing it."
-    snippet "haskell line-numbers" [NI.text|
-      {-# LANGUAGE OverloadedStrings #-}
-      import Reflex.Dom
-      main = mainWidget $ el "div" $ do
-        t <- inputElement def
-        dynText $ _inputElement_value t
-    |]
+    demoSnippet tutorial3 tutorial3_code
     el "p" $ do
       text "Running this in your browser, you’ll see that it produces a "
       monospace "div"
@@ -273,11 +270,7 @@ dynamicsAndEvents = Section
     el "p" $ do
       hs "InputElement"
       text " is a function with the following type:"
-    snippet "haskell" [NI.text|
-      inputElement :: DomBuilder t m
-        => InputElementConfig er t (DomBuilderSpace m)
-        -> m (InputElement er (DomBuilderSpace m) t)
-    |]
+    snippet "haskell" $(typeSignature argPerLine 'inputElement)
     el "p" $ do
       text "It takes an "
       hs "InputElementConfig"
@@ -286,18 +279,7 @@ dynamicsAndEvents = Section
       text ". The "
       hs "InputElement"
       text " exposes the following functionality:"
-    snippet "haskell" [NI.text|
-      data InputElement er d t = InputElement
-        { _inputElement_value :: Dynamic t Text
-        , _inputElement_checked :: Dynamic t Bool
-        , _inputElement_checkedChange :: Event t Bool
-        , _inputElement_input :: Event t Text
-        , _inputElement_hasFocus :: Dynamic t Bool
-        , _inputElement_element :: Element er d t
-        , _inputElement_raw :: RawInputElement d
-        , _inputElement_files :: Dynamic t [File]
-        }
-    |]
+    snippet "haskell" $(typeSignature id ''InputElement)
     el "p" $ do
       text "Here we are using "
       hs "_inputElement_value"
@@ -317,24 +299,12 @@ dynamicsAndEvents = Section
   , _section_subsections = []
   }
 
-numberInput :: DomBuilder t m => Section m
-numberInput = Section
+numberInputSection :: (PostBuild t m, DomBuilder t m) => Section m
+numberInputSection = Section
   { _section_title = "A Number Input"
   , _section_content = do
     el "p" $ text "A calculator was promised, we know. We'll start building the calculator now by creating an input for numbers."
-    snippet "haskell line-numbers" [NI.text|
-      {-# LANGUAGE OverloadedStrings #-}
-      import Reflex
-      import Reflex.Dom
-      import Data.Map (Map)
-      import qualified Data.Map as Map
-
-      main = mainWidget $ el "div" $ do
-        t <- inputElement $ def
-          & inputElementConfig_initialValue .~ "0"
-          & inputElementConfig_elementConfig .  elementConfig_initialAttributes .~ ("type" =: "number")
-        dynText $ _inputElement_value t
-    |]
+    demoSnippet tutorial4 tutorial4_code
     el "p" $ do
       text "The code above overrides some of the default values of the "
       hs "InputElementConfig"
@@ -402,26 +372,7 @@ numberInput = Section
       text " to actually display the "
       hs "Text"
       text "."
-    snippet "haskell line-numbers" [NI.text|
-      {-# LANGUAGE OverloadedStrings #-}
-      import Reflex.Dom
-      import Data.Map (Map)
-      import qualified Data.Map as Map
-      import Data.Text (pack, unpack)
-      import Text.Read (readMaybe)
-
-      main = mainWidget $ el "div" $ do
-        x <- numberInput
-        let numberString = fmap (pack . show) x
-        dynText numberString
-
-      numberInput :: DomBuilder t m => m (Dynamic t (Maybe Double))
-      numberInput = do
-        n <- inputElement $ def
-          & inputElementConfig_initialValue .~ "0"
-          & inputElementConfig_elementConfig .  elementConfig_initialAttributes .~ ("type" =: "number")
-        return . fmap (readMaybe . unpack) $ _inputElement_value n
-    |]
+    demoSnippet tutorial5 tutorial5_code
     el "p" $ do
       text "Running the app at this point should produce an input and some text showing the "
       hs "Maybe Double"
@@ -433,7 +384,7 @@ numberInput = Section
   , _section_subsections = []
   }
 
-adding :: DomBuilder t m => Section m
+adding :: (DomBuilder t m, PostBuild t m) => Section m
 adding = Section
   { _section_title = "Adding"
   , _section_content = do
@@ -441,30 +392,7 @@ adding = Section
       text "Now that we have "
       hs "numberInput"
       text " we can put together a couple of inputs to make a basic calculator."
-    snippet "haskell line-numbers" [NI.text|
-      {-# LANGUAGE OverloadedStrings #-}
-      import Reflex.Dom
-      import Data.Map (Map)
-      import qualified Data.Map as Map
-      import Data.Text (pack, unpack)
-      import Text.Read (readMaybe)
-
-      main = mainWidget $ el "div" $ do
-        nx <- numberInput
-        text " + "
-        ny <- numberInput
-        text " = "
-        let result = zipDynWith (\x y -> (+) <$> x <*> y) nx ny
-            resultString = fmap (pack . show) result
-        dynText resultString
-
-      numberInput :: DomBuilder t m => m (Dynamic t (Maybe Double))
-      numberInput = do
-        n <- inputElement $ def
-          & inputElementConfig_initialValue .~ "0"
-          & inputElementConfig_elementConfig .  elementConfig_initialAttributes .~ ("type" =: "number")
-        return . fmap (readMaybe . unpack) $ _inputElement_value n
-    |]
+    demoSnippet tutorial6 tutorial6_code
     el "p" $ do
       hs "numberInput"
       text " hasn’t changed here. Our "
@@ -474,9 +402,7 @@ adding = Section
       text " is used to produce the actual sum of the values of the inputs. The type signature of "
       hs "zipDynWith"
       text " is:"
-    snippet "haskell" [NI.text|
-      Reflex t => (a -> b -> c) -> Dynamic t a -> Dynamic t b -> Dynamic t c
-    |]
+    snippet "haskell" $(typeSignature id 'zipDynWith)
     el "p" $ do
       text "You can see that it takes a function that combines two pure values and produces some other pure value, and two "
       hs "Dynamic"
@@ -508,7 +434,7 @@ adding = Section
   , _section_subsections = []
   }
 
-multipleOps :: DomBuilder t m => Section m
+multipleOps :: (MonadFix m, DomBuilder t m, MonadHold t m, PostBuild t m) => Section m
 multipleOps = Section
   { _section_title = "Supporting Multiple Operations"
   , _section_content = do
@@ -516,10 +442,7 @@ multipleOps = Section
       text "Next, we’ll add support for other operations. We’re going to add a dropdown so that the user can select the operation to apply. The function "
       hs "dropdown"
       text " has the type: "
-    snippet "haskell" [NI.text|
-      dropdown :: (DomBuilder t m, MonadFix m, MonadHold t m, PostBuild t m, Ord k)
-        => k -> Dynamic t (Map k Text) -> DropdownConfig t k -> m (Dropdown t k)
-    |]
+    snippet "haskell" $(typeSignature contextNewline 'dropdown)
     el "p" $ do
       text "The first argument is the initial value of the "
       hs "Dropdown"
@@ -572,44 +495,7 @@ multipleOps = Section
       text " by using "
       hs "_dropdown_value"
       text "."
-    snippet "haskell line-numbers" [NI.text|
-      {-# LANGUAGE OverloadedStrings #-}
-      import Reflex
-      import Reflex.Dom
-      import Data.Map (Map)
-      import qualified Data.Map as Map
-      import Data.Text (pack, unpack, Text)
-      import Text.Read (readMaybe)
-
-      main = mainWidget $ el "div" $ do
-        nx <- numberInput
-        d <- dropdown Times (constDyn ops) def
-        ny <- numberInput
-        let values = zipDynWith (,) nx ny
-            result = zipDynWith (\o (x,y) -> runOp o <$> x <*> y) (_dropdown_value d) values
-            resultText = fmap (pack . show) result
-        text " = "
-        dynText resultText
-
-      numberInput :: DomBuilder t m => m (Dynamic t (Maybe Double))
-      numberInput = do
-        n <- inputElement $ def
-          & inputElementConfig_initialValue .~ "0"
-          & inputElementConfig_elementConfig . elementConfig_initialAttributes .~ ("type" =: "number")
-        return . fmap (readMaybe . unpack) $ _inputElement_value n
-
-      data Op = Plus | Minus | Times | Divide deriving (Eq, Ord)
-
-      ops :: Map Op Text
-      ops = Map.fromList [(Plus, "+"), (Minus, "-"), (Times, "*"), (Divide, "/")]
-
-      runOp :: Fractional a => Op -> a -> a -> a
-      runOp s = case s of
-        Plus -> (+)
-        Minus -> (-)
-        Times -> (*)
-        Divide -> (/)
-    |]
+    demoSnippet tutorial7 tutorial7_code
     el "p" $ do
       text "This is our complete program. We've added an uninteresting function "
       hs "runOp"
@@ -664,29 +550,14 @@ multipleOps = Section
   , _section_subsections = []
   }
 
-dynAttrs :: DomBuilder t m => Section m
+dynAttrs :: (MonadFix m, DomBuilder t m, MonadHold t m, PostBuild t m) => Section m
 dynAttrs = Section
   { _section_title = "Dynamic Element Attribute"
   , _section_content = do
     el "p" $ text "Let’s spare a thought for the user of our calculator and add a little UI styling. Our number input currently looks like this:"
-    snippet "haskell" [NI.text|
-      numberInput :: DomBuilder t m => m (Dynamic t (Maybe Double))
-      numberInput = do
-        n <- inputElement $ def
-          & inputElementConfig_initialValue .~ "0"
-          & inputElementConfig_elementConfig . elementConfig_initialAttributes .~ ("type" =: "number")
-        return . fmap (readMaybe . unpack) $ _inputElement_value n
-    |]
+    demoSnippet numberInput_1 numberInput_1_code
     el "p" $ text "Let’s give it some html attributes to work with:"
-    snippet "haskell" [NI.text|
-      numberInput :: DomBuilder t m => m (Dynamic t (Maybe Double))
-      numberInput = do
-        let initAttrs = (("type" =: "number") <> ("style" =: "border-color: blue"))
-        n <- inputElement $ def
-          & inputElementConfig_initialValue .~ "0"
-          & inputElementConfig_elementConfig . elementConfig_initialAttributes .~ initAttrs
-        return . fmap (readMaybe . unpack) $ _inputElement_value n
-    |]
+    demoSnippet numberInput_2 numberInput_2_code
     el "p" $ do
       text "Here, we’re used a "
       hs "Map Text Text"
@@ -699,27 +570,7 @@ dynAttrs = Section
       text " blue, let’s change it’s colour based on whether the input successfully parses to a "
       hs "Double"
       text ":"
-    snippet "haskell line-numbers" [NI.text|
-      {-# LANGUAGE RecursiveDo #-}
-      ...
-      numberInput :: DomBuilder t m => m (Dynamic t (Maybe Double))
-      numberInput = do
-        let initAttrs = ("type" =: "number") <> (style False)
-            color error = if error then "red" else "green"
-            style error = "style" =: ("border-color: " <> color error)
-            styleChange :: Maybe Double -> Map AttributeName (Maybe Text)
-            styleChange result = case result of
-              Just _ -> fmap Just (style False)
-              Nothing -> fmap Just (style True)
-        rec
-          n <- inputElement $ def
-            & inputElementConfig_initialValue .~ "0"
-            & inputElementConfig_elementConfig .  elementConfig_initialAttributes .~ initAttrs
-            & inputElementConfig_elementConfig .  elementConfig_modifyAttributes .~ modAttrEv
-          let result = fmap (readMaybe . unpack) $ _inputElement_value n
-              modAttrEv = fmap styleChange (updated result)
-        return result
-    |]
+    demoSnippet numberInput numberInput_code
     el "p" $ do
       text "Note that we need to add a language pragma here to enable the "
       hs "RecursiveDo"
@@ -771,56 +622,9 @@ dynAttrs = Section
       hs "Event"
       text " to modify the attributes."
     el "p" $ text "The complete program now looks like this:"
-    snippet "haskell line-numbers" [NI.text|
-      {-# LANGUAGE OverloadedStrings #-}
-      {-# LANGUAGE RecursiveDo #-}
-      import Reflex
-      import Reflex.Dom
-      import Data.Map (Map)
-      import qualified Data.Map as Map
-      import Data.Text (pack, unpack, Text)
-      import Text.Read (readMaybe)
 
-      main = mainWidget $ el "div" $ do
-        nx <- numberInput
-        d <- dropdown Times (constDyn ops) def
-        ny <- numberInput
-        let values = zipDynWith (,) nx ny
-            result = zipDynWith (\o (x,y) -> runOp o <$> x <*> y) (_dropdown_value d) values
-            resultText = fmap (pack . show) result
-        text " = "
-        dynText resultText
+    demoSnippet tutorial8 $ T.unlines [numberInput_code, tutorial8_code]
 
-      numberInput :: DomBuilder t m => m (Dynamic t (Maybe Double))
-      numberInput = do
-        let initAttrs = ("type" =: "number") <> (style False)
-            color error = if error then "red" else "green"
-            style error = "style" =: ("border-color: " <> color error)
-            styleChange :: Maybe Double -> Map AttributeName (Maybe Text)
-            styleChange result = case result of
-              Just _ -> fmap Just (style False)
-              Nothing -> fmap Just (style True)
-        rec
-          n <- inputElement $ def
-            & inputElementConfig_initialValue .~ "0"
-            & inputElementConfig_elementConfig .  elementConfig_initialAttributes .~ initAttrs
-            & inputElementConfig_elementConfig .  elementConfig_modifyAttributes .~ modAttrEv
-          let result = fmap (readMaybe . unpack) $ _inputElement_value n
-              modAttrEv = fmap styleChange (updated result)
-        return result
-
-      data Op = Plus | Minus | Times | Divide deriving (Eq, Ord)
-
-      ops :: Map Op Text
-      ops = Map.fromList [(Plus, "+"), (Minus, "-"), (Times, "*"), (Divide, "/")]
-
-      runOp :: Fractional a => Op -> a -> a -> a
-      runOp s = case s of
-        Plus -> (+)
-        Minus -> (-)
-        Times -> (*)
-        Divide -> (/)
-    |]
     el "p" $ text "The input border colors will now change depending on their value."
   , _section_subsections = []
   }

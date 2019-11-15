@@ -1,0 +1,7 @@
+{
+  "url": "ssh://git@github.com/obsidiansystems/calculator-tutorial.git",
+  "rev": "27afe7631109b287ebc84b7852c1d522bd55e491",
+  "sha256": "0zw5kjyicfmag9ihbgdfcz2is0mqhv7bypl4ix1yq0f5q3dv3ajr",
+  "fetchSubmodules": false,
+  "branch": "ts-qq"
+}

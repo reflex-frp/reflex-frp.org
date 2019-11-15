@@ -3,7 +3,7 @@
 , withHoogle ? false
 }:
 with import ./.obelisk/impl { inherit system iosSdkVersion; };
-project ./. ({ hackGet, ... }: {
+project ./. ({ pkgs, hackGet, ... }: {
   inherit withHoogle;
   android.applicationId = "systems.obsidian.obelisk.examples.minimal";
   android.displayName = "Obelisk Minimal Example";
@@ -12,5 +12,6 @@ project ./. ({ hackGet, ... }: {
 
   packages = {
     obelisk-google-analytics = hackGet deps/obelisk-google-analytics;
+    tutorial = hackGet deps/calculator-tutorial + "/tutorial";
   };
 })

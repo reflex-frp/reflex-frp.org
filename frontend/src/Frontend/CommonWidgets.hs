@@ -7,6 +7,7 @@
 
 module Frontend.CommonWidgets where
 
+import Control.Monad (void)
 import Data.Foldable (for_)
 import Data.Text (Text)
 import Obelisk.Route.Frontend
@@ -69,6 +70,11 @@ sectionPage r mainSection = el "main" $ do
       goSections (prec + 1) $ _section_subsections section
     header (i :: Int) t = elAttr h ("id" =: titleFragment t) $ text t
       where h = "h" <> T.pack (show $ min 6 $ max 1 i)
+
+demoSnippet :: DomBuilder t m => m a -> Text -> m ()
+demoSnippet m code = do
+  snippet "haskell line-numbers" code
+  void m
 
 -- | Code snippet
 snippet :: DomBuilder t m => Text -> Text -> m ()
