@@ -71,7 +71,7 @@ metaKeywords = "name" =: "keywords"
 
 viewport :: Map Text Text
 viewport = "name" =: "viewport"
-        <> "content" =: "width=device-width, initial-scale=1"
+        <> "content" =: "width=device-width, initial-scale=1, maximum-scale=1.0, minimum-scale=1.0"
 
 --  styleSheet are functions to add links to html <head>
 styleSheet :: DomBuilder t m => Text -> m ()
