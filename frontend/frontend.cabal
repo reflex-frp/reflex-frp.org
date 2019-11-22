@@ -2,7 +2,6 @@ name: frontend
 version: 0.1
 cabal-version: >= 1.8
 build-type: Simple
-extra-source-files: app.pde
 
 library
   hs-source-dirs: src
@@ -14,7 +13,6 @@ library
                , file-embed
                , font-awesome-type
                , ghcjs-dom
-               , jsaddle
                , lens
                , mtl
                , neat-interpolation

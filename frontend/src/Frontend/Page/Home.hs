@@ -16,8 +16,6 @@ import Data.Text (Text)
 import Obelisk.Generated.Static
 import Obelisk.Route.Frontend
 import Reflex.Dom
-import qualified JavaScript.Array as JS
-import qualified Language.Javascript.JSaddle as JS
 
 home :: (DomBuilder t m, RouteToUrl (R Route) m, SetRoute t (R Route) m, Prerender js t m) => m ()
 home = do
@@ -30,27 +28,6 @@ home = do
 
 slogan :: (DomBuilder t m, RouteToUrl (R Route) m, SetRoute t (R Route) m, Prerender js t m) => m ()
 slogan = divClass "jumbotron" $ do
-  prerender_ blank $ do
-    (canvas, _) <- el' "canvas" blank
-    JS.liftJSM $ do
-      -- Processing will continue running in the background when the user
-      -- switches routes. Also, the data-processing-sources method of loading
-      -- sketches doesn't work automagically when we create elements with JS.
-      -- Instead, we create the instances manually, making sure to keep track of
-      -- the previous instances so that we can end them before making new ones.
-      -- They stick around between JS page views, so if the user switches back
-      -- and forth to this page repeatedly the page will slow to a crawl.
-      instances <- JS.SomeJSArray <$> JS.jsg @Text "processingInstances"
-      JS.lengthIO instances >>= \case
-        0 -> pure ()
-        _ -> JS.pop instances >>= \i -> void $ i JS.# ("exit" :: Text) $ ()
-      i <- JS.new (JS.jsg @Text "Processing")
-        ( _element_raw canvas
-        , $(embedStringFile =<< makeRelativeToProject "app.pde") :: Text
-        )
-      JS.push i instances
-      pure ()
-    pure ()
   elClass "h1" "tagline" $ text "The world changes," >> el "br" blank >> text "your apps should keep up."
   callToAction ""
 
