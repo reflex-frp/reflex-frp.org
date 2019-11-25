@@ -24,10 +24,13 @@ import Obelisk.Route.Frontend
 import Obelisk.Generated.Static
 import Reflex.Dom.Core
 
+import qualified Data.Map as Map
+import Data.Text (Text)
+
 frontend :: Frontend (R Route)
 frontend = Frontend
   { _frontend_head = pageHead
-  , _frontend_body = do
+  , _frontend_body = minWidth "1140px" $ do
       el "header" nav
       subRoute_ $ \case
         Route_Home -> home
@@ -40,3 +43,6 @@ frontend = Frontend
         Route_Resources -> sectionPage (Route_Resources :/ ()) resources
       el "footer" footer
   }
+
+minWidth :: DomBuilder t m => Text -> m a -> m a
+minWidth txt = elAttr "div" (Map.singleton "min-width" txt)

@@ -10,8 +10,6 @@
 module Frontend.Page.Home (home) where
 
 import Common.Route
-import Control.Monad (void)
-import Data.FileEmbed (makeRelativeToProject, embedStringFile)
 import Data.Text (Text)
 import Obelisk.Generated.Static
 import Obelisk.Route.Frontend
