@@ -45,4 +45,4 @@ frontend = Frontend
   }
 
 minWidth :: DomBuilder t m => Text -> m a -> m a
-minWidth txt = elAttr "div" (Map.singleton "min-width" txt)
+minWidth txt = elAttr "div" (Map.singleton "style" $ "min-width: " <> txt)
