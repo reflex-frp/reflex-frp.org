@@ -26,6 +26,8 @@ pageHead = do
   styleSheet $ static @"css/font.css"
   styleSheet $ static @"css/style.css"
   styleSheet $ static @"css/icomoon.css"
+  -- TODO don't vendor for calculator-tutorial repo
+  styleSheet $ static @"calculator/style.css"
   styleSheet $ "https://fonts.googleapis.com/css?family=Poppins&display=swap"
   styleSheet $ "https://fonts.googleapis.com/css?family=DM+Serif+Display&display=swap"
   styleSheet $ "https://fonts.googleapis.com/css?family=Roboto+Mono&display=swap"
