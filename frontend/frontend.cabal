@@ -26,6 +26,7 @@ library
                , text
                , universe
                , tutorial
+               , mmark
                , template-haskell
                , haskell-src-exts
                , haskell-src-meta
