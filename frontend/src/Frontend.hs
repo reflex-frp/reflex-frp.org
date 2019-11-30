@@ -36,7 +36,7 @@ frontend = Frontend
         Route_Home -> home
         Route_GetStarted -> sectionPage (Route_GetStarted :/ ()) getStarted
         Route_Tutorial -> do
-          sectionPage (Route_Tutorial :/ ()) tutorial
+          el "main" $ el "article" $ tutorial
           -- Prism is in prerender so that it doesn't muck with the DOM until hydration is finished.
           -- It's here rather than in the head such that it runs when switching to this page with JS.
           prerender_ blank $ elAttr "script" ("type" =: "text/javascript" <> "src" =: static @"js/prism.js") blank

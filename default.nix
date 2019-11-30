@@ -2,8 +2,12 @@
 , iosSdkVersion ? "10.2"
 , withHoogle ? false
 }:
+
 with import ./.obelisk/impl { inherit system iosSdkVersion; };
-project ./. ({ pkgs, hackGet, ... }: {
+
+project ./. ({ pkgs, hackGet, ... }: let
+  tutorialSrc = hackGet deps/calculator-tutorial;
+in {
   inherit withHoogle;
   android.applicationId = "systems.obsidian.obelisk.examples.minimal";
   android.displayName = "Obelisk Minimal Example";
@@ -12,7 +16,10 @@ project ./. ({ pkgs, hackGet, ... }: {
 
   packages = {
     obelisk-google-analytics = hackGet deps/obelisk-google-analytics;
-    tutorial = hackGet deps/calculator-tutorial + "/tutorial";
+    tutorial = tutorialSrc + "/tutorial";
+    # TODO make overlay or something in that repo
+    mmark = hackGet (tutorialSrc + "/dep/mmark");
+    modern-uri = hackGet (tutorialSrc + "/dep/modern-uri");
   };
 
   overrides = with pkgs.haskell.lib; self: super: {
@@ -21,6 +28,7 @@ project ./. ({ pkgs, hackGet, ... }: {
     mono-traversable = dontCheck super.mono-traversable;
     unliftio = dontCheck super.unliftio;
     yaml = dontCheck super.yaml;
+    modern-uri = pkgs.haskell.lib.doJailbreak super.modern-uri;
   };
 
 })

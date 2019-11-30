@@ -23,7 +23,35 @@ import qualified Data.Text as T
 import qualified Language.Haskell.Exts as Exts
 import qualified Language.Haskell.Meta as Meta
 
-import Tutorial.QQ (parseMode)
+parseMode :: Exts.ParseMode
+parseMode = Exts.defaultParseMode
+    { Exts.baseLanguage = Exts.Haskell2010
+    , Exts.fixities = Just $ concat
+      [ Exts.preludeFixities
+      , Exts.baseFixities
+      , Exts.infixl_ 8 ["^?", "^."]
+      , Exts.infixl_ 7 ["=:"]
+      , Exts.infixr_ 4 ["%~", ".~", "?~", "<>~"]
+      , Exts.infixl_ 1 ["&"]
+      ]
+    , Exts.extensions = Exts.EnableExtension <$> knownExtensions
+    }
+
+knownExtensions :: [Exts.KnownExtension]
+knownExtensions =
+  [ Exts.DataKinds
+  , Exts.ExistentialQuantification
+  , Exts.ExplicitForAll
+  , Exts.GADTs
+  , Exts.LambdaCase
+  , Exts.MultiParamTypeClasses
+  , Exts.RecordWildCards
+  , Exts.RecursiveDo
+  , Exts.ScopedTypeVariables
+  , Exts.TypeApplications
+  , Exts.TypeFamilies
+  , Exts.TemplateHaskell
+  ]
 
 example :: QuasiQuoter
 example = QuasiQuoter
