@@ -25,7 +25,7 @@ library
                , obelisk-generated-static
                , text
                , universe
-               , tutorial
+               , tutorial-frontend
                , mmark
                , template-haskell
                , haskell-src-exts
