@@ -18,8 +18,8 @@ in {
     obelisk-google-analytics = hackGet deps/obelisk-google-analytics;
     tutorial = tutorialSrc + "/tutorial";
     # TODO make overlay or something in that repo
-    mmark = hackGet (tutorialSrc + "/dep/mmark");
-    modern-uri = hackGet (tutorialSrc + "/dep/modern-uri");
+    mmark = hackGet ./deps/mmark);
+    modern-uri = hackGet ./deps/modern-uri);
   };
 
   overrides = with pkgs.haskell.lib; self: super: {
