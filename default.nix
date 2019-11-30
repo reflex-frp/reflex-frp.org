@@ -43,5 +43,4 @@ in {
       cp -rL tutorial-frontend/* $out/
     '') {};
   };
-
 })
