@@ -24,11 +24,11 @@ in {
 
   overrides = with pkgs.haskell.lib; self: super: {
     conduit = dontCheck super.conduit;
-    mmark = if self.ghc.isGhcjs or false then pkgs.haskell.lib.dontHaddock super.mmark else super.mmark;
+    mmark = if self.ghc.isGhcjs or false then dontHaddock super.mmark else super.mmark;
     mono-traversable = dontCheck super.mono-traversable;
     unliftio = dontCheck super.unliftio;
     yaml = dontCheck super.yaml;
-    modern-uri = pkgs.haskell.lib.doJailbreak super.modern-uri;
+    modern-uri = doJailbreak super.modern-uri;
   };
 
 })
