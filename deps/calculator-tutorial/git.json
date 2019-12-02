@@ -1,7 +1,7 @@
 {
   "url": "ssh://git@github.com/obsidiansystems/calculator-tutorial.git",
-  "rev": "ea4f2bd2eba6c600483ad0943d4f5bb41ed9ebea",
-  "sha256": "0zk0pzf59r46984rck7zai5rylc1kf6ddbzy10rvmsibbhrg576c",
+  "rev": "9cc7f57f0dbca596a7b4c90637a6af3be1fdffb0",
+  "sha256": "179qbxzshh8vgdrwas6r06ddsickgqvc6f8v7bvq8z48cwjcf97f",
   "fetchSubmodules": false,
-  "branch": "aa-reunify"
+  "branch": "master"
 }
