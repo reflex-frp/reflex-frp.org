@@ -1,5 +1,9 @@
 input {
     margin: 10px;
+    /* This is a workaround viewport scaling on mobile making the default
+     * border too small. In the future when the design is more properly
+     * responsive this shouldn't be needed.
+     */
     border-radius: 3px;
 }
 
