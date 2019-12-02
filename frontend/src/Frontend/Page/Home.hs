@@ -69,7 +69,7 @@ benefits = do
   article "right" (static @"img/graphics/undraw_code_typing_7jnv.svg") "Never lost in translation." $ do
     elClass "p" "description" $ text "Reflex platform allows you to write entirely in Haskell, everywhere. Using one language does away with client / server protocol mismatches and separate engineering teams. Code becomes easier to write, with fewer kinds of bugs possible."
   article "left" (static @"img/graphics/undraw_good_team_m7uu.svg") "Jump the complexity wall." $ do
-    elClass "p" "description" $ text "As you add to your codebase it inevitably becomes more complex, but it shouldn’t become harder to manage. No matter the size of your App, Reflex allows for individual pieces of code to be independently understandable."
+    elClass "p" "description" $ text "As you add to your codebase, it inevitably becomes more complex, but it shouldn’t become harder to manage. No matter the size of your App, Reflex allows for individual pieces of code to be independently understandable."
   article "right" (static @"img/graphics/undraw_investment_xv9d.svg") "Code for the only constant." $ do
     elClass "p" "description" $ text "The only constants are time and change, what if your code could account for them? Functional reactive programming lets you write code that understands real world dynamics as naturally as you do, but isn’t any harder to write."
   article "left" (static @"img/graphics/undraw_to_the_moon_v1mv.svg") "Batteries included." $ do
