@@ -103,7 +103,7 @@ learnReflexFRP = Section
       (titleFragment $ _section_title (haskellForBeginners :: Section m))
       (text "‘Haskell for Beginners’")
     text "."
-  , _section_subsections = [reflexBasics, reflexExamples, reflexExtended, haskellForBeginners, theTutorial]
+  , _section_subsections = [reflexBasics, reflexExtended, haskellForBeginners, theTutorial]
   }
 
 reflexBasics :: DomBuilder t m => Section m
@@ -120,26 +120,6 @@ reflexBasics = Section
         text "Watch this video on "
         extLink "https://www.youtube.com/watch?v=mYvkcskJbc4" $ text "the basics of FRP"
         text "."
-  , _section_subsections = []
-  }
-
-reflexExamples :: DomBuilder t m => Section m
-reflexExamples = Section
-  { _section_title = "Reflex Examples"
-  , _section_content = do
-    el "p" $ text "There is an abundance of resources available as you become more familiar with FRP, beginning with some basic examples of Reflex in use."
-    el "p" $ do
-      text "You can toy with a "
-      unfinished "outdated" $ extLink "https://examples.reflex-frp.org/examples/basictodo" $ text "basic to-do list"
-      text ", a "
-      unfinished "outdated" $ extLink "https://examples.reflex-frp.org/examples/filereader" $ text "file reader"
-      text ", and an "
-      unfinished "outdated" $ extLink "https://examples.reflex-frp.org/examples/screenkeyboard" $ text "on-screen keyboard"
-      text ", as well as many other examples, all made with Reflex using Obelisk."
-    el "p" $ do
-      text "Get tinkering with any of these examples in less than 5 minutes by downloading "
-      extLink "https://github.com/obsidiansystems/obelisk" $ text "Obelisk"
-      text ". Run them locally to get a feel for Reflex, or even use them as a starting point for building your own application."
   , _section_subsections = []
   }
 
