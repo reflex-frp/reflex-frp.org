@@ -1,3 +1,7 @@
+input {
+    margin: 10px;
+}
+
 .calculator {
     display: flex;
     flex-direction: column;
