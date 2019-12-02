@@ -111,6 +111,7 @@ a:active { color: var(--visited); }
 .jumbotron {
   position: relative;
   margin-top: -160px;
+  min-height: 650px;
   height: 100vh;
   display: flex;
   flex-direction: column;

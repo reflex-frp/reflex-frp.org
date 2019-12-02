@@ -25,7 +25,7 @@ home = do
   callToAction "" --TODO: The bottom-of-page call-to-action should probably be different from the top-of-page one
 
 slogan :: (DomBuilder t m, RouteToUrl (R Route) m, SetRoute t (R Route) m, Prerender js t m) => m ()
-slogan = elAttr "div" ("class" =: "jumbotron" <> "style" =: "min-height:650px") $ do
+slogan = divClass "jumbotron" $ do
   elClass "h1" "tagline" $ text "The world changes," >> el "br" blank >> text "your apps should keep up."
   callToAction ""
   learnMore
