@@ -21,7 +21,7 @@ import Frontend.Page.Tutorial
 import Obelisk.Frontend
 import Obelisk.Route
 import Obelisk.Route.Frontend
-import Obelisk.Generated.Static
+import Obelisk.Frontend.GoogleAnalytics
 import Reflex.Dom.Core
 
 import qualified Data.Map as Map
@@ -30,7 +30,7 @@ import Data.Text (Text)
 frontend :: Frontend (R Route)
 frontend = Frontend
   { _frontend_head = pageHead
-  , _frontend_body = minWidth "1140px" $ do
+  , _frontend_body = runGoogleAnalyticsT id $ minWidth "1140px" $ do
       el "header" nav
       subRoute_ $ \case
         Route_Home -> home

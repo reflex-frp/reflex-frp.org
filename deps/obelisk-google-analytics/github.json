@@ -1,7 +1,7 @@
 {
   "owner": "obsidiansystems",
   "repo": "obelisk-google-analytics",
-  "branch": "master",
-  "rev": "ad3dfdf82a6723c6a1db6fe931094cb639680e5a",
-  "sha256": "0lkx4nsclhygjdidm2lxrynknsg88sx6z5g2xq0s9fz7vnx83924"
+  "branch": "ls-gtag-binding",
+  "rev": "bd40d8aa1d46fd673f2a2549572e00927ef0b33a",
+  "sha256": "1nn5ix8y5vajmpv3pdzm6bdhmssidfwyfkvj7a8xvlxlnql35jvy"
 }

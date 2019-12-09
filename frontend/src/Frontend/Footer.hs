@@ -4,12 +4,13 @@
 module Frontend.Footer (footer) where
 
 import Obelisk.Route.Frontend
+import Obelisk.Frontend.GoogleAnalytics
 import Reflex.Dom
 
 import Common.Route
 import Frontend.CommonWidgets
 
-footer :: (RouteToUrl (R Route) m, SetRoute t (R Route) m, DomBuilder t m, Prerender js t m) => m ()
+footer :: (Analytics t GtagJSCall m, RouteToUrl (R Route) m, SetRoute t (R Route) m, DomBuilder t m, Prerender js t m) => m ()
 footer = do
   reflexLogo
   elClass "section" "social" $ do
