@@ -30,11 +30,11 @@ import Data.Text (Text)
 frontend :: Frontend (R Route)
 frontend = Frontend
   { _frontend_head = pageHead
-  , _frontend_body = runGoogleAnalyticsT id $ minWidth "1140px" $ do
+  , _frontend_body = mapRoutedT (runGoogleAnalyticsT id) $ minWidth "1140px" $ do
       el "header" nav
       subRoute_ $ \case
         Route_Home -> home
-        Route_GetStarted -> sectionPage (Route_GetStarted :/ ()) getStarted
+        Route_GetStarted ->  sectionPage (Route_GetStarted :/ ()) getStarted
         Route_Tutorial -> do
           el "main" $ el "article" $ tutorial
           -- Prism is in prerender so that it doesn't muck with the DOM until hydration is finished.
