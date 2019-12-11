@@ -1,5 +1,6 @@
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE ScopedTypeVariables #-}
 
 module Frontend.Footer (footer) where
 
@@ -10,7 +11,7 @@ import Reflex.Dom
 import Common.Route
 import Frontend.CommonWidgets
 
-footer :: (Analytics t GtagJSCall m, RouteToUrl (R Route) m, SetRoute t (R Route) m, DomBuilder t m, Prerender js t m) => m ()
+footer :: forall js t m. (Analytics t GtagJSCall m, RouteToUrl (R Route) m, SetRoute t (R Route) m, DomBuilder t m, Prerender js t m) => m ()
 footer = do
   reflexLogo
   elClass "section" "social" $ do
@@ -27,4 +28,7 @@ footer = do
       extLink "https://reddit.com/r/reflexfrp" $ text "Reddit"
       extLink "http://webchat.freenode.net?channels=%23reflex-frp&uio=d4" $ text "#reflex-frp on IRC"
   where
-    externalLinkWithTitle title url = elAttr "a" ("href" =: url <> "title" =: title)
+    externalLinkWithTitle title url m = do
+      (e,a) <- elAttr' "a" ("href" =: url <> "target" =: "_blank" <> "rel" =: "noopener" <> "title" =: title) $ m
+      tellAnalytics (gaOutboundClickEvent url <$ (domEvent Click e :: Event t ()))
+      return a

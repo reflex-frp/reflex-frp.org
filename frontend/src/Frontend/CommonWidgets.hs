@@ -7,7 +7,6 @@
 
 module Frontend.CommonWidgets where
 
-import Data.Aeson (toJSON)
 import Control.Monad (void)
 import Data.Foldable (for_)
 import Data.Text (Text)
@@ -20,14 +19,8 @@ import Obelisk.Frontend.GoogleAnalytics
 extLink :: forall t m a. (Analytics t GtagJSCall m, DomBuilder t m) => Text -> m a -> m a
 extLink href m = do
   (e,a) <- elAttr' "a" ("href" =: href <> "target" =: "_blank" <> "rel" =: "noopener") $ m
-  tellAnalytics (gtagCall <$ (domEvent Click e :: Event t ()))
+  tellAnalytics (gaOutboundClickEvent href <$ (domEvent Click e :: Event t ()))
   return a
-  where
-    gtagCall = GtagJSCall
-      { _GtagJSCall_Event_method = "event"
-      , _GtagJSCall_Event_action = "view_item"
-      , _GtagJSCall_Event_params = toJSON (("item"::Text) =: href)
-      }
 
 -- | TODO this is for marking up unfinished parts in an obvious fashion. It
 -- should be removed
