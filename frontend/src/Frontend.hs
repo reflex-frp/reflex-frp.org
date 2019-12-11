@@ -19,10 +19,12 @@ import Frontend.Page.Resources
 import Frontend.Page.Tutorial
 
 import Obelisk.Frontend
+import Obelisk.Generated.Static
 import Obelisk.Route
 import Obelisk.Route.Frontend
 import Obelisk.Frontend.GoogleAnalytics
 import Reflex.Dom.Core
+
 
 import qualified Data.Map as Map
 import Data.Text (Text)
