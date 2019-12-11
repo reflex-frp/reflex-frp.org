@@ -39,8 +39,6 @@ library
     Frontend.Footer
     Frontend.Head
     Frontend.Nav
-    Frontend.Page.Documentation
-    Frontend.Page.Examples
     Frontend.Page.GetStarted
     Frontend.Page.Resources
     Frontend.Page.Home

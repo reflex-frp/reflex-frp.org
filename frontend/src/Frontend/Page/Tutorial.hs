@@ -71,20 +71,3 @@ tutorial
      )
   => m ()
 tutorial = renderReflex' id parsedTutorial
-
-summary :: (DomBuilder t m, RouteToUrl (R Route) m, SetRoute t (R Route) m, Prerender js t m) => Section m
-summary = Section
-  { _section_title = "In Summary"
-  , _section_content = do
-    el "p" $ text "Congratulations! You’ve written a simple functional reactive calculator with Reflex!"
-    el "p" $ text "We hope that you now feel confident in your understanding of Reflex, and are ready to begin working on your own project."
-    el "p" $ text "If you have additional time or just want to continue practicing your new Reflex skills, here are some ideas for improvements that you could make to the calculator:"
-    el "ol" $ do
-      el "li" $ el "p" $ unfinished "unfinished" $ text "how to put calculator on your phone"
-    el "p" $ do
-      text "Again, nice work on making it to the end of this tutorial, if you have any additional questions, check out our "
-      routeLinkScrollToTop (Route_Resources :/ ()) $ text "resources page"
-      text "."
-    el "p" $ text "Happy Coding!"
-  , _section_subsections = []
-  }
