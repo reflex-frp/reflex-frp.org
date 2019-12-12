@@ -9,6 +9,7 @@ module Frontend.CommonWidgets where
 
 import Control.Monad (void)
 import Data.Foldable (for_)
+import Data.Map (Map)
 import Data.Text (Text)
 import Obelisk.Route.Frontend
 import Obelisk.Generated.Static
@@ -16,11 +17,15 @@ import Reflex.Dom
 import qualified Data.Text as T
 import Obelisk.Frontend.GoogleAnalytics
 
-extLink :: forall t m a. (Analytics t GtagJSCall m, DomBuilder t m) => Text -> m a -> m a
-extLink href m = do
-  (e,a) <- elAttr' "a" ("href" =: href <> "target" =: "_blank" <> "rel" =: "noopener") $ m
+extLink :: forall t m a. (Analytics t m, DomBuilder t m) => Text -> m a -> m a
+extLink = extLinkAttr mempty
+
+extLinkAttr :: forall t m a. (Analytics t m, DomBuilder t m) => Map Text Text -> Text -> m a -> m a
+extLinkAttr attrs href m = do
+  (e,a) <- elAttr' "a" ("href" =: href <> attrs <> "target" =: "_blank" <> "rel" =: "noopener") m
   tellAnalytics (gaOutboundClickEvent href <$ (domEvent Click e :: Event t ()))
   return a
+
 
 -- | TODO this is for marking up unfinished parts in an obvious fashion. It
 -- should be removed

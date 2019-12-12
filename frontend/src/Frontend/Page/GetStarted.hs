@@ -1,22 +1,20 @@
 {-# LANGUAGE DataKinds #-}
-{-# LANGUAGE GADTs #-}
 {-# LANGUAGE FlexibleContexts #-}
-{-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE GADTs #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE TypeOperators #-}
 
 module Frontend.Page.GetStarted (getStarted) where
 
 import Obelisk.Route.Frontend
-import Obelisk.Frontend.GoogleAnalytics(Analytics, GtagJSCall)
+import Obelisk.Frontend.GoogleAnalytics (Analytics)
 import Reflex.Dom
 import Frontend.CommonWidgets
 
 import Common.Route
 
-getStarted :: (Analytics t GtagJSCall m, DomBuilder t m, RouteToUrl (R Route) m, SetRoute t (R Route) m, Prerender js t m) => Section m
+getStarted :: (Analytics t m, DomBuilder t m, RouteToUrl (R Route) m, SetRoute t (R Route) m, Prerender js t m) => Section m
 getStarted = Section
   { _section_title = "Getting Started"
   , _section_content = do
@@ -28,14 +26,14 @@ getStarted = Section
   , _section_subsections = [tryReflexFRP, learnReflexFRP]
   }
 
-tryReflexFRP :: (Analytics t GtagJSCall m, DomBuilder t m) => Section m
+tryReflexFRP :: (Analytics t m, DomBuilder t m) => Section m
 tryReflexFRP = Section
   { _section_title = "Try Reflex-FRP"
   , _section_content = elClass "p" "description" $ text "The Reflex ecosystem was created by developers, for developers, to provide a better way to build apps. No matter what you’re working on, it can benefit from Reflex. Here are a few ways to incorporate Reflex-FRP into your project:"
   , _section_subsections = [createANewApp, buildAFrontend, convertExistingApp, testDrive]
   }
 
-createANewApp :: (Analytics t GtagJSCall m, DomBuilder t m) => Section m
+createANewApp :: (Analytics t m, DomBuilder t m) => Section m
 createANewApp = Section
   { _section_title = "Create a New Reflex App"
   , _section_content = do
@@ -50,7 +48,7 @@ createANewApp = Section
   , _section_subsections = []
   }
 
-buildAFrontend :: (Analytics t GtagJSCall m, DomBuilder t m) => Section m
+buildAFrontend :: (Analytics t m, DomBuilder t m) => Section m
 buildAFrontend = Section
   { _section_title = "Build a Frontend in Reflex"
   , _section_content = do
@@ -67,7 +65,7 @@ buildAFrontend = Section
   , _section_subsections = []
   }
 
-convertExistingApp :: (Analytics t GtagJSCall m, DomBuilder t m) => Section m
+convertExistingApp :: (Analytics t m, DomBuilder t m) => Section m
 convertExistingApp = Section
   { _section_title = "Convert Parts of an Existing App to Reflex"
   , _section_content = do
@@ -80,7 +78,7 @@ convertExistingApp = Section
   , _section_subsections = []
   }
 
-testDrive :: (Analytics t GtagJSCall m, DomBuilder t m) => Section m
+testDrive :: (Analytics t m, DomBuilder t m) => Section m
 testDrive = Section
   { _section_title = "Take FRP for a Test Drive"
   , _section_content = do
@@ -95,7 +93,7 @@ testDrive = Section
   , _section_subsections = []
   }
 
-learnReflexFRP :: forall js t m. (Analytics t GtagJSCall m, DomBuilder t m, SetRoute t (R Route) m, RouteToUrl (R Route) m, Prerender js t m) => Section m
+learnReflexFRP :: forall js t m. (Analytics t m, DomBuilder t m, SetRoute t (R Route) m, RouteToUrl (R Route) m, Prerender js t m) => Section m
 learnReflexFRP = Section
   { _section_title = "Learn Reflex-FRP"
   , _section_content = elClass "p" "description" $ do
@@ -107,7 +105,7 @@ learnReflexFRP = Section
   , _section_subsections = [reflexBasics, reflexExtended, haskellForBeginners, theTutorial]
   }
 
-reflexBasics :: (Analytics t GtagJSCall m, DomBuilder t m) => Section m
+reflexBasics :: (Analytics t m, DomBuilder t m) => Section m
 reflexBasics = Section
   { _section_title = "Reflex-FRP Basics"
   , _section_content = do
@@ -124,7 +122,7 @@ reflexBasics = Section
   , _section_subsections = []
   }
 
-reflexExtended :: (Analytics t GtagJSCall m, DomBuilder t m) => Section m
+reflexExtended :: (Analytics t m, DomBuilder t m) => Section m
 reflexExtended = Section
   { _section_title = "Reflex Extended Education"
   , _section_content = do
@@ -143,7 +141,7 @@ reflexExtended = Section
   , _section_subsections = []
   }
 
-haskellForBeginners :: (Analytics t GtagJSCall m, DomBuilder t m) => Section m
+haskellForBeginners :: (Analytics t m, DomBuilder t m) => Section m
 haskellForBeginners = Section
   { _section_title = "Haskell for Beginners"
   , _section_content = do
@@ -158,7 +156,7 @@ haskellForBeginners = Section
   , _section_subsections = []
   }
 
-theTutorial :: (Analytics t GtagJSCall m, DomBuilder t m, SetRoute t (R Route) m, RouteToUrl (R Route) m, Prerender js t m) => Section m
+theTutorial :: (Analytics t m, DomBuilder t m, SetRoute t (R Route) m, RouteToUrl (R Route) m, Prerender js t m) => Section m
 theTutorial = Section
   { _section_title = "The Tutorial"
   , _section_content = do

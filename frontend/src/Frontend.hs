@@ -29,7 +29,7 @@ import Reflex.Dom.Core
 frontend :: Frontend (R Route)
 frontend = Frontend
   { _frontend_head = pageHead
-  , _frontend_body = mapRoutedT (runGoogleAnalyticsT id) $ minWidth "1140px" $ do
+  , _frontend_body = mapRoutedT runGoogleAnalyticsT $ minWidth "1140px" $ do
       el "header" nav
       subRoute_ $ \case
         Route_Home -> home

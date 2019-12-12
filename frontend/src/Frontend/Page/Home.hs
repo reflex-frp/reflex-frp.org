@@ -16,7 +16,7 @@ import Obelisk.Route.Frontend
 import Obelisk.Frontend.GoogleAnalytics
 import Reflex.Dom
 
-home :: (DomBuilder t m, RouteToUrl (R Route) m, SetRoute t (R Route) m, Prerender js t m, Analytics t GtagJSCall m) => m ()
+home :: (DomBuilder t m, RouteToUrl (R Route) m, SetRoute t (R Route) m, Prerender js t m, Analytics t m) => m ()
 home = do
   slogan
   elClass "hr" "short top-container" blank
@@ -25,7 +25,7 @@ home = do
   benefits
   callToAction "" --TODO: The bottom-of-page call-to-action should probably be different from the top-of-page one
 
-slogan :: forall js t m. (DomBuilder t m, RouteToUrl (R Route) m, SetRoute t (R Route) m, Prerender js t m, Analytics t GtagJSCall m) => m ()
+slogan :: forall js t m. (DomBuilder t m, RouteToUrl (R Route) m, SetRoute t (R Route) m, Prerender js t m, Analytics t m) => m ()
 slogan = divClass "jumbotron" $ do
   (e,_) <- elClass' "h1" "tagline" $ text "The world changes," >> el "br" blank >> text "your apps should keep up."
   tellAnalytics (gaClickEvent "internal" "jumbotron" <$ (domEvent Click e :: Event t ()))

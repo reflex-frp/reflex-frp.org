@@ -15,7 +15,7 @@ import Data.Text (Text)
 import Reflex.Dom
 import Frontend.CommonWidgets
 
-resources :: (Analytics t GtagJSCall m, DomBuilder t m) => Section m
+resources :: (Analytics t m, DomBuilder t m) => Section m
 resources = Section
   { _section_title = "Resources"
   , _section_content = do
@@ -29,12 +29,12 @@ data LinkItem m = LinkItem
   , _linkItem_description :: m ()
   }
 
-linksList :: (Analytics t GtagJSCall m, DomBuilder t m) => [LinkItem m] -> m ()
+linksList :: (Analytics t m, DomBuilder t m) => [LinkItem m] -> m ()
 linksList links = elClass "dl" "links" $ for_ links $ \li -> do
   el "dt" $ extLink (_linkItem_link li) $ text $ _linkItem_title li
   el "dd" $ _linkItem_description li
 
-guides :: (Analytics t GtagJSCall m, DomBuilder t m) => Section m
+guides :: (Analytics t m, DomBuilder t m) => Section m
 guides = Section
   { _section_title = "Guides"
   , _section_content = do
@@ -84,7 +84,7 @@ guides = Section
   , _section_subsections = []
   }
 
-workshops :: (Analytics t GtagJSCall m, DomBuilder t m) => Section m
+workshops :: (Analytics t m, DomBuilder t m) => Section m
 workshops = Section
   { _section_title = "Workshops"
   , _section_content = do
@@ -98,7 +98,7 @@ workshops = Section
   , _section_subsections = []
   }
 
-presentations :: (Analytics t GtagJSCall m, DomBuilder t m) => Section m
+presentations :: (Analytics t m, DomBuilder t m) => Section m
 presentations = Section
   { _section_title = "Presentations"
   , _section_content = do
@@ -117,7 +117,7 @@ presentations = Section
   , _section_subsections = []
   }
 
-discussionForums :: (Analytics t GtagJSCall m, DomBuilder t m) => Section m
+discussionForums :: (Analytics t m, DomBuilder t m) => Section m
 discussionForums = Section
   { _section_title = "Discussion Forums"
   , _section_content = do
@@ -136,7 +136,7 @@ discussionForums = Section
   , _section_subsections = []
   }
 
-downloads :: (Analytics t GtagJSCall m, DomBuilder t m) => Section m
+downloads :: (Analytics t m, DomBuilder t m) => Section m
 downloads = Section
   { _section_title = "Downloads"
   , _section_content = do
@@ -175,7 +175,7 @@ downloads = Section
   , _section_subsections = []
   }
 
-frpExtras :: (Analytics t GtagJSCall m, DomBuilder t m) => Section m
+frpExtras :: (Analytics t m, DomBuilder t m) => Section m
 frpExtras = Section
   { _section_title = "FRP Extras"
   , _section_content = do
