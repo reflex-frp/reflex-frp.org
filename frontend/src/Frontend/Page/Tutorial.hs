@@ -1,25 +1,20 @@
 {-# LANGUAGE DataKinds #-}
-{-# LANGUAGE GADTs #-}
 {-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE GADTs #-}
 {-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE QuasiQuotes #-}
-{-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE TypeApplications #-}
-{-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE PatternGuards #-}
-{-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE TypeOperators #-}
 
 module Frontend.Page.Tutorial (tutorial) where
 
 import Control.Arrow ((&&&))
 import Control.Monad.Fix
-import Obelisk.Route.Frontend
 import Reflex.Dom
 import qualified Data.Text as T
 import qualified Text.MMark.Internal.Type as MMark
 
-import Common.Route
 import Frontend.CommonWidgets
 import Reflex.MMark.Render
 import Tutorial
@@ -58,33 +53,13 @@ renderReflex' f md = mapM_ (either f rBlock) md
       = fix defaultBlockRender
       . fmap rInlines
     rInlines
-      = (MMark.mkOisInternal &&& mapM_ (fix defaultInlineRender))
+      = MMark.mkOisInternal &&& mapM_ (fix defaultInlineRender)
 
 tutorial
   :: ( MonadFix m
      , PostBuild t m
      , MonadHold t m
      , DomBuilder t m
-     , RouteToUrl (R Route) m
-     , SetRoute t (R Route) m
-     , Prerender js t m
      )
   => m ()
 tutorial = renderReflex' id parsedTutorial
-
-summary :: (DomBuilder t m, RouteToUrl (R Route) m, SetRoute t (R Route) m, Prerender js t m) => Section m
-summary = Section
-  { _section_title = "In Summary"
-  , _section_content = do
-    el "p" $ text "Congratulations! You’ve written a simple functional reactive calculator with Reflex!"
-    el "p" $ text "We hope that you now feel confident in your understanding of Reflex, and are ready to begin working on your own project."
-    el "p" $ text "If you have additional time or just want to continue practicing your new Reflex skills, here are some ideas for improvements that you could make to the calculator:"
-    el "ol" $ do
-      el "li" $ el "p" $ unfinished "unfinished" $ text "how to put calculator on your phone"
-    el "p" $ do
-      text "Again, nice work on making it to the end of this tutorial, if you have any additional questions, check out our "
-      routeLinkScrollToTop (Route_Resources :/ ()) $ text "resources page"
-      text "."
-    el "p" $ text "Happy Coding!"
-  , _section_subsections = []
-  }

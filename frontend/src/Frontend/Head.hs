@@ -12,9 +12,9 @@ import Obelisk.Generated.Static
 import Reflex.Dom
 import Obelisk.Route.Frontend
 
-pageHead :: (Routed t r m, DomBuilder t m, Prerender js t m, PerformEvent t m, HasConfigs m) => m ()
+pageHead :: (Routed t r m, DomBuilder t m, Prerender js t m, HasConfigs m) => m ()
 pageHead = do
-  -- googleAnalyticsFromConfig
+  googleAnalyticsFromConfig
   elAttr "base" ("href" =: "/") blank --TODO: Update obelisk to automatically inject this
   el "title" $ text "Reflex FRP"
   elAttr "meta" metaDesc blank
