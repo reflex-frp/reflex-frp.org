@@ -1,25 +1,20 @@
 {-# LANGUAGE DataKinds #-}
-{-# LANGUAGE GADTs #-}
 {-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE GADTs #-}
 {-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE QuasiQuotes #-}
-{-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE TypeApplications #-}
-{-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE PatternGuards #-}
-{-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE TypeOperators #-}
 
 module Frontend.Page.Tutorial (tutorial) where
 
 import Control.Arrow ((&&&))
 import Control.Monad.Fix
-import Obelisk.Route.Frontend
 import Reflex.Dom
 import qualified Data.Text as T
 import qualified Text.MMark.Internal.Type as MMark
 
-import Common.Route
 import Frontend.CommonWidgets
 import Reflex.MMark.Render
 import Tutorial
@@ -58,16 +53,13 @@ renderReflex' f md = mapM_ (either f rBlock) md
       = fix defaultBlockRender
       . fmap rInlines
     rInlines
-      = (MMark.mkOisInternal &&& mapM_ (fix defaultInlineRender))
+      = MMark.mkOisInternal &&& mapM_ (fix defaultInlineRender)
 
 tutorial
   :: ( MonadFix m
      , PostBuild t m
      , MonadHold t m
      , DomBuilder t m
-     , RouteToUrl (R Route) m
-     , SetRoute t (R Route) m
-     , Prerender js t m
      )
   => m ()
 tutorial = renderReflex' id parsedTutorial
