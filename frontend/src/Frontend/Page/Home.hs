@@ -27,14 +27,14 @@ home = do
 
 slogan :: forall js t m. (DomBuilder t m, RouteToUrl (R Route) m, SetRoute t (R Route) m, Prerender js t m, Analytics t m) => m ()
 slogan = divClass "jumbotron" $ do
-  (e,_) <- elClass' "h1" "tagline" $ text "The world changes," >> el "br" blank >> text "your apps should keep up."
-  tellAnalytics (gaClickEvent "internal" "jumbotron" <$ (domEvent Click e :: Event t ()))
+  elClass "h1" "tagline" $ text "The world changes," >> el "br" blank >> text "your apps should keep up."
   callToAction ""
   learnMore
 
-callToAction :: (DomBuilder t m, RouteToUrl (R Route) m, SetRoute t (R Route) m, Prerender js t m) => Text -> m ()
+callToAction :: forall js t m. (DomBuilder t m, RouteToUrl (R Route) m, SetRoute t (R Route) m, Prerender js t m, Analytics t m) => Text -> m ()
 callToAction c = do
-  divClass ("call-to-action " <> c) $ routeLinkScrollToTop (Route_GetStarted :/ ()) $ text "Checkout the Get Started guide"
+  (e, _) <- divClass ("call-to-action " <> c) $ routeLinkScrollToTop' (Route_GetStarted :/ ()) $ text "Checkout the Get Started guide"
+  tellAnalytics (gaClickEvent "engagement" "jumbotron" <$ (domEvent Click e :: Event t ()))
 
 learnMore :: DomBuilder t m => m ()
 learnMore = do

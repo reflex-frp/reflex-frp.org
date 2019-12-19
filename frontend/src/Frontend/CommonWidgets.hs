@@ -36,13 +36,16 @@ reflexLogo :: DomBuilder t m => m ()
 reflexLogo = elAttr "img" ("class" =: "reflex-logo" <> "src" =: static @"img/logo.svg" <> "alt" =: "Reflex") blank
 
 routeFragment
-  :: (DomBuilder t m, RouteToUrl r m)
+  :: forall t m r a . (DomBuilder t m, RouteToUrl r m, Analytics t m)
   => r -> Text -> m a -> m a
 routeFragment r frag w = do
   enc <- askRouteToUrl
-  elAttr "a" ("href" =: (enc r <> "#" <> frag)) w
+  let href = enc r <> "#" <> frag
+  (e, a) <- elAttr' "a" ("href" =: href) w
+  tellAnalytics (gaClickEvent "engagement" href <$ (domEvent Click e :: Event t ()))
+  return a
 
-tableOfContents :: (DomBuilder t m, RouteToUrl r m) => r -> Section m -> m ()
+tableOfContents :: (DomBuilder t m, RouteToUrl r m, Analytics t m) => r -> Section m -> m ()
 tableOfContents r topSection = el "ul" $ do
   el "li" $ titleLink $ _section_title topSection
   go $ _section_subsections topSection
@@ -62,7 +65,7 @@ data Section m = Section
   }
 
 sectionPage
-  :: (DomBuilder t m, RouteToUrl r m)
+  :: (DomBuilder t m, RouteToUrl r m, Analytics t m)
   => r -> Section m -> m ()
 sectionPage r mainSection = el "main" $ do
   header 1 $ _section_title mainSection
