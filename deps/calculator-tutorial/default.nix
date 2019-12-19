@@ -1,4 +1,7 @@
 # DO NOT HAND-EDIT THIS FILE
-let fetchGit = {url, rev, ref ? null, branch ? null, sha256 ? null, fetchSubmodules ? null}:
-  assert !fetchSubmodules; (import <nixpkgs> {}).fetchgit { inherit url rev sha256; };
-in import (fetchGit (builtins.fromJSON (builtins.readFile ./git.json)))
+import ((import <nixpkgs> {}).fetchFromGitHub (
+  let json = builtins.fromJSON (builtins.readFile ./github.json);
+  in { inherit (json) owner repo rev sha256;
+       private = json.private or false;
+     }
+))

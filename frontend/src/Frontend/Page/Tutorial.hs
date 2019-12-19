@@ -17,11 +17,13 @@ import qualified Text.MMark.Internal.Type as MMark
 
 import Frontend.CommonWidgets
 import Reflex.MMark.Render
+import Obelisk.Frontend.GoogleAnalytics
+import qualified Text.URI as URI
 import Tutorial
 import Tutorial.Markdown
 
 parsedTutorial
-  :: (MonadFix m, PostBuild t m, MonadHold t m, DomBuilder t m)
+  :: (MonadFix m, PostBuild t m, MonadHold t m, DomBuilder t m, Analytics t m)
   => [Either (m ()) MMark.Bni]
 parsedTutorial = go =<< parsedMarkdown
   where
@@ -43,7 +45,7 @@ parsedTutorial = go =<< parsedMarkdown
       block -> [Right block]
 
 renderReflex'
-  :: DomBuilder t m
+  :: (DomBuilder t m, Analytics t m)
   => (x -> m ())
   -> [Either x MMark.Bni]
   -> m ()
@@ -53,13 +55,17 @@ renderReflex' f md = mapM_ (either f rBlock) md
       = fix defaultBlockRender
       . fmap rInlines
     rInlines
-      = MMark.mkOisInternal &&& mapM_ (fix defaultInlineRender)
+      = MMark.mkOisInternal &&& mapM_ (fix $ defaultInlineRender rLink)
+    rLink url mtitle
+      = let attrs = maybe mempty ("title" =:) mtitle
+         in extLinkAttr attrs (URI.render url)
 
 tutorial
   :: ( MonadFix m
      , PostBuild t m
      , MonadHold t m
      , DomBuilder t m
+     , Analytics t m
      )
   => m ()
 tutorial = renderReflex' id parsedTutorial
