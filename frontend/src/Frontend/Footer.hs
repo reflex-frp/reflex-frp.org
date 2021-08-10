@@ -26,4 +26,5 @@ footer = do
       routeLinkScrollToTop (Route_Resources :/ ()) $ text "Resources"
     category "Community" $ do
       extLink "https://reddit.com/r/reflexfrp" $ text "Reddit"
-      extLink "http://webchat.freenode.net?channels=%23reflex-frp&uio=d4" $ text "#reflex-frp on IRC"
+      extLink "https://web.libera.chat?channels=%23reflex-frp&uio=d4" $ text "#reflex-frp on IRC"
+
