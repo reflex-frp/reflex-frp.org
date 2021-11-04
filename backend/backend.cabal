@@ -15,8 +15,6 @@ library
                , modern-uri
                , obelisk-backend
                , obelisk-backend
-               , obelisk-executable-config
-               , obelisk-executable-config-inject
                , obelisk-route
                , text
   exposed-modules:
@@ -34,19 +32,5 @@ executable backend
                , lens
                , modern-uri
                , obelisk-backend
-               , obelisk-executable-config
-               , obelisk-executable-config-inject
                , obelisk-route
                , text
-
-executable youtubepreviews
-  main-is: src-bin/youtubepreviews.hs
-  if impl(ghcjs)
-    buildable: false
-  build-depends: base
-               , bytestring
-               , common
-               , HTTP
-               , network-uri
-               , text
-               , universe

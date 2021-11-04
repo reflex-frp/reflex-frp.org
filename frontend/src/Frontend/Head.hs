@@ -6,11 +6,15 @@ module Frontend.Head (pageHead) where
 import Data.Map (Map)
 import Data.Text
 import qualified Data.Text as T
+import Obelisk.Configs
+import Obelisk.Frontend.GoogleAnalytics
 import Obelisk.Generated.Static
 import Reflex.Dom
+import Obelisk.Route.Frontend
 
-pageHead :: DomBuilder t m => m ()
+pageHead :: (Routed t r m, DomBuilder t m, Prerender js t m, HasConfigs m) => m ()
 pageHead = do
+  googleAnalyticsFromConfig
   elAttr "base" ("href" =: "/") blank --TODO: Update obelisk to automatically inject this
   el "title" $ text "Reflex FRP"
   elAttr "meta" metaDesc blank
@@ -21,6 +25,15 @@ pageHead = do
   styleSheet $ static @"css/fontawesome.min.css"
   styleSheet $ static @"css/font.css"
   styleSheet $ static @"css/style.css"
+  styleSheet $ static @"css/icomoon.css"
+  -- TODO don't vendor for calculator-tutorial repo
+  styleSheet $ static @"calculator/style.css"
+  styleSheet $ "https://fonts.googleapis.com/css?family=Poppins&display=swap"
+  styleSheet $ "https://fonts.googleapis.com/css?family=DM+Serif+Display&display=swap"
+  styleSheet $ "https://fonts.googleapis.com/css?family=Roboto+Mono&display=swap"
+  elAttr "script" ("type" =: "text/javascript" <> "src" =: static @"js/processing.min.js") blank
+  styleSheet $ static @"css/prism.css"
+
 
 -- | Link to icons for this page (favicons, etc.)
 pageIcons :: DomBuilder t m => m ()
@@ -60,7 +73,7 @@ metaKeywords = "name" =: "keywords"
 
 viewport :: Map Text Text
 viewport = "name" =: "viewport"
-        <> "content" =: "width=device-width, initial-scale=1"
+        <> "content" =: "width=device-width"
 
 --  styleSheet are functions to add links to html <head>
 styleSheet :: DomBuilder t m => Text -> m ()

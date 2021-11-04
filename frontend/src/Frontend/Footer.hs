@@ -1,18 +1,29 @@
+{-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+
 module Frontend.Footer (footer) where
 
-import Control.Monad (forM_)
-import Frontend.FontAwesome
+import Obelisk.Frontend.GoogleAnalytics
+import Obelisk.Route.Frontend
 import Reflex.Dom
 
-footer :: DomBuilder t m => m ()
+import Common.Route
+import Frontend.CommonWidgets
+
+footer :: forall js t m. (Analytics t m, RouteToUrl (R Route) m, SetRoute t (R Route) m, DomBuilder t m, Prerender js t m) => m ()
 footer = do
-  let links =
-        [ ("Hackage", "https://hackage.haskell.org/package/reflex")
-        , ("#reflex-frp", "https://web.libera.chat/")
-        ]
-  forM_ links $ \(name, url) -> elAttr "a" ("href" =: url) $ text name
-  let socialIcon i title url = elAttr "a" ("href" =: url <> "title" =: title) $ brandIcon_ i
-  socialIcon "twitter" "Twitter" "https://twitter.com/search?q=%23reflexfrp"
-  socialIcon "github" "GitHub" "http://github.com/reflex-frp"
-  socialIcon "reddit" "Reddit" "http://reddit.com/r/reflexfrp"
+  reflexLogo
+  elClass "section" "social" $
+    extLinkAttr ("title" =: "Twitter") "https://twitter.com/reflexfrp" $ elClass "i" "icon-twitter" blank
+  elClass "section" "links" $ do
+    let category title content = el "article" $ do
+          el "h5" $ text title
+          content
+    category "Ecosystem" $ do
+      routeLinkScrollToTop (Route_Home :/ ()) $ text "Home"
+      routeLinkScrollToTop (Route_GetStarted :/ ()) $ text "Get Started"
+      routeLinkScrollToTop (Route_Resources :/ ()) $ text "Resources"
+    category "Community" $ do
+      extLink "https://reddit.com/r/reflexfrp" $ text "Reddit"
+      extLink "https://web.libera.chat/#reflex-frp" $ text "#reflex-frp on IRC"

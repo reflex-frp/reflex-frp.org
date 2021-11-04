@@ -10,18 +10,29 @@ library
                , containers
                , data-default
                , dependent-sum
+               , file-embed
                , font-awesome-type
                , ghcjs-dom
-               , jsaddle
                , lens
+               , modern-uri
                , mtl
+               , neat-interpolation
+               , obelisk-executable-config-lookup
                , obelisk-frontend
+               , obelisk-google-analytics
                , obelisk-route
                , reflex
                , reflex-dom
                , obelisk-generated-static
                , text
                , universe
+               , tutorial-frontend
+               , mmark
+               , template-haskell
+               , haskell-src-exts
+               , haskell-src-meta
+  if impl(ghcjs)
+    build-depends: ghcjs-base
   exposed-modules:
     Frontend
     Frontend.CommonWidgets
@@ -29,10 +40,11 @@ library
     Frontend.Footer
     Frontend.Head
     Frontend.Nav
-    Frontend.Page.Documentation
-    Frontend.Page.Examples
     Frontend.Page.GetStarted
+    Frontend.Page.Resources
     Frontend.Page.Home
+    Frontend.Page.Tutorial
+    Frontend.QQ
   ghc-options: -Wall
 
 executable frontend

@@ -3,58 +3,45 @@
 {-# LANGUAGE GADTs #-}
 {-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE RecursiveDo #-}
 {-# LANGUAGE TypeApplications #-}
+
 module Frontend (frontend) where
 
 import Common.Route
-import Data.Dependent.Sum (DSum(..))
+import Frontend.CommonWidgets
 import Frontend.Head
+import Frontend.Footer
 import Frontend.Nav
-import Frontend.Page.Documentation
-import Frontend.Page.Examples
 import Frontend.Page.Home
 import Frontend.Page.GetStarted
+import Frontend.Page.Resources
+import Frontend.Page.Tutorial
 
+import qualified Data.Map as Map
+import Data.Text (Text)
 import Obelisk.Frontend
+import Obelisk.Generated.Static
 import Obelisk.Route
 import Obelisk.Route.Frontend
+import Obelisk.Frontend.GoogleAnalytics
 import Reflex.Dom.Core
 
 frontend :: Frontend (R Route)
 frontend = Frontend
   { _frontend_head = pageHead
-  , _frontend_body = do
-      -- The recursion here allows us to send a click event from the content area "up" into the header
-      rec el "header" $ nav click
-          click <- mainContainer $ do
-            article $ subRoute_ $ \case
-              Route_Home -> home
-              Route_GetStarted -> getStarted
-              Route_Examples -> examples
-              Route_Documentation -> documentation
-      return ()
+  , _frontend_body = mapRoutedT runGoogleAnalyticsT $ minWidth "1140px" $ do
+      el "header" nav
+      subRoute_ $ \case
+        Route_Home -> home
+        Route_GetStarted -> sectionPage (Route_GetStarted :/ ()) getStarted
+        Route_Tutorial -> do
+          el "main" $ el "article" tutorial
+          -- Prism is in prerender so that it doesn't muck with the DOM until hydration is finished.
+          -- It's here rather than in the head such that it runs when switching to this page with JS.
+          prerender_ blank $ elAttr "script" ("type" =: "text/javascript" <> "src" =: static @"js/prism.js") blank
+        Route_Resources -> sectionPage (Route_Resources :/ ()) resources
+      el "footer" footer
   }
 
--- | The @<main>@ tag that will contain most of the site's content
-mainContainer :: DomBuilder t m => m () -> m (Event t ())
-mainContainer w = domEvent Click . fst <$> el' "main" w
-
--- | An @<article>@ tag that will set its title and the class of its child
--- @<section>@ based on the current route
-article
-  :: ( DomBuilder t m
-     , Routed t (R Route) m
-     , PostBuild t m
-     )
-  => m () -- ^ Article content widget
-  -> m ()
-article c = el "article" $ do
-  r <- askRoute
-  el "h3" $ dynText $ routeDescription <$> r
-  let sectionClass = ffor r $ ("class" =:) . \(r' :=> _) -> case r' of
-        Route_Home -> "home"
-        Route_GetStarted -> "getStarted"
-        Route_Examples -> "examples"
-        Route_Documentation -> "documentation"
-  elDynAttr "section" sectionClass c
+minWidth :: DomBuilder t m => Text -> m a -> m a
+minWidth txt = elAttr "div" (Map.singleton "style" $ "min-width: " <> txt)
