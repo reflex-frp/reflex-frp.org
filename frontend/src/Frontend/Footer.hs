@@ -9,7 +9,7 @@ footer :: DomBuilder t m => m ()
 footer = do
   let links =
         [ ("Hackage", "https://hackage.haskell.org/package/reflex")
-        , ("#reflex-frp", "http://webchat.freenode.net/?channels=%23reflex-frp&uio=d4")
+        , ("#reflex-frp", "https://web.libera.chat/")
         ]
   forM_ links $ \(name, url) -> elAttr "a" ("href" =: url) $ text name
   let socialIcon i title url = elAttr "a" ("href" =: url <> "title" =: title) $ brandIcon_ i
