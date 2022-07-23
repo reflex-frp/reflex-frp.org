@@ -7,15 +7,22 @@
 
 module Frontend.CommonWidgets where
 
+import Control.Lens hiding (element)
 import Control.Monad (void)
+import Control.Monad
 import Data.Foldable (for_)
 import Data.Map (Map)
+import qualified Data.Map as Map
+import Data.Proxy
 import Data.Text (Text)
-import Obelisk.Route.Frontend
-import Obelisk.Generated.Static
-import Reflex.Dom
 import qualified Data.Text as T
+import qualified GHCJS.DOM.Window as Window
+import qualified JSDOM as DOM
+import Language.Javascript.JSaddle
 import Obelisk.Frontend.GoogleAnalytics
+import Obelisk.Generated.Static
+import Obelisk.Route.Frontend
+import Reflex.Dom
 
 extLink :: forall t m a. (Analytics t m, DomBuilder t m) => Text -> m a -> m a
 extLink = extLinkAttr mempty
@@ -72,7 +79,7 @@ sectionPage r mainSection = el "main" $ do
   _section_content mainSection
   el "hr" blank
   divClass "toc" $ do
-    el "nav" $ tableOfContents r mainSection
+    el "aside" $ el "nav" $ tableOfContents r mainSection
     el "article" $ goSections 2 $ _section_subsections mainSection
   where
     goSections prec sections = for_ sections $ \section -> do
@@ -103,3 +110,74 @@ hs = inlineSnippet "haskell"
 -- | Generic inline monospace text
 monospace :: DomBuilder t m => Text -> m ()
 monospace = elClass "span" "monospace" . text
+
+-- * Route link: delete this section when obelisk has been updated
+--
+-- | A link widget that, when clicked, sets the route to the provided route. In non-javascript
+-- contexts, this widget falls back to using @href@s to control navigation
+routeLink
+  :: forall t m a route js.
+     ( DomBuilder t m
+     , RouteToUrl route m
+     , SetRoute t route m
+     , Prerender js t m
+     )
+  => route -- ^ Target route
+  -> m a -- ^ Child widget
+  -> m a
+routeLink r w = do
+  (e, a) <- routeLinkImpl mempty r w
+  scrollToTop e
+  return a
+
+-- | Like 'routeLink', but takes additional attributes as argument.
+--
+routeLinkAttr
+  :: forall t m a route js.
+     ( DomBuilder t m
+     , RouteToUrl route m
+     , SetRoute t route m
+     , Prerender js t m
+     )
+  => Map AttributeName Text -- ^ Additional attributes
+  -> route -- ^ Target route
+  -> m a -- ^ Child widget
+  -> m a
+routeLinkAttr attrs r w = do
+  (e, a) <- routeLinkImpl attrs r w
+  let
+    targetBlank = Map.lookup "target" attrs == Just "_blank"
+  when (not targetBlank) $ scrollToTop e
+  return a
+
+-- | Raw implementation of 'routeLink'. Does not scroll to the top of the page on clicks.
+routeLinkImpl
+  :: forall t m a route.
+     ( DomBuilder t m
+     , RouteToUrl route m
+     , SetRoute t route m
+     )
+  => Map AttributeName Text
+  -> route -- ^ Target route
+  -> m a -- ^ Child widget
+  -> m (Event t (), a)
+routeLinkImpl attrs r w = do
+  enc <- askRouteToUrl
+  let
+    -- If targetBlank == True, the link will be opened in another page. In that
+    -- case, we don't prevent the default behaviour, and we don't need to
+    -- setRoute.
+    targetBlank = Map.lookup "target" attrs == Just "_blank"
+    cfg = (def :: ElementConfig EventResult t (DomBuilderSpace m))
+        & elementConfig_initialAttributes .~ ("href" =: enc r <> attrs)
+        & (if targetBlank
+           then id
+           else elementConfig_eventSpec %~ addEventSpecFlags (Proxy :: Proxy (DomBuilderSpace m)) Click (const preventDefault))
+  (e, a) <- element "a" cfg w
+  when (not targetBlank) $ setRoute $ r <$ domEvent Click e
+  return (domEvent Click e, a)
+
+scrollToTop :: forall m t js. (Prerender js t m, Monad m) => Event t () -> m ()
+scrollToTop e = prerender_ blank $ performEvent_ $ ffor e $ \_ -> liftJSM $ DOM.currentWindow >>= \case
+  Nothing -> pure ()
+  Just win -> Window.scrollTo win 0 0

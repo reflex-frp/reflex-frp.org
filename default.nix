@@ -19,6 +19,7 @@ in {
     # TODO make overlay or something in that repo
     mmark = hackGet ./deps/mmark;
     modern-uri = hackGet ./deps/modern-uri;
+    waitforjs = hackGet ./deps/waitforjs;
   };
 
   overrides = with pkgs.haskell.lib; self: super: {

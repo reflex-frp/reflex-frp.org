@@ -1,0 +1,105 @@
+/**
+ * Tooltip ([data-tooltip])
+ */
+
+[data-tooltip] {
+  position: relative;
+
+  &:not(a):not(button):not(input) {
+    border-bottom: 1px dotted;
+    text-decoration: none;
+    cursor: help;
+  }
+
+  &::before,
+  &::after {
+    display: block;
+    z-index: 99;
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    padding: .25rem .5rem;
+    overflow: hidden;
+    transform: translate(-50%, -.25rem);
+    border-radius: var(--border-radius);
+    background: var(--tooltip-background-color);
+    content: attr(data-tooltip);
+    color: var(--tooltip-color);
+    font-style: normal;
+    font-weight: var(--font-weight);
+    font-size: .875rem;
+    text-decoration: none;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  // Caret
+  &::after {
+    padding: 0;
+    transform: translate(-50%, 0rem);
+    border-top: .3rem solid;
+    border-right: .3rem solid transparent;
+    border-left: .3rem solid transparent;
+    border-radius: 0;
+    background-color: transparent;
+    content: "";
+    color: var(--tooltip-background-color);
+  }
+
+  // Display
+  &:focus,
+  &:hover {
+    &::before,
+    &::after {
+      opacity: 1;
+    }
+  }
+
+  // Animations, excluding touch devices
+  @if $enable-transitions {
+    @media (hover: hover) and (pointer: fine) {
+      &:focus,
+      &:hover {
+        &::before,
+        &::after {
+          animation-duration: .2s;
+          animation-name: slide;
+        }
+
+        &::after {
+          animation-name: slideCaret; 
+        }
+      }
+    }
+  }
+}
+
+// Animations
+@if $enable-transitions {
+  @keyframes slide {
+    from {
+      transform: translate(-50%, .75rem);
+      opacity: 0;
+    }
+    to {
+      transform: translate(-50%, -.25rem);
+      opacity: 1;
+    }
+  }
+
+  @keyframes slideCaret {
+    from {
+      opacity: 0;
+    }
+    50% {
+      transform: translate(-50%, -.25rem);
+      opacity: 0;
+    }
+    to {
+      transform: translate(-50%, 0rem);
+      opacity: 1;
+    }
+  }
+}

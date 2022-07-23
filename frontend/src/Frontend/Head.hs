@@ -17,21 +17,20 @@ pageHead = do
   googleAnalyticsFromConfig
   elAttr "base" ("href" =: "/") blank --TODO: Update obelisk to automatically inject this
   el "title" $ text "Reflex FRP"
+  elAttr "meta" ("charset" =: "utf-8") blank
   elAttr "meta" metaDesc blank
   elAttr "meta" metaKeywords blank
   elAttr "meta" viewport blank
   pageIcons
-  styleSheet $ static @"css/normalize.css"
   styleSheet $ static @"css/fontawesome.min.css"
-  styleSheet $ static @"css/font.css"
-  styleSheet $ static @"css/style.css"
+  styleSheet $ static @"css/brands.min.css"
   styleSheet $ static @"css/icomoon.css"
+  styleSheet $ static @"css/pico/css/pico.classless.min.css"
+  styleSheet $ static @"css/style.css"
   -- TODO don't vendor for calculator-tutorial repo
   styleSheet $ static @"calculator/style.css"
-  styleSheet $ "https://fonts.googleapis.com/css?family=Poppins&display=swap"
-  styleSheet $ "https://fonts.googleapis.com/css?family=DM+Serif+Display&display=swap"
-  styleSheet $ "https://fonts.googleapis.com/css?family=Roboto+Mono&display=swap"
   elAttr "script" ("type" =: "text/javascript" <> "src" =: static @"js/processing.min.js") blank
+  elAttr "script" particles blank
   styleSheet $ static @"css/prism.css"
 
 
@@ -73,7 +72,7 @@ metaKeywords = "name" =: "keywords"
 
 viewport :: Map Text Text
 viewport = "name" =: "viewport"
-        <> "content" =: "width=device-width"
+        <> "content" =: "width=device-width, initial-scale=1"
 
 --  styleSheet are functions to add links to html <head>
 styleSheet :: DomBuilder t m => Text -> m ()
@@ -84,3 +83,10 @@ styleSheet myLink = elAttr "link" attrs blank
 
 tshow :: Show a => a -> Text
 tshow = T.pack . show
+
+particles :: Map Text Text
+particles =
+  ( "type" =: "text/javascript"
+  <> "src" =: static @"js/particles.min.js"
+  <> "onload" =: "particlesJS.load('particles', 'static/js/particlesjs-config.json')"
+  )
