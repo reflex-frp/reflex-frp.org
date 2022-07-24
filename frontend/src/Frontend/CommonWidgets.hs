@@ -17,7 +17,7 @@ import Data.Proxy
 import Data.Text (Text)
 import qualified Data.Text as T
 import qualified GHCJS.DOM.Window as Window
-import qualified JSDOM as DOM
+import qualified GHCJS.DOM as DOM
 import Language.Javascript.JSaddle
 import Obelisk.Frontend.GoogleAnalytics
 import Obelisk.Generated.Static
