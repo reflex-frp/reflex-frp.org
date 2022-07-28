@@ -16,6 +16,27 @@
   --monospaceFont: 'Roboto Mono', monospace;
 }
 
+/* Dark/Light mode */
+
+@media only screen and (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .light-theme {
+    display: none;
+  }
+}
+@media only screen and (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) .dark-theme {
+    display: none;
+  }
+}
+
+[data-theme="light"] .dark-theme {
+  display: none;
+}
+
+[data-theme="dark"] .light-theme {
+  display: none;
+}
+
 .purple {
   color: var(--purple);
 }
@@ -26,7 +47,19 @@ article h3 i {
 
 nav ul li a {
   white-space: nowrap;
+  display: flex;
+  flex-direction: row;
+  align-items: baseline;
 }
+
+nav ul li a i {
+  padding: 0.1em;
+}
+
+nav ul li a i img {
+  max-width: 1.1em;
+}
+
 
 section.cards {
   display: flex;

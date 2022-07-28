@@ -39,8 +39,14 @@ extLinkAttr attrs href m = do
 unfinished :: DomBuilder t m => Text -> m a -> m a
 unfinished t = elAttr "span" ("style" =: "background: red" <> "title" =: t)
 
+logo :: DomBuilder t m => Text -> m ()
+logo img = elAttr "img" ("class" =: "reflex-logo" <> "src" =: img <> "alt" =: "Reflex") blank
+
 reflexLogo :: DomBuilder t m => m ()
-reflexLogo = elAttr "img" ("class" =: "reflex-logo" <> "src" =: static @"img/logo.svg" <> "alt" =: "Reflex") blank
+reflexLogo = logo (static @"img/logo.svg")
+
+reflexLogoInverted :: DomBuilder t m => m ()
+reflexLogoInverted = logo (static @"img/logo-white.svg")
 
 routeFragment
   :: forall t m r a . (DomBuilder t m, RouteToUrl r m, Analytics t m)

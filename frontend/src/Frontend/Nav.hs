@@ -29,7 +29,10 @@ nav
   => m ()
 nav = el "nav" $ do
   el "ul" $ el "li" $
-    routeLinkScrollToTop (sectionHomepage (Some.Some Route_Home)) reflexLogo
+    routeLinkScrollToTop (sectionHomepage (Some.Some Route_Home)) $ do
+      -- We use CSS to decide which of these logos to show
+      divClass "light-theme" reflexLogo
+      divClass "dark-theme" reflexLogoInverted
   el "ul" menu
 
 -- | Build the nav's tabs
