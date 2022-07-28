@@ -44,8 +44,20 @@ particlesId :: Text
 particlesId = "particles"
 
 initParticles :: MonadJSM m => m ()
-initParticles = withGlobalJS "particlesJS" $ \pjs -> liftJSM $
-  void $ pjs ^. js2 ("load" :: Text) particlesId (static @"js/particlesjs-config.json")
+initParticles = withGlobalJS "particlesJS" $ \pjs -> liftJSM $ do
+  let dark = static @"js/particlesjs-config-dark.json"
+      light = static @"js/particlesjs-config.json"
+  matchMedia <- jsg ("window" :: Text) ^. js ("matchMedia" :: Text)
+  cantUseMatchMedia <- valIsNull matchMedia
+  mode <- if cantUseMatchMedia
+    then return light
+    else do
+      darkModePreferred <- valToBool
+        =<< (jsg ("window" :: Text)
+        ^. js1 ("matchMedia" :: Text) ("(prefers-color-scheme: dark)" :: Text)
+        ^. js ("matches" :: Text))
+      return $ if darkModePreferred then dark else light
+  void $ pjs ^. js2 ("load" :: Text) particlesId mode
 
 callToAction :: forall js t m. (DomBuilder t m, RouteToUrl (R Route) m, SetRoute t (R Route) m, Prerender js t m, Analytics t m) => Text -> m ()
 callToAction c = do
