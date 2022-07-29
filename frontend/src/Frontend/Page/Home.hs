@@ -10,11 +10,17 @@
 module Frontend.Page.Home (home) where
 
 import Common.Route
+import Control.Lens hiding (element)
+import Control.Monad
 import Data.Text (Text)
+import JSDOM.WaitForJS
+import Language.Javascript.JSaddle
+import Obelisk.Frontend.GoogleAnalytics
 import Obelisk.Generated.Static
 import Obelisk.Route.Frontend
-import Obelisk.Frontend.GoogleAnalytics
 import Reflex.Dom
+
+import Frontend.CommonWidgets
 
 home :: (DomBuilder t m, RouteToUrl (R Route) m, SetRoute t (R Route) m, Prerender js t m, Analytics t m) => m ()
 home = do
@@ -27,36 +33,54 @@ home = do
 
 slogan :: forall js t m. (DomBuilder t m, RouteToUrl (R Route) m, SetRoute t (R Route) m, Prerender js t m, Analytics t m) => m ()
 slogan = divClass "jumbotron" $ do
+  elAttr "div" ("id" =: particlesId) blank
+  prerender_ blank $ do
+    pb <- getPostBuild
+    performEvent_ $ ffor pb $ \_ -> initParticles
   elClass "h1" "tagline" $ text "The world changes," >> el "br" blank >> text "your apps should keep up."
   callToAction ""
-  learnMore
+
+particlesId :: Text
+particlesId = "particles"
+
+initParticles :: MonadJSM m => m ()
+initParticles = withGlobalJS "particlesJS" $ \pjs -> liftJSM $ do
+  let dark = static @"js/particlesjs-config-dark.json"
+      light = static @"js/particlesjs-config.json"
+  matchMedia <- jsg ("window" :: Text) ^. js ("matchMedia" :: Text)
+  cantUseMatchMedia <- valIsNull matchMedia
+  mode <- if cantUseMatchMedia
+    then return light
+    else do
+      darkModePreferred <- valToBool
+        =<< (jsg ("window" :: Text)
+        ^. js1 ("matchMedia" :: Text) ("(prefers-color-scheme: dark)" :: Text)
+        ^. js ("matches" :: Text))
+      return $ if darkModePreferred then dark else light
+  void $ pjs ^. js2 ("load" :: Text) particlesId mode
 
 callToAction :: forall js t m. (DomBuilder t m, RouteToUrl (R Route) m, SetRoute t (R Route) m, Prerender js t m, Analytics t m) => Text -> m ()
 callToAction c = do
-  (e, _) <- divClass ("call-to-action " <> c) $ routeLinkScrollToTop' (Route_GetStarted :/ ()) $ text "Checkout the Get Started guide"
+  (e, _) <- elAttr' "div" ("class" =: ("call-to-action " <> c)) $
+    routeLinkAttr ("role" =: "button") (Route_GetStarted :/ ()) $
+      text "Get Started"
   tellAnalytics (gaClickEvent "engagement" "jumbotron" <$ (domEvent Click e :: Event t ()))
-
-learnMore :: DomBuilder t m => m ()
-learnMore = do
-  divClass "learn-more" $ do
-    text "Learn More"
-    el "br" blank
-    elClass "i" "fas fa-chevron-down" blank
 
 valueProp :: DomBuilder t m => m ()
 valueProp = do
-  elClass "h3" "centered close" $ text "Reflex adapts to changes in your..."
-  elClass "section" "cards" $ do
-    let card icon title child = elClass "article" "card" $ do
+  elAttr "h1" ("id" =: "learn-more" <> "class" =: "centered close") $
+    text "Reflex adapts to changes in your..."
+  elClass "section" "cards grid" $ do
+    let card icon title child = el "article" $ do
           el "h3" $ elClass "i" icon blank >> text title
           child
-    card "icon-stats blueish" "Data" $ do
+    card "icon-stats purple" "Data" $ do
       el "p" $ text "Reflex apps automatically react to changing data. This keeps every interaction current, accurately representing the relationship between your data and the real world."
       el "p" $ text "Reflex is the key to writing self-updating user interfaces."
-    card "icon-list redish" "Requirements" $ do
+    card "icon-list purple" "Requirements" $ do
       el "p" $ text "Reflex components are modular and reusable. If your requirements change, your app can quickly and easily be reworked. The modularity of Reflex lets you iterate quickly, without wasting code."
       el "p" $ text "Develop efficiently no matter how many times you pivot."
-    card "icon-devices greenish" "Platform" $ do
+    card "icon-devices purple" "Platform" $ do
       el "p" $ text "Reflex has been built to seamlessly support interfaces on desktop, mobile, web, and other platforms, all in Haskell. Regardless of your platform needs, Reflex lets you take your team and your code with you."
       el "p" $ text "One team, one code base, every platform."
 
@@ -76,3 +100,4 @@ benefits = do
     elClass "p" "description" $ text "The only constants are time and change, what if your code could account for them? Functional reactive programming lets you write code that understands real world dynamics as naturally as you do, but isn’t any harder to write."
   article "left" (static @"img/graphics/undraw_to_the_moon_v1mv.svg") "Batteries included." $ do
     elClass "p" "description" $ text "Obelisk is the full-stack framework for building Reflex apps using the entire ecosystem. Designed to work ‘out of the box’, with best practices and starter templates included. This is the best option for developing and deploying serious real world applications, quickly."
+

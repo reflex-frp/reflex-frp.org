@@ -8,9 +8,9 @@ module Frontend.Nav (nav) where
 
 import Common.Route
 import Control.Monad (forM_)
-import Data.Dependent.Sum (DSum ((:=>)))
+import Data.Dependent.Sum (DSum((:=>)))
+import Data.Some (Some(..))
 import qualified Data.Some as Some
-import Data.Universe (universe)
 import Obelisk.Route
 import Obelisk.Route.Frontend
 import Reflex.Dom
@@ -27,9 +27,13 @@ nav
      , Prerender js t m
      )
   => m ()
-nav = do
-  reflexLogo
-  el "nav" menu
+nav = el "nav" $ do
+  el "ul" $ el "li" $
+    routeLinkScrollToTop (sectionHomepage (Some.Some Route_Home)) $ do
+      -- We use CSS to decide which of these logos to show
+      divClass "light-theme" reflexLogo
+      divClass "dark-theme" reflexLogoInverted
+  el "ul" menu
 
 -- | Build the nav's tabs
 menu
@@ -44,13 +48,16 @@ menu
 menu = do
   -- Get the current route, so that we can highlight the corresponding tab
   currentTab <- askRoute
-  let currentTabDemux = demux $ fmap (\(sec :=> _) -> Some.Some sec) currentTab
-  -- Iterate over all the top-level routes except Home
-  -- Home is reached by clicking logo
-  forM_ universe $ \section -> do
+  let currentTabDemux = demux $ fmap (\(sec :=> _) -> Some sec) currentTab
+      tabs =
+        [ Some Route_GetStarted
+        , Some Route_Tutorial
+        , Some Route_Resources
+        ]
+  forM_ tabs $ \section -> do
     -- Create a link that is highlighted if it is the current section
     let thisTabIsSelected = demuxed currentTabDemux section
         highlight = ffor thisTabIsSelected $ \case
           True -> "selected"
           False -> ""
-    elDynClass "span" highlight $ routeLinkScrollToTop (sectionHomepage section) $ text $ sectionTitle section
+    elDynClass "li" highlight $ routeLinkScrollToTop (sectionHomepage section) $ text $ sectionTitle section

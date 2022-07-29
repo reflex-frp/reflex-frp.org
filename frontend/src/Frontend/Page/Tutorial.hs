@@ -23,7 +23,7 @@ import Tutorial
 import Tutorial.Markdown
 
 parsedTutorial
-  :: (MonadFix m, PostBuild t m, MonadHold t m, DomBuilder t m, Analytics t m)
+  :: (MonadFix m, PostBuild t m, MonadHold t m, DomBuilder t m)
   => [Either (m ()) MMark.Bni]
 parsedTutorial = go =<< parsedMarkdown
   where

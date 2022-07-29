@@ -31,6 +31,9 @@ library
                , template-haskell
                , haskell-src-exts
                , haskell-src-meta
+               , waitforjs
+               , jsaddle
+               , jsaddle-dom
   if impl(ghcjs)
     build-depends: ghcjs-base
   exposed-modules:
