@@ -88,5 +88,4 @@ particles :: Map Text Text
 particles =
   ( "type" =: "text/javascript"
   <> "src" =: static @"js/particles.min.js"
-  <> "onload" =: "particlesJS.load('particles', 'static/js/particlesjs-config.json')"
   )
