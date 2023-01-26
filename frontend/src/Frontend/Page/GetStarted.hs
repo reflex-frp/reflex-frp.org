@@ -160,7 +160,10 @@ theTutorial :: (Analytics t m, DomBuilder t m, SetRoute t (R Route) m, RouteToUr
 theTutorial = Section
   { _section_title = "The Tutorial"
   , _section_content = do
-    el "p" $ text "If you feel comfortable with your Haskell abilities and have done all the ‘reading up’ on FRP you care to, get started on our Reflex tutorial! The tutorial walks you through building a simple functional reactive calculator that can be used in a web browser, beginning with the download instructions for Nix and Obelisk."
+    el "p" $ do
+      text "If you feel comfortable with your Haskell abilities and have done all the ‘reading up’ on FRP you care to, get started on our "
+      routeLinkScrollToTop (Route_Tutorial :/ ()) $ text "Reflex tutorial"
+      text "! The tutorial walks you through building a simple functional reactive calculator that can be used in a web browser, beginning with the download instructions for Nix and Obelisk."
     el "p" $ do
       text "Even if you don’t plan to build a calculator for your own project, this tutorial is helpful as it teaches the fundamentals of building a Reflex application, and the key concepts at play. A familiarity with this process will make developing other applications much easier. If you get stuck, try referencing our "
       routeLinkScrollToTop (Route_Resources :/ ()) $ text "resources page"
